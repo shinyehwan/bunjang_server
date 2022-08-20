@@ -204,7 +204,7 @@ gradle-app.setting
 .classpath
 
 # 시크릿 파일
-**/secret/
+#**/secret/
 
 # End of https://www.toptal.com/developers/gitignore/api/intellij,windows,macos,gradle,git
 

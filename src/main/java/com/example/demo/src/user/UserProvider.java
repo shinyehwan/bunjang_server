@@ -64,9 +64,9 @@ public class UserProvider {
     }
 
     // 해당 이메일이 이미 User Table에 존재하는지 확인
-    public int checkEmail(String email) throws BaseException {
+    public int checkPhone(String phone) throws BaseException {
         try {
-            return userDao.checkEmail(email);
+            return userDao.checkPhone(phone);
         } catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR);
         }

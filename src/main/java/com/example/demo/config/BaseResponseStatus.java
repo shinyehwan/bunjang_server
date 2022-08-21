@@ -26,9 +26,14 @@ public enum BaseResponseStatus {
     USERS_EMPTY_USER_ID(false, 2010, "유저 아이디 값을 확인해주세요."),
 
     // [POST] /users
-    POST_USERS_EMPTY_EMAIL(false, 2015, "이메일을 입력해주세요."),
-    POST_USERS_INVALID_EMAIL(false, 2016, "이메일 형식을 확인해주세요."),
-    POST_USERS_EXISTS_EMAIL(false,2017,"중복된 이메일입니다."),
+    POST_USERS_EMPTY_NAME(false, 2014, "이름을 입력해주세요."),
+    POST_USERS_EMPTY_PHONE(false, 2015, "핸드폰 번호를 입력해주세요."),
+    POST_USERS_INVALID_PHONE(false, 2016, "핸드폰 번호 형식을 확인해주세요."),
+    POST_USERS_EXISTS_PHONE(false,2017,"이미 등록된 핸드폰번호 입니다."),
+
+    POST_USERS_EMPTY_BIRTH(false,2018,"생년월일을 입력해 주세요"),
+    POST_USERS_INVALID_BIRTH(false,2019,"생년월일 형식을 확인해 주세요."),
+
 
 
 

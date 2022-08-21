@@ -44,12 +44,12 @@ public class UserController {
     }
 
     /**
-     * 회원가입 및 로그인 API
-     * [POST] /users
+     * 회원가입
+     * [POST] bungae/users/new
      */
     // Body
     @ResponseBody
-    @PostMapping("/login")    // POST 방식의 요청을 매핑하기 위한 어노테이션
+    @PostMapping("/new")    // POST 방식의 요청을 매핑하기 위한 어노테이션
     public BaseResponse<PostUserRes> createUser(@RequestBody PostUserReq postUserReq) {
         if (postUserReq.getName().isEmpty()) {
             return new BaseResponse<>(POST_USERS_EMPTY_NAME);
@@ -75,27 +75,21 @@ public class UserController {
         }
     }
 
-//    /**
-//     * 로그인 API
-//     * [POST] /users/{userId}/login
-//     */
-//    @ResponseBody
-//    @PostMapping("/{userId}/login")
-//    public BaseResponse<PostLoginRes> logIn(@PathVariable int userId, @RequestBody PostLoginReq postLoginReq) {
-//        try {
-//
-//            int userIdxByJwt = jwtService.getUserIdx();
-//            //userIdx와 접근한 유저가 같은지 확인
-//            if(userId != userIdxByJwt){
-//                return new BaseResponse<>(INVALID_USER_JWT);
-//            }
-//
-//            PostLoginRes postLoginRes = userProvider.logIn(postLoginReq);
-//            return new BaseResponse<>(postLoginRes);
-//        } catch (BaseException exception) {
-//            return new BaseResponse<>(exception.getStatus());
-//        }
-//    }
+    /**
+     * 로그인 API
+     * [POST] /users/login
+     */
+    @ResponseBody
+    @PostMapping("/login")
+    public BaseResponse<PostLoginRes> logIn(@RequestBody PostLoginReq postLoginReq) {
+
+        try {
+            PostLoginRes postLoginRes = userProvider.logIn(postLoginReq);
+            return new BaseResponse<>(postLoginRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
 //
 //
 //    /**

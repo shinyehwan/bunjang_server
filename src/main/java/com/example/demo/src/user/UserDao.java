@@ -56,8 +56,8 @@ public class UserDao {
 
     // 회원가입
     public int createUser(PostUserReq postUserReq) {
-        String createUserQuery = "insert into Store (name, phone, birth, gender) VALUES (?,?,?,?)"; // 실행될 동적 쿼리문
-        Object[] createUserParams = new Object[]{postUserReq.getName(), postUserReq.getPhone(), postUserReq.getBirth(), postUserReq.getGender()}; // 동적 쿼리의 ?부분에 주입될 값
+        String createUserQuery = "insert into Store (name, birth, gender, phone, password) VALUES (?,?,?,?,?)"; // 실행될 동적 쿼리문
+        Object[] createUserParams = new Object[]{postUserReq.getName(), postUserReq.getBirth(), postUserReq.getGender(), postUserReq.getPhone(), postUserReq.getPassword()}; // 동적 쿼리의 ?부분에 주입될 값
         this.jdbcTemplate.update(createUserQuery, createUserParams);
 
         String lastInserIdQuery = "select last_insert_id()"; // 가장 마지막에 삽입된(생성된) id값은 가져온다.
@@ -91,17 +91,18 @@ public class UserDao {
 
 
     // 로그인
-    public User getName(PostUserReq postUserReq) {
-        String getPwdQuery = "select id, name, phone, birth, gender from Store where name = ?";
-        String getPwdParams = postUserReq.getName();
+    public User getPwd(PostLoginReq postLoginReq) {
+        String getPwdQuery = "select id, name, birth, gender, phone, password from Store where phone = ?";
+        String getPwdParams = postLoginReq.getPhone();
 
         return this.jdbcTemplate.queryForObject(getPwdQuery,
                 (rs, rowNum) -> new User(
                         rs.getInt("id"),
                         rs.getString("name"),
-                        rs.getString("phone"),
                         rs.getString("birth"),
-                        rs.getString("gender")
+                        rs.getString("gender"),
+                        rs.getString("phone"),
+                        rs.getString("password")
                 ), // RowMapper(위의 링크 참조): 원하는 결과값 형태로 받기
                 getPwdParams
         ); // 한 개의 회원정보를 얻기 위한 jdbcTemplate 함수(Query, 객체 매핑 정보, Params)의 결과 반환

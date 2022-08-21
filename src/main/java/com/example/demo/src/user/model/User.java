@@ -13,7 +13,8 @@ import lombok.*;
 public class User {
     private int id;
     private String name;
-    private String phone;
     private String birth;
     private String gender;
+    private String phone;
+    private String password;
 }

@@ -64,10 +64,19 @@ public class UserDao {
         return this.jdbcTemplate.queryForObject(lastInserIdQuery, int.class); // 해당 쿼리문의 결과 마지막으로 삽인된 유저의 userIdx번호를 반환한다.
     }
 
-    // 이메일 확인
+    // 핸드폰 확인
     public int checkPhone(String phone) {
         String checkPhoneQuery = "select exists(select phone from Store where phone = ?)";
         String checkPhoneParams = phone;
+        return this.jdbcTemplate.queryForObject(checkPhoneQuery,
+                int.class,
+                checkPhoneParams);
+    }
+
+    // 이름 확인
+    public int checkName(String name) {
+        String checkPhoneQuery = "select exists(select name from Store where name = ?)";
+        String checkPhoneParams = name;
         return this.jdbcTemplate.queryForObject(checkPhoneQuery,
                 int.class,
                 checkPhoneParams);
@@ -77,22 +86,22 @@ public class UserDao {
     public int modifyUserName(PatchUserReq patchUserReq) {
         String modifyUserNameQuery = "update User set nickname = ? where userIdx = ? "; // 해당 userIdx를 만족하는 User를 해당 nickname으로 변경한다.
         Object[] modifyUserNameParams = new Object[]{patchUserReq.getNickname(), patchUserReq.getUserIdx()}; // 주입될 값들(nickname, userIdx) 순
-
-        return this.jdbcTemplate.update(modifyUserNameQuery, modifyUserNameParams); // 대응시켜 매핑시켜 쿼리 요청(생성했으면 1, 실패했으면 0) 
+        return this.jdbcTemplate.update(modifyUserNameQuery, modifyUserNameParams); // 대응시켜 매핑시켜 쿼리 요청(생성했으면 1, 실패했으면 0)
     }
 
 
-    // 로그인: 해당 email에 해당되는 user의 암호화된 비밀번호 값을 가져온다.
-    public User getPwd(PostLoginReq postLoginReq) {
-        String getPwdQuery = "select userIdx, password,email,nickname from User where email = ?"; // 해당 email을 만족하는 User의 정보들을 조회한다.
-        String getPwdParams = postLoginReq.getEmail(); // 주입될 email값을 클라이언트의 요청에서 주어진 정보를 통해 가져온다.
+    // 로그인
+    public User getName(PostUserReq postUserReq) {
+        String getPwdQuery = "select id, name, phone, birth, gender from Store where name = ?";
+        String getPwdParams = postUserReq.getName();
 
         return this.jdbcTemplate.queryForObject(getPwdQuery,
                 (rs, rowNum) -> new User(
-                        rs.getInt("userIdx"),
-                        rs.getString("email"),
-                        rs.getString("password"),
-                        rs.getString("nickname")
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getString("phone"),
+                        rs.getString("birth"),
+                        rs.getString("gender")
                 ), // RowMapper(위의 링크 참조): 원하는 결과값 형태로 받기
                 getPwdParams
         ); // 한 개의 회원정보를 얻기 위한 jdbcTemplate 함수(Query, 객체 매핑 정보, Params)의 결과 반환

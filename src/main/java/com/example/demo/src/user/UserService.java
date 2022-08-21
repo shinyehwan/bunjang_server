@@ -2,6 +2,7 @@ package com.example.demo.src.user;
 
 
 import com.example.demo.config.BaseException;
+import com.example.demo.config.BaseResponse;
 import com.example.demo.config.secret.Secret;
 import com.example.demo.src.user.model.*;
 import com.example.demo.utils.AES128;
@@ -38,23 +39,28 @@ public class UserService {
         this.jwtService = jwtService; // JWT부분은 7주차에 다루므로 모르셔도 됩니다!
 
     }
-    // 회원가입(POST)
+    // 회원가입 및 로그인 (POST)
     public PostUserRes createUser(PostUserReq postUserReq) throws BaseException {
-        if (userProvider.checkPhone(postUserReq.getPhone()) == 1) {
-            throw new BaseException(POST_USERS_EXISTS_PHONE);
+        if (userProvider.checkPhone(postUserReq.getPhone()) == 1 & userProvider.checkName(postUserReq.getName()) == 0) {
+            throw new BaseException(POST_USERS_EXISTS_USER);
         }
-//        String pwd;
-//        try {
-//            // 암호화: postUserReq에서 제공받은 비밀번호를 보안을 위해 암호화시켜 DB에 저장합니다.
-//            // ex) password123 -> dfhsjfkjdsnj4@!$!@chdsnjfwkenjfnsjfnjsd.fdsfaifsadjfjaf
-//            pwd = new AES128(Secret.USER_INFO_PASSWORD_KEY).encrypt(postUserReq.getPassword()); // 암호화코드
-//            postUserReq.setPassword(pwd);
-//        } catch (Exception ignored) { // 암호화가 실패하였을 경우 에러 발생
-//            throw new BaseException(PASSWORD_ENCRYPTION_ERROR);
-//        }
+
+        if (userProvider.checkPhone(postUserReq.getPhone()) == 1 & userProvider.checkName(postUserReq.getName()) == 1) {
+            try {
+                int userId = userDao.getName(postUserReq).getId();
+                //jwt에서 idx 추출.
+                int userIdxByJwt = jwtService.getUserIdx();
+                //userIdx와 접근한 유저가 같은지 확인
+                if(userId != userIdxByJwt){
+                    throw new BaseException(INVALID_USER_JWT);
+                }
+                return new PostUserRes(userId, jwtService.getJwt());
+            } catch (Exception exception) {
+                throw new BaseException(DATABASE_ERROR);
+            }
+        }
         try {
             int userIdx = userDao.createUser(postUserReq);
-//            return new PostUserRes(userIdx);
             //jwt 발급.
             String jwt = jwtService.createJwt(userIdx);
             return new PostUserRes(userIdx, jwt);

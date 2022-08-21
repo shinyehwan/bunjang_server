@@ -29,7 +29,7 @@ public enum BaseResponseStatus {
     POST_USERS_EMPTY_NAME(false, 2014, "이름을 입력해주세요."),
     POST_USERS_EMPTY_PHONE(false, 2015, "핸드폰 번호를 입력해주세요."),
     POST_USERS_INVALID_PHONE(false, 2016, "핸드폰 번호 형식을 확인해주세요."),
-    POST_USERS_EXISTS_PHONE(false,2017,"이미 등록된 핸드폰번호 입니다."),
+    POST_USERS_EXISTS_USER(false,2017,"이미 등록된 전화번호 입니다."),
 
     POST_USERS_EMPTY_BIRTH(false,2018,"생년월일을 입력해 주세요"),
     POST_USERS_INVALID_BIRTH(false,2019,"생년월일 형식을 확인해 주세요."),
@@ -58,8 +58,8 @@ public enum BaseResponseStatus {
     //[PATCH] /users/{userIdx}
     MODIFY_FAIL_USERNAME(false,4014,"유저네임 수정 실패"),
 
-    PASSWORD_ENCRYPTION_ERROR(false, 4011, "비밀번호 암호화에 실패하였습니다."),
-    PASSWORD_DECRYPTION_ERROR(false, 4012, "비밀번호 복호화에 실패하였습니다.");
+    PASSWORD_ENCRYPTION_ERROR(false, 4011, "번호 암호화에 실패하였습니다."),
+    PASSWORD_DECRYPTION_ERROR(false, 4012, "번호 복호화에 실패하였습니다.");
 
 
     // 5000 : 필요시 만들어서 쓰세요

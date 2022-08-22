@@ -49,3 +49,28 @@ tag들을 `List<String>`형태로 입력해주세요
         }
     }
 ```
+
+## 검증 관련 코드
+
+- 자주 쓰일만한 validation 코드들을 utils/Verifier 에 넣어놓으려고 합니다
+- 현재 "상점 아이디 검증 코드" , 예환님께서 만들어주신 전화번호,이름 검색 코드 넣어놓았으니, 필요시에 추가,수정해주세요!
+
+### 사용방법
+```java
+// Controller
+// ...
+    // 아래 코드를 Contoller/Service/Provider 위에 붙여넣기
+    // 검증코드 클래스 추가
+    private Verifier verifier;
+    @Autowired
+    public void setVerifier(Verifier verifier){
+    this.verifier = verifier;
+    }
+    
+    // ...
+    // (예시) 존재하는 상점 아이디인지 검증
+    if (!verifier.isPresentStoreId(uid))
+        throw new BaseException(INVALID_STORE_ID);
+
+    
+```

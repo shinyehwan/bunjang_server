@@ -42,6 +42,7 @@ public enum BaseResponseStatus {
      */
     // Common
     RESPONSE_ERROR(false, 3000, "값을 불러오는데 실패하였습니다."),
+    INVALID_STORE_ID (false, 3001, "존재하지 않는 상점 id 입니다."),
 
     // [POST] /users
     DUPLICATED_EMAIL(false, 3013, "중복된 이메일입니다."),

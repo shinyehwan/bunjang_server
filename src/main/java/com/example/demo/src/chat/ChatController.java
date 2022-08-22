@@ -2,6 +2,7 @@ package com.example.demo.src.chat;
 
 import com.example.demo.config.BaseException;
 import com.example.demo.config.BaseResponse;
+import com.example.demo.src.chat.model.GetChatRes;
 import com.example.demo.src.chat.model.GetChatRoomsRes;
 import com.example.demo.utils.JwtService;
 import com.example.demo.utils.Verifier;
@@ -20,6 +21,7 @@ import static com.example.demo.config.BaseResponseStatus.*;
                 //  Web MVC 코드에 사용되는 어노테이션. @RequestMapping 어노테이션을 해당 어노테이션 밑에서만 사용할 수 있다.
                 // @ResponseBody    모든 method의 return object를 적절한 형태로 변환 후, HTTP Response Body에 담아 반환.
 @RequestMapping("/bungae/chat")
+
 /**
  * Controller란?
  * 사용자의 Request를 전달받아 요청의 처리를 담당하는 Service, Prodiver 를 호출
@@ -83,8 +85,55 @@ public class ChatController {
     }
 
 //    @ResponseBody
-//    @GetMapping("/{partnerId}")
-//    public BaseResponse<List<GetRoomInfoRes>> getChatRoomInfo() {
+//    @GetMapping("/{roomId}")
+//    public BaseResponse<GetRecentProductRes> getChatRoomInfo(
+//            @PathVariable("roomId") Integer roomId) {
+//        try {
+//            // jwt 에서 uid 추출
+//            int uid;
+//            uid = jwtService.getUserIdx();
+//            // 존재하는 상점 아이디인지 검증
+//            if (!verifier.isPresentStoreId(uid))
+//                throw new BaseException(INVALID_STORE_ID);
+//            // 접속 가능한 채팅방인지 검증
+//            if (!chatProvider.isAccessableRoom(uid, roomId))
+//                throw new BaseException(INVALID_ROOM_ID);
+//
+//
+//        } catch (BaseException exception) {
+//            return new BaseResponse<>((exception.getStatus()));
+//        }
+//    }
+
+    /**
+     * 최근 채팅 메시지 조회
+     * [GET] /bungae/chat/:roomId/message ? p=
+     */
+    @ResponseBody
+    @GetMapping("/{roomId}/message")
+    public BaseResponse<List<GetChatRes>> getChatHistory (
+            @PathVariable("roomId") Integer roomId,
+            @RequestParam(required = false) Integer p) {
+        try {
+            // jwt 에서 uid 추출
+            int uid;
+            uid = jwtService.getUserIdx();
+            // 존재하는 상점 아이디인지 검증
+            if (!verifier.isPresentStoreId(uid))
+                throw new BaseException(INVALID_STORE_ID);
+            // 접속 가능한 채팅방인지 검증
+            if (!chatProvider.isAccessableRoom(uid, roomId))
+                throw new BaseException(INVALID_ROOM_ID);
+
+            if (p == null)
+                p = 1;
+
+            return new BaseResponse<>(chatProvider.getChatHistory(roomId,uid,p));
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+
+    }
 
 //
 //    /**

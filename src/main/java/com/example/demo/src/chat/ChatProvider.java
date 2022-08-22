@@ -1,8 +1,9 @@
 package com.example.demo.src.chat;
 
 import com.example.demo.config.BaseException;
+import com.example.demo.src.chat.model.GetChatRes;
 import com.example.demo.src.chat.model.GetChatRoomsRes;
-import com.example.demo.src.chat.model.RecentRoomInfoModel;
+import com.example.demo.src.chat.model.MessageRawInfoModel;
 import com.example.demo.utils.JwtService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,19 +49,28 @@ import static com.example.demo.config.BaseResponseStatus.*;
 
             // 각 채팅방 정보 조회
             List<GetChatRoomsRes> roomList = new ArrayList<>();
+
             for (int roomId : idList) {
-                RecentRoomInfoModel recentRoomInfoModel = chatDao.getRecentRoomInfo(roomId);
+                // 각 대화방의 가장 최신 메시지 정보 조회
+                MessageRawInfoModel messageRawInfoModel = chatDao.getRecentRoomInfo(roomId);
+
+                // 대화 상대방의 프로필정보 조회
                 GetChatRoomsRes getChatRoomsRes = chatDao.getChatProfileInfo(roomId, uid);
+
+                // 메시지 정보 조작
                 String message;
-                if (recentRoomInfoModel.getDescription() != null)
-                    message = recentRoomInfoModel.getDescription();
+                if (messageRawInfoModel.getDescription() != null)
+                    message = messageRawInfoModel.getDescription(); // 텍스트 메시지는 내용 그대로 전송
                 else {
-                    message = recentRoomInfoModel.getMediaType() + recentRoomInfoModel.getMediaDescriptionUrl();
+                    // 텍스트가 아닌 객체는 종류에 따라 전송
+                    // TODO
+                    message = messageRawInfoModel.getMediaType() + messageRawInfoModel.getMediaDescriptionUrl();
                 }
 
-                if (getChatRoomsRes.getTalkerId() != 0) {
+                // 대화 상대방 정보가 없다면 패스
+                if (getChatRoomsRes.getCallerId() != 0) {
                     getChatRoomsRes.setLastMessage(message);
-                    getChatRoomsRes.setLastMessageTime(recentRoomInfoModel.getUploaded());
+                    getChatRoomsRes.setLastMessageTime(messageRawInfoModel.getUploaded());
 
                     roomList.add(getChatRoomsRes);
                 }
@@ -69,6 +79,65 @@ import static com.example.demo.config.BaseResponseStatus.*;
         } catch (Exception exception) { // DB에 이상이 있는 경우 에러 메시지를 보냅니다.
             logger.error(exception.getMessage());
             throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+
+    /**
+     * 최근 채팅 메시지 조회
+     */
+    public List<GetChatRes> getChatHistory(int roomId, int uid, int p) throws BaseException {
+        try {
+            List<MessageRawInfoModel> messageRawInfoModels = chatDao.getChatHistory(roomId, p);
+            List<GetChatRes> getChatResList = new ArrayList<>();
+
+
+            // 대화 상대방의 프로필정보 조회
+            GetChatRoomsRes callerInfo = chatDao.getChatProfileInfo(roomId, uid);
+
+            for (MessageRawInfoModel m : messageRawInfoModels) {
+
+                // 내용 조작
+                String description;
+                if (m.getDescription() != null) {
+                    m.setMediaType("text");
+                    description = m.getDescription();
+                } else if (m.getMediaType().equals("image")) {
+                    description = m.getMediaDescriptionUrl();
+                } else {
+                    // TODO
+                    description = "아직 개발되지 않은 객체입니다.";
+                }
+
+                GetChatRes g = new GetChatRes(
+                        m.getChatId(),
+                        m.getSendStoreId(),
+                        callerInfo.getThumbnailImgUrl(),
+                        m.getMediaType(),
+                        description,
+                        m.getUploaded()
+                );
+                getChatResList.add(g);
+            }
+
+            return getChatResList;
+        } catch (Exception exception) { // DB에 이상이 있는 경우 에러 메시지를 보냅니다.
+            logger.error(exception.getMessage());
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+
+    /**
+     * (Validation) 사용자가 접근 가능한 채팅방인지 검증
+     */
+    public boolean isAccessableRoom(int uid, int roomId) {
+        try {
+            chatDao.isAccessableRoom(uid, roomId);
+            return true;
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            return false;
         }
     }
 

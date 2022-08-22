@@ -3,6 +3,7 @@ package com.example.demo.src.chat;
 
 import com.example.demo.src.user.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -53,6 +54,8 @@ public class ChatDao {
      * https://jaehoney.tistory.com/34 -> JdbcTemplate 관련 함수에 대한 설명
      * https://velog.io/@seculoper235/RowMapper%EC%97%90-%EB%8C%80%ED%95%B4 -> RowMapper에 대한 설명
      */
+
+
 
 //    // 회원가입
 //    public int createUser(PostUserReq postUserReq) {

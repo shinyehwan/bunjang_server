@@ -58,7 +58,7 @@ public class ChatController {
     // ******************************************************************************
 
     /**
-     *
+     * 채팅방 목록 조회
      */
     @ResponseBody
     @GetMapping("")
@@ -77,9 +77,8 @@ public class ChatController {
 //            if (!checkTime(postViewStartReq.getStartViewPoint()))
 //                throw new BaseException(INAVLID_STARTVIEWPOINT_FORMAT);
 //
-//            long viewId = videoService.viewStart(vid, uid, postViewStartReq);
-
-            throw new BaseException(REQUEST_ERROR);
+            return new BaseResponse<>(chatProvider.getChatRoomList(uid));
+//            throw new BaseException(REQUEST_ERROR);
 //            return new BaseResponse<>(___);
         } catch (BaseException exception) {
             return new BaseResponse<>((exception.getStatus()));

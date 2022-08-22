@@ -48,6 +48,9 @@ public enum BaseResponseStatus {
     FAILED_TO_LOGIN(false,3014,"없는 번호이거나 비밀번호가 틀렸습니다."),
 
 
+    // 3400 : 번개톡 관련
+    INVALID_ROOM_ID(false, 3400, "이용자가 접속 불가능한 대화방입니다."),
+
 
     /**
      * 4000 : Database, Server 오류

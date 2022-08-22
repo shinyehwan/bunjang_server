@@ -1,8 +1,8 @@
 package com.example.demo.src.chat;
 
 
-import com.example.demo.src.chat.model.GetChatRoomRes;
-import com.example.demo.src.chat.model.RecentRoomInfoModel;
+import com.example.demo.src.chat.model.GetChatRoomsRes;
+import com.example.demo.src.chat.model.MessageRawInfoModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -71,9 +71,9 @@ public class ChatDao {
     /**
      * 채팅방 최근 메시지 정보 조회
      */
-    public RecentRoomInfoModel getRecentRoomInfo(int roomId) {
+    public MessageRawInfoModel getRecentRoomInfo(int roomId) {
         try {
-            String Query = "SELECT Chat.sendStoreId, description,mediaType, mediaDescriptionUrl, createdAt AS 'uploaded'\n" +
+            String Query = "SELECT Chat.id, Chat.sendStoreId, description,mediaType, mediaDescriptionUrl, createdAt AS 'uploaded'\n" +
                     "From Chat\n" +
                     "JOIN (SELECT chatRoomId, MAX(createdAt) AS 'created'\n" +
                     "           FROM Chat\n" +
@@ -81,7 +81,8 @@ public class ChatDao {
                     "           GROUP BY chatRoomId) recentDate\n" +
                     "ON Chat.createdAt=recentDate.created AND Chat.chatRoomId=recentDate.chatRoomId";
             return this.jdbcTemplate.queryForObject(Query,
-                    (rs, rn) -> new RecentRoomInfoModel(
+                    (rs, rn) -> new MessageRawInfoModel(
+                            rs.getInt("id"),
                             rs.getInt("sendStoreId"),
                             rs.getString("description"),
                             rs.getString("mediaType"),
@@ -90,14 +91,14 @@ public class ChatDao {
                     ),
                     roomId);
         } catch (Exception e) {
-            return new RecentRoomInfoModel(0, "", "", "", "");
+            return new MessageRawInfoModel(0,0, "", "", "", "");
         }
     }
 
     /**
      * 채팅방 상대방 정보 조회
      */
-    public GetChatRoomRes getChatProfileInfo(int roomId, int uid) {
+    public GetChatRoomsRes getChatProfileInfo(int roomId, int uid) {
         try {
             String Query = "SELECT id, storeName, profileImgUrl FROM Store\n" +
                     "JOIN (SELECT storeId FROM ChatRoomStoreMap\n" +
@@ -105,7 +106,7 @@ public class ChatDao {
                     "ON Store.id = Id.storeId";
 
             return this.jdbcTemplate.queryForObject(Query,
-                    (rs,rn)-> new GetChatRoomRes(
+                    (rs,rn)-> new GetChatRoomsRes(
                             roomId,
                             rs.getInt("id"),
                             rs.getString("storeName"),
@@ -113,8 +114,45 @@ public class ChatDao {
                             "",""
                     ),roomId,uid);
         } catch (Exception e) {
-            return new GetChatRoomRes( roomId,0, "", "", "","");
+            return new GetChatRoomsRes( roomId,0, "", "", "","");
         }
+    }
+
+    /**
+     * 최근 채팅 메시지 조회
+     */
+    public List<MessageRawInfoModel> getChatHistory (int roomId, int p){
+            String Query = "SELECT id, Chat.sendStoreId, description, mediaType,  mediaDescriptionUrl, createdAt From Chat\n" +
+                    "WHERE status='active' AND chatRoomId=?\n" +
+                    "ORDER BY createdAt DESC\n" +
+                    "LIMIT ?,? ";
+
+            return this.jdbcTemplate.query(Query,
+                    (rs, rn) -> new MessageRawInfoModel(
+                            rs.getInt("id"),
+                            rs.getInt("sendStoreId"),
+                            rs.getString("description"),
+                            rs.getString("mediaType"),
+                            rs.getString("mediaDescriptionUrl"),
+                            rs.getString("createdAt")
+                    ),
+                    roomId, 20*(p-1), 20);
+    }
+
+
+
+
+
+
+    /**
+     * (Validation) 사용자가 접근 가능한 채팅방인지 검증
+     */
+    public void isAccessableRoom (int uid, int roomId){
+        String Query = "SELECT * FROM ChatRoomStoreMap\n" +
+                "WHERE status='active' AND storeId=? AND chatRoomId=?";
+        this.jdbcTemplate.queryForObject(Query,
+                (rs, rowNum) -> rs.getInt("id"),
+                uid,roomId);
     }
 
 

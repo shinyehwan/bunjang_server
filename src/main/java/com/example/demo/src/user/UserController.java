@@ -77,11 +77,18 @@ public class UserController {
 
     /**
      * 로그인 API
-     * [POST] /users/login
+     * [POST] bungae/users/login
      */
     @ResponseBody
     @PostMapping("/login")
     public BaseResponse<PostLoginRes> logIn(@RequestBody PostLoginReq postLoginReq) {
+
+        if(postLoginReq.getPhone().isEmpty()){
+            return new BaseResponse<>(POST_USERS_EMPTY_PHONE);
+        }
+        if (!isRegexPhone(postLoginReq.getPhone())) {
+            return new BaseResponse<>(POST_USERS_INVALID_PHONE);
+        }
 
         try {
             PostLoginRes postLoginRes = userProvider.logIn(postLoginReq);

@@ -30,7 +30,6 @@ public enum BaseResponseStatus {
     POST_USERS_EMPTY_PHONE(false, 2015, "핸드폰 번호를 입력해주세요."),
     POST_USERS_INVALID_PHONE(false, 2016, "핸드폰 번호 형식을 확인해주세요."),
     POST_USERS_EXISTS_USER(false,2017,"이미 등록된 전화번호 입니다."),
-
     POST_USERS_EMPTY_BIRTH(false,2018,"생년월일을 입력해 주세요"),
     POST_USERS_INVALID_BIRTH(false,2019,"생년월일 형식을 확인해 주세요."),
 
@@ -45,7 +44,7 @@ public enum BaseResponseStatus {
 
     // [POST] /users
     DUPLICATED_EMAIL(false, 3013, "중복된 이메일입니다."),
-    FAILED_TO_LOGIN(false,3014,"없는 아이디거나 비밀번호가 틀렸습니다."),
+    FAILED_TO_LOGIN(false,3014,"없는 번호이거나 비밀번호가 틀렸습니다."),
 
 
 

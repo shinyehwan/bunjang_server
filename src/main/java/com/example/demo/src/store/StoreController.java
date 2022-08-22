@@ -1,10 +1,11 @@
-package com.example.demo.src.user;
+package com.example.demo.src.store;
 
+import com.example.demo.utils.Verifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.example.demo.config.BaseException;
 import com.example.demo.config.BaseResponse;
-import com.example.demo.src.user.model.*;
+import com.example.demo.src.store.model.*;
 import com.example.demo.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -20,56 +21,62 @@ import static com.example.demo.utils.ValidationRegex.*;
                 //  [Presentation Layer?] 클라이언트와 최초로 만나는 곳으로 데이터 입출력이 발생하는 곳
                 //  Web MVC 코드에 사용되는 어노테이션. @RequestMapping 어노테이션을 해당 어노테이션 밑에서만 사용할 수 있다.
                 // @ResponseBody    모든 method의 return object를 적절한 형태로 변환 후, HTTP Response Body에 담아 반환.
-@RequestMapping("/bungae/users")
+@RequestMapping("/bungae/stores")
 /**
  * Controller란?
  * 사용자의 Request를 전달받아 요청의 처리를 담당하는 Service, Prodiver 를 호출
  */
-public class UserController {
+public class StoreController {
 
     final Logger logger = LoggerFactory.getLogger(this.getClass()); // Log를 남기기: 일단은 모르고 넘어가셔도 무방합니다.
 
     @Autowired
-    private final UserProvider userProvider;
+    private final StoreProvider storeProvider;
     @Autowired
-    private final UserService userService;
+    private final StoreService storeService;
     @Autowired
     private final JwtService jwtService;
 
 
-    public UserController(UserProvider userProvider, UserService userService, JwtService jwtService) {
-        this.userProvider = userProvider;
-        this.userService = userService;
+    public StoreController(StoreProvider storeProvider, StoreService storeService, JwtService jwtService) {
+        this.storeProvider = storeProvider;
+        this.storeService = storeService;
         this.jwtService = jwtService;
+    }
+
+    private Verifier verifier;
+    @Autowired
+    public void setVerifier(Verifier verifier){
+        this.verifier = verifier;
     }
 
     /**
      * 회원가입
-     * [POST] bungae/users/new
+     * [POST] bungae/stores/new
      */
     // Body
     @ResponseBody
     @PostMapping("/new")    // POST 방식의 요청을 매핑하기 위한 어노테이션
-    public BaseResponse<PostUserRes> createUser(@RequestBody PostUserReq postUserReq) {
-        if (postUserReq.getName().isEmpty()) {
+    public BaseResponse<PostStoreRes> createUser(@RequestBody PostStoreReq postStoreReq) {
+        if (postStoreReq.getName().isEmpty()) {
             return new BaseResponse<>(POST_USERS_EMPTY_NAME);
         }
-        if(postUserReq.getPhone().isEmpty()){
+        if(postStoreReq.getPhone().isEmpty()){
             return new BaseResponse<>(POST_USERS_EMPTY_PHONE);
         }
-        if (!isRegexPhone(postUserReq.getPhone())) {
+        if (!isRegexPhone(postStoreReq.getPhone())) {
             return new BaseResponse<>(POST_USERS_INVALID_PHONE);
         }
-        if(postUserReq.getBirth().isEmpty()){
+        if(postStoreReq.getBirth().isEmpty()){
             return new BaseResponse<>(POST_USERS_EMPTY_BIRTH);
         }
-        if(!isRegexBirth(postUserReq.getBirth())){
+        if(!isRegexBirth(postStoreReq.getBirth())){
             return new BaseResponse<>(POST_USERS_INVALID_BIRTH);
         }
 
         try {
-            PostUserRes postUserRes = userService.createUser(postUserReq);
-            return new BaseResponse<>(postUserRes);
+            PostStoreRes postStoreRes = storeService.createUser(postStoreReq);
+            return new BaseResponse<>(postStoreRes);
         } catch (BaseException exception) {
             return new BaseResponse<>((exception.getStatus()));
         }
@@ -77,7 +84,7 @@ public class UserController {
 
     /**
      * 로그인 API
-     * [POST] bungae/users/login
+     * [POST] bungae/stores/login
      */
     @ResponseBody
     @PostMapping("/login")
@@ -91,44 +98,35 @@ public class UserController {
         }
 
         try {
-            PostLoginRes postLoginRes = userProvider.logIn(postLoginReq);
+            PostLoginRes postLoginRes = storeProvider.logIn(postLoginReq);
             return new BaseResponse<>(postLoginRes);
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
         }
     }
-//
-//
-//    /**
-//     * 모든 회원들의  조회 API
-//     * [GET] /users
-//     *
-//     * 또는
-//     *
-//     * 해당 닉네임을 같는 유저들의 정보 조회 API
-//     * [GET] /users? NickName=
-//     */
-//    //Query String
-//    @ResponseBody   // return되는 자바 객체를 JSON으로 바꿔서 HTTP body에 담는 어노테이션.
-//    //  JSON은 HTTP 통신 시, 데이터를 주고받을 때 많이 쓰이는 데이터 포맷.
-//    @GetMapping("") // (GET) 127.0.0.1:9000/app/users
-//    // GET 방식의 요청을 매핑하기 위한 어노테이션
-//    public BaseResponse<List<GetUserRes>> getUsers(@RequestParam(required = false) String nickname) {
-//        //  @RequestParam은, 1개의 HTTP Request 파라미터를 받을 수 있는 어노테이션(?뒤의 값). default로 RequestParam은 반드시 값이 존재해야 하도록 설정되어 있지만, (전송 안되면 400 Error 유발)
-//        //  지금 예시와 같이 required 설정으로 필수 값에서 제외 시킬 수 있음
-//        //  defaultValue를 통해, 기본값(파라미터가 없는 경우, 해당 파라미터의 기본값 설정)을 지정할 수 있음
-//        try {
-//            if (nickname == null) { // query string인 nickname이 없을 경우, 그냥 전체 유저정보를 불러온다.
-//                List<GetUserRes> getUsersRes = userProvider.getUsers();
-//                return new BaseResponse<>(getUsersRes);
-//            }
-//            // query string인 nickname이 있을 경우, 조건을 만족하는 유저정보들을 불러온다.
-//            List<GetUserRes> getUsersRes = userProvider.getUsersByNickname(nickname);
-//            return new BaseResponse<>(getUsersRes);
-//        } catch (BaseException exception) {
-//            return new BaseResponse<>((exception.getStatus()));
-//        }
-//    }
+
+
+    /**
+     * 마이페이지 화면 조회 API(판매중)
+     * [GET] /bungae/stores/sale
+     */
+    //Query String
+    @ResponseBody
+    @GetMapping("/{storeId}/sale")
+    public BaseResponse<List<GetStoreSaleRes>> getSale(@PathVariable int storeId) {
+        try {
+            //jwt에서 idx 추출.
+            int userIdxByJwt = jwtService.getUserIdx();
+            //userIdx와 접근한 유저가 같은지 확인
+            if(storeId != userIdxByJwt){
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }
+            List<GetStoreSaleRes> getStoreSaleRes = storeProvider.getStoreSale(storeId);
+            return new BaseResponse<>(getStoreSaleRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
 //    /**
 //
 //
@@ -154,7 +152,7 @@ public class UserController {
 //        }
 //
 //    }
-
+//
 //    /**
 //     * 유저정보변경 API
 //     * [PATCH] /users/:userIdx

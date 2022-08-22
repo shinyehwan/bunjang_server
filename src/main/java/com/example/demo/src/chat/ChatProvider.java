@@ -1,15 +1,8 @@
 package com.example.demo.src.chat;
 
 import com.example.demo.config.BaseException;
-import com.example.demo.config.BaseResponse;
-import com.example.demo.config.secret.Secret;
 import com.example.demo.src.chat.model.GetChatRoomRes;
 import com.example.demo.src.chat.model.RecentRoomInfoModel;
-import com.example.demo.src.user.model.GetUserRes;
-import com.example.demo.src.user.model.PostLoginReq;
-import com.example.demo.src.user.model.PostLoginRes;
-import com.example.demo.src.user.model.User;
-import com.example.demo.utils.AES128;
 import com.example.demo.utils.JwtService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -3,9 +3,7 @@ package com.example.demo.src.chat;
 
 import com.example.demo.src.chat.model.GetChatRoomRes;
 import com.example.demo.src.chat.model.RecentRoomInfoModel;
-import com.example.demo.src.user.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 

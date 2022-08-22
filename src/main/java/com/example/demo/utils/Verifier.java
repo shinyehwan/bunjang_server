@@ -33,13 +33,13 @@ public class Verifier {
             throw new BaseException(DATABASE_ERROR);
         }
     }
-    public int checkName(String name) throws BaseException {
-        try {
-            return verifierDao.checkName(name);
-        } catch (Exception exception) {
-            throw new BaseException(DATABASE_ERROR);
-        }
-    }
+//    public int checkName(String name) throws BaseException {
+//        try {
+//            return verifierDao.checkName(name);
+//        } catch (Exception exception) {
+//            throw new BaseException(DATABASE_ERROR);
+//        }
+//    }
 
     public boolean isPresentStoreId(int uid){
         try{

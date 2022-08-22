@@ -1,4 +1,4 @@
-package com.example.demo.src.user.model;
+package com.example.demo.src.store.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -8,6 +8,6 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class PostLoginRes {
-    private int userId;
+    private int storeId;
     private String jwt;
 }

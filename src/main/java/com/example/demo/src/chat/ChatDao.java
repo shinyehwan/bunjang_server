@@ -79,7 +79,7 @@ public class ChatDao {
                     "From Chat\n" +
                     "JOIN (SELECT chatRoomId, MAX(createdAt) AS 'created'\n" +
                     "           FROM Chat\n" +
-                    "           WHERE status='active' AND chatRoomId = 2\n" +
+                    "           WHERE status='active' AND chatRoomId = ?\n" +
                     "           GROUP BY chatRoomId) recentDate\n" +
                     "ON Chat.createdAt=recentDate.created AND Chat.chatRoomId=recentDate.chatRoomId";
             return this.jdbcTemplate.queryForObject(Query,

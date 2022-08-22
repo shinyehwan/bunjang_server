@@ -2,11 +2,7 @@ package com.example.demo.src.chat;
 
 import com.example.demo.config.BaseException;
 import com.example.demo.config.BaseResponse;
-import com.example.demo.src.chat.model.GetChatRoomRes;
-import com.example.demo.src.user.model.PostLoginReq;
-import com.example.demo.src.user.model.PostLoginRes;
-import com.example.demo.src.user.model.PostUserReq;
-import com.example.demo.src.user.model.PostUserRes;
+import com.example.demo.src.chat.model.GetChatRoomsRes;
 import com.example.demo.utils.JwtService;
 import com.example.demo.utils.Verifier;
 import org.slf4j.Logger;
@@ -62,7 +58,7 @@ public class ChatController {
      */
     @ResponseBody
     @GetMapping("")
-    public BaseResponse<List<GetChatRoomRes>> getChatRoomList() {
+    public BaseResponse<List<GetChatRoomsRes>> getChatRoomList() {
         try {
             // jwt 에서 uid 추출
             int uid;
@@ -85,6 +81,11 @@ public class ChatController {
         }
 
     }
+
+//    @ResponseBody
+//    @GetMapping("/{partnerId}")
+//    public BaseResponse<List<GetRoomInfoRes>> getChatRoomInfo() {
+
 //
 //    /**
 //     * 회원가입

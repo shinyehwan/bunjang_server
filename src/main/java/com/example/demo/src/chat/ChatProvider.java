@@ -1,15 +1,8 @@
 package com.example.demo.src.chat;
 
 import com.example.demo.config.BaseException;
-import com.example.demo.config.BaseResponse;
-import com.example.demo.config.secret.Secret;
-import com.example.demo.src.chat.model.GetChatRoomRes;
+import com.example.demo.src.chat.model.GetChatRoomsRes;
 import com.example.demo.src.chat.model.RecentRoomInfoModel;
-import com.example.demo.src.user.model.GetUserRes;
-import com.example.demo.src.user.model.PostLoginReq;
-import com.example.demo.src.user.model.PostLoginRes;
-import com.example.demo.src.user.model.User;
-import com.example.demo.utils.AES128;
 import com.example.demo.utils.JwtService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,16 +41,16 @@ import static com.example.demo.config.BaseResponseStatus.*;
     /**
      * 채팅방 목록 조회
      */
-    public List<GetChatRoomRes> getChatRoomList(int uid) throws BaseException {
+    public List<GetChatRoomsRes> getChatRoomList(int uid) throws BaseException {
         try {
             // 채팅방 id 리스트 조회
             List<Integer> idList = chatDao.getRoomListById(uid);
 
             // 각 채팅방 정보 조회
-            List<GetChatRoomRes> roomList = new ArrayList<>();
+            List<GetChatRoomsRes> roomList = new ArrayList<>();
             for (int roomId : idList) {
                 RecentRoomInfoModel recentRoomInfoModel = chatDao.getRecentRoomInfo(roomId);
-                GetChatRoomRes getChatRoomRes = chatDao.getChatProfileInfo(roomId, uid);
+                GetChatRoomsRes getChatRoomsRes = chatDao.getChatProfileInfo(roomId, uid);
                 String message;
                 if (recentRoomInfoModel.getDescription() != null)
                     message = recentRoomInfoModel.getDescription();
@@ -65,11 +58,11 @@ import static com.example.demo.config.BaseResponseStatus.*;
                     message = recentRoomInfoModel.getMediaType() + recentRoomInfoModel.getMediaDescriptionUrl();
                 }
 
-                if (getChatRoomRes.getTalkerId() != 0) {
-                    getChatRoomRes.setLastMessage(message);
-                    getChatRoomRes.setLastMessageTime(recentRoomInfoModel.getUploaded());
+                if (getChatRoomsRes.getTalkerId() != 0) {
+                    getChatRoomsRes.setLastMessage(message);
+                    getChatRoomsRes.setLastMessageTime(recentRoomInfoModel.getUploaded());
 
-                    roomList.add(getChatRoomRes);
+                    roomList.add(getChatRoomsRes);
                 }
             }
             return roomList;

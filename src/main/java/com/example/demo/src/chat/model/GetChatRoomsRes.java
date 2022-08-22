@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class GetChatRoomRes {
+public class GetChatRoomsRes {
     int roomId;
     int talkerId;
     String name;

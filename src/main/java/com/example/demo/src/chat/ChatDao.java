@@ -1,11 +1,9 @@
 package com.example.demo.src.chat;
 
 
-import com.example.demo.src.chat.model.GetChatRoomRes;
+import com.example.demo.src.chat.model.GetChatRoomsRes;
 import com.example.demo.src.chat.model.RecentRoomInfoModel;
-import com.example.demo.src.user.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -99,7 +97,7 @@ public class ChatDao {
     /**
      * 채팅방 상대방 정보 조회
      */
-    public GetChatRoomRes getChatProfileInfo(int roomId, int uid) {
+    public GetChatRoomsRes getChatProfileInfo(int roomId, int uid) {
         try {
             String Query = "SELECT id, storeName, profileImgUrl FROM Store\n" +
                     "JOIN (SELECT storeId FROM ChatRoomStoreMap\n" +
@@ -107,7 +105,7 @@ public class ChatDao {
                     "ON Store.id = Id.storeId";
 
             return this.jdbcTemplate.queryForObject(Query,
-                    (rs,rn)-> new GetChatRoomRes(
+                    (rs,rn)-> new GetChatRoomsRes(
                             roomId,
                             rs.getInt("id"),
                             rs.getString("storeName"),
@@ -115,7 +113,7 @@ public class ChatDao {
                             "",""
                     ),roomId,uid);
         } catch (Exception e) {
-            return new GetChatRoomRes( roomId,0, "", "", "","");
+            return new GetChatRoomsRes( roomId,0, "", "", "","");
         }
     }
 

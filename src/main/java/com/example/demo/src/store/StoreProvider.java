@@ -83,6 +83,33 @@ public class StoreProvider {
             throw new BaseException(DATABASE_ERROR);
         }
     }
+    // 마이페이지에서 예약인 상품 조회
+    public List<GetStoreReservedRes> getStoreReserved(int storeId) throws BaseException {
+        try {
+            List<GetStoreReservedRes> getStoreReservedRes = storeDao.getStoreReserved(storeId);
+            return getStoreReservedRes;
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+    // 마이페이지에서 판매완료된 상품 조회
+    public List<GetStoreClosedRes> getStoreClosed(int storeId) throws BaseException {
+        try {
+            List<GetStoreClosedRes> getStoreClosedRes = storeDao.getStoreClosed(storeId);
+            return getStoreClosedRes;
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+    // 마이페이지에서 판매완료된 상품 조회
+    public GetStoreDetailRes getStoreDetail(int storeId) throws BaseException {
+        try {
+            GetStoreDetailRes getStoreDetailRes = storeDao.getStoreDetail(storeId);
+            return getStoreDetailRes;
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
 
 
 

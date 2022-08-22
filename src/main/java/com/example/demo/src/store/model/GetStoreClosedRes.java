@@ -7,9 +7,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class GetStoreSaleRes {
+public class GetStoreClosedRes {
     private String imageUrl01;
     private String title;
     private int price;
-
 }

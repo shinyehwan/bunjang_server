@@ -91,15 +91,56 @@ public class StoreDao {
         ); // 한 개의 회원정보를 얻기 위한 jdbcTemplate 함수(Query, 객체 매핑 정보, Params)의 결과 반환
     }
 
-    // 해당 userIdx를 갖는 유저조회
+    // 상점에 따른 판매중인 상품 조회
     public List<GetStoreSaleRes> getStoreSale (int storeId) {
-        String getUserQuery = "select Product.ImageUrl01, Product.title, Product.price from Product, Store where dealStatus = \"sale\" and Store.id = ?";
+        String getUserQuery = "select Product.imageUrl01, Product.title, Product.price from Product where dealStatus = \"sale\" and Product.storeId = ?";
         int getUserParams = storeId;
         return this.jdbcTemplate.query(getUserQuery,
                 (rs, rowNum) -> new GetStoreSaleRes(
-                        rs.getInt("ImageUrl01"),
+                        rs.getString("imageUrl01"),
                         rs.getString("title"),
                         rs.getInt("price")
+                        ), // RowMapper(위의 링크 참조): 원하는 결과값 형태로 받기
+                getUserParams); // 한 개의 회원정보를 얻기 위한 jdbcTemplate 함수(Query, 객체 매핑 정보, Params)의 결과 반환
+    }
+    // 상점에 따른 예약중인 상품 조회
+    public List<GetStoreReservedRes> getStoreReserved (int storeId) {
+        String getUserQuery = "select Product.imageUrl01, Product.title, Product.price from Product where dealStatus = \"reserved\" and Product.storeId = ?";
+        int getUserParams = storeId;
+        return this.jdbcTemplate.query(getUserQuery,
+                (rs, rowNum) -> new GetStoreReservedRes(
+                        rs.getString("imageUrl01"),
+                        rs.getString("title"),
+                        rs.getInt("price")
+                        ), // RowMapper(위의 링크 참조): 원하는 결과값 형태로 받기
+                getUserParams); // 한 개의 회원정보를 얻기 위한 jdbcTemplate 함수(Query, 객체 매핑 정보, Params)의 결과 반환
+    }
+    // 상점에 따른 예약중인 상품 조회
+    public List<GetStoreClosedRes> getStoreClosed (int storeId) {
+        String getUserQuery = "select Product.imageUrl01, Product.title, Product.price from Product where dealStatus = \"closed\" and Product.storeId = ?";
+        int getUserParams = storeId;
+        return this.jdbcTemplate.query(getUserQuery,
+                (rs, rowNum) -> new GetStoreClosedRes(
+                        rs.getString("imageUrl01"),
+                        rs.getString("title"),
+                        rs.getInt("price")
+                        ), // RowMapper(위의 링크 참조): 원하는 결과값 형태로 받기
+                getUserParams); // 한 개의 회원정보를 얻기 위한 jdbcTemplate 함수(Query, 객체 매핑 정보, Params)의 결과 반환
+    }
+    // 상점 상세 정보 조회
+    public GetStoreDetailRes getStoreDetail (int storeId) {
+        String getUserQuery = "select Store.storeName, Store.profileImgUrl, Store.contactTime, Store.introduce, Store.policy, Store.precautions\n" +
+                "from Store\n" +
+                "where Store.id = ?\n";
+        int getUserParams = storeId;
+        return this.jdbcTemplate.queryForObject(getUserQuery,
+                (rs, rowNum) -> new GetStoreDetailRes(
+                        rs.getString("storeName"),
+                        rs.getString("profileImgUrl"),
+                        rs.getString("contactTime"),
+                        rs.getString("introduce"),
+                        rs.getString("policy"),
+                        rs.getString("precautions")
                         ), // RowMapper(위의 링크 참조): 원하는 결과값 형태로 받기
                 getUserParams); // 한 개의 회원정보를 얻기 위한 jdbcTemplate 함수(Query, 객체 매핑 정보, Params)의 결과 반환
     }
@@ -113,27 +154,28 @@ public class StoreDao {
 //                checkPhoneParams);
 //    }
 
-//    // 회원정보 변경
-//    public int modifyUserName(PatchUserReq patchUserReq) {
-//        String modifyUserNameQuery = "update User set nickname = ? where userIdx = ? "; // 해당 userIdx를 만족하는 User를 해당 nickname으로 변경한다.
-//        Object[] modifyUserNameParams = new Object[]{patchUserReq.getNickname(), patchUserReq.getUserIdx()}; // 주입될 값들(nickname, userIdx) 순
-//        return this.jdbcTemplate.update(modifyUserNameQuery, modifyUserNameParams); // 대응시켜 매핑시켜 쿼리 요청(생성했으면 1, 실패했으면 0)
-//    }
+    // 회원정보 변경
+    public int modifyStore(int storeId, PatchStoreDetailReq patchStoreDetailReq) {
+        String modifyUserNameQuery = "update Store set storeName = ?, profileImgUrl = ?, contactTime = ?, introduce = ?, policy = ?, precautions = ?\n" +
+                "             where id = ?"; // 해당 userIdx를 만족하는 User를 해당 nickname으로 변경한다.
+        Object[] modifyUserNameParams = new Object[]{patchStoreDetailReq.getStoreName(), patchStoreDetailReq.getProfileImgUrl(), patchStoreDetailReq.getContactTime(), patchStoreDetailReq.getIntroduce(), patchStoreDetailReq.getPolicy(), patchStoreDetailReq.getPrecautions(), storeId};
+        return this.jdbcTemplate.update(modifyUserNameQuery, modifyUserNameParams); // 대응시켜 매핑시켜 쿼리 요청(생성했으면 1, 실패했으면 0)
+    }
 
 
 
 
     // User 테이블에 존재하는 전체 유저들의 정보 조회
-    public List<GetUserRes> getUsers() {
-        String getUsersQuery = "select * from User"; //User 테이블에 존재하는 모든 회원들의 정보를 조회하는 쿼리
-        return this.jdbcTemplate.query(getUsersQuery,
-                (rs, rowNum) -> new GetUserRes(
-                        rs.getInt("userIdx"),
-                        rs.getString("nickname"),
-                        rs.getString("Email"),
-                        rs.getString("password")) // RowMapper(위의 링크 참조): 원하는 결과값 형태로 받기
-        ); // 복수개의 회원정보들을 얻기 위해 jdbcTemplate 함수(Query, 객체 매핑 정보)의 결과 반환(동적쿼리가 아니므로 Parmas부분이 없음)
-    }
+//    public List<GetUserRes> getUsers() {
+//        String getUsersQuery = "select * from User"; //User 테이블에 존재하는 모든 회원들의 정보를 조회하는 쿼리
+//        return this.jdbcTemplate.query(getUsersQuery,
+//                (rs, rowNum) -> new GetUserRes(
+//                        rs.getInt("userIdx"),
+//                        rs.getString("nickname"),
+//                        rs.getString("Email"),
+//                        rs.getString("password")) // RowMapper(위의 링크 참조): 원하는 결과값 형태로 받기
+//        ); // 복수개의 회원정보들을 얻기 위해 jdbcTemplate 함수(Query, 객체 매핑 정보)의 결과 반환(동적쿼리가 아니므로 Parmas부분이 없음)
+//    }
 
 //    // 해당 nickname을 갖는 유저들의 정보 조회
 //    public List<GetUserRes> getUsersByNickname(String nickname) {

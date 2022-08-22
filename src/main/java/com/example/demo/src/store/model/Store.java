@@ -17,4 +17,11 @@ public class Store {
     private String gender;
     private String phone;
     private String password;
+//    private String storeName;
+//    private String profileImgUrl;
+//    private String contactTime;
+//    private String introduce;
+//    private String policy;
+//    private String precautions;
+
 }

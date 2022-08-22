@@ -110,7 +110,6 @@ public class StoreController {
      * 마이페이지 화면 조회 API(판매중)
      * [GET] /bungae/stores/sale
      */
-    //Query String
     @ResponseBody
     @GetMapping("/{storeId}/sale")
     public BaseResponse<List<GetStoreSaleRes>> getSale(@PathVariable int storeId) {
@@ -127,6 +126,93 @@ public class StoreController {
             return new BaseResponse<>((exception.getStatus()));
         }
     }
+
+    /**
+     * 마이페이지 화면 조회 API(예약중)
+     * [GET] /bungae/stores/reserved
+     */
+    @ResponseBody
+    @GetMapping("/{storeId}/reserved")
+    public BaseResponse<List<GetStoreReservedRes>> getReserved(@PathVariable int storeId) {
+        try {
+            //jwt에서 idx 추출.
+            int userIdxByJwt = jwtService.getUserIdx();
+            //userIdx와 접근한 유저가 같은지 확인
+            if(storeId != userIdxByJwt){
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }
+            List<GetStoreReservedRes> getStoreReservedRes = storeProvider.getStoreReserved(storeId);
+            return new BaseResponse<>(getStoreReservedRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+    /**
+     * 마이페이지 화면 조회 API(판매완료)
+     * [GET] /bungae/stores/closed
+     */
+    @ResponseBody
+    @GetMapping("/{storeId}/closed")
+    public BaseResponse<List<GetStoreClosedRes>> getClosed(@PathVariable int storeId) {
+        try {
+            //jwt에서 idx 추출.
+            int userIdxByJwt = jwtService.getUserIdx();
+            //userIdx와 접근한 유저가 같은지 확인
+            if(storeId != userIdxByJwt){
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }
+            List<GetStoreClosedRes> getStoreClosedRes = storeProvider.getStoreClosed(storeId);
+            return new BaseResponse<>(getStoreClosedRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+    /**
+     * 마이페이지 화면 상점 클릭시 상점 설명 조회 API
+     * [GET] /bungae/stores/detail
+     */
+    @ResponseBody
+    @GetMapping("/{storeId}/detail")
+    public BaseResponse<GetStoreDetailRes> getDetail(@PathVariable int storeId) {
+        try {
+            //jwt에서 idx 추출.
+            int userIdxByJwt = jwtService.getUserIdx();
+            //userIdx와 접근한 유저가 같은지 확인
+            if(storeId != userIdxByJwt){
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }
+            GetStoreDetailRes getStoreDetailRes = storeProvider.getStoreDetail(storeId);
+            return new BaseResponse<>(getStoreDetailRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     //     * 유저정보변경 API
+     //     * [PATCH] /users/:userIdx
+     //     */
+    @ResponseBody
+    @PatchMapping("/{storeId}/detail")
+    public BaseResponse<String> modifyStoreDetail(@PathVariable int storeId, @RequestBody PatchStoreDetailReq patchStoreDetailReq) {
+        try {
+            //jwt에서 idx 추출.
+            int userIdxByJwt = jwtService.getUserIdx();
+            //storeId와 접근한 유저가 같은지 확인
+            if(storeId != userIdxByJwt){
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }
+//            PatchStoreDetailReq patchStoreDetailReq = new PatchStoreDetailReq(storeId, );
+            storeService.modifyStore(storeId, patchStoreDetailReq);
+
+            String result = "상점 정보가 수정되었습니다.";
+            return new BaseResponse<>(result);
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+
 //    /**
 //
 //
@@ -153,32 +239,5 @@ public class StoreController {
 //
 //    }
 //
-//    /**
-//     * 유저정보변경 API
-//     * [PATCH] /users/:userIdx
-//     */
-//    @ResponseBody
-//    @PatchMapping("/{userIdx}")
-//    public BaseResponse<String> modifyUserName(@PathVariable("userIdx") int userIdx, @RequestBody User user) {
-//        try {
-///**
-//  *********** 해당 부분은 7주차 - JWT 수업 후 주석해체 해주세요!  ****************
-//            //jwt에서 idx 추출.
-//            int userIdxByJwt = jwtService.getUserIdx();
-//            //userIdx와 접근한 유저가 같은지 확인
-//            if(userIdx != userIdxByJwt){
-//                return new BaseResponse<>(INVALID_USER_JWT);
-//            }
-//            //같다면 유저네임 변경
-//  **************************************************************************
-// */
-//            PatchUserReq patchUserReq = new PatchUserReq(userIdx, user.getNickname());
-//            userService.modifyUserName(patchUserReq);
 //
-//            String result = "회원정보가 수정되었습니다.";
-//            return new BaseResponse<>(result);
-//        } catch (BaseException exception) {
-//            return new BaseResponse<>((exception.getStatus()));
-//        }
-//    }
 }

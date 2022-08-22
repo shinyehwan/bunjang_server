@@ -1,7 +1,7 @@
-package com.example.demo.src.user;
+package com.example.demo.src.store;
 
 
-import com.example.demo.src.user.model.*;
+import com.example.demo.src.store.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -16,7 +16,7 @@ import java.util.List;
  * 데이터베이스 관련 작업을 전담하는 클래스
  * 데이터베이스에 연결하여, 입력 , 수정, 삭제, 조회 등의 작업을 수행
  */
-public class UserDao {
+public class StoreDao {
 
     // *********************** 동작에 있어 필요한 요소들을 불러옵니다. *************************
 
@@ -55,9 +55,9 @@ public class UserDao {
      */
 
     // 회원가입
-    public int createUser(PostUserReq postUserReq) {
+    public int createUser(PostStoreReq postStoreReq) {
         String createUserQuery = "insert into Store (name, birth, gender, phone, password) VALUES (?,?,?,?,?)"; // 실행될 동적 쿼리문
-        Object[] createUserParams = new Object[]{postUserReq.getName(), postUserReq.getBirth(), postUserReq.getGender(), postUserReq.getPhone(), postUserReq.getPassword()}; // 동적 쿼리의 ?부분에 주입될 값
+        Object[] createUserParams = new Object[]{postStoreReq.getName(), postStoreReq.getBirth(), postStoreReq.getGender(), postStoreReq.getPhone(), postStoreReq.getPassword()}; // 동적 쿼리의 ?부분에 주입될 값
         this.jdbcTemplate.update(createUserQuery, createUserParams);
 
         String lastInserIdQuery = "select last_insert_id()"; // 가장 마지막에 삽입된(생성된) id값은 가져온다.
@@ -73,30 +73,13 @@ public class UserDao {
                 checkPhoneParams);
     }
 
-    // 이름 확인
-    public int checkName(String name) {
-        String checkPhoneQuery = "select exists(select name from Store where name = ?)";
-        String checkPhoneParams = name;
-        return this.jdbcTemplate.queryForObject(checkPhoneQuery,
-                int.class,
-                checkPhoneParams);
-    }
-
-    // 회원정보 변경
-    public int modifyUserName(PatchUserReq patchUserReq) {
-        String modifyUserNameQuery = "update User set nickname = ? where userIdx = ? "; // 해당 userIdx를 만족하는 User를 해당 nickname으로 변경한다.
-        Object[] modifyUserNameParams = new Object[]{patchUserReq.getNickname(), patchUserReq.getUserIdx()}; // 주입될 값들(nickname, userIdx) 순
-        return this.jdbcTemplate.update(modifyUserNameQuery, modifyUserNameParams); // 대응시켜 매핑시켜 쿼리 요청(생성했으면 1, 실패했으면 0)
-    }
-
-
     // 로그인
-    public User getPwd(PostLoginReq postLoginReq) {
+    public Store getPwd(PostLoginReq postLoginReq) {
         String getPwdQuery = "select id, name, birth, gender, phone, password from Store where phone = ?";
         String getPwdParams = postLoginReq.getPhone();
 
         return this.jdbcTemplate.queryForObject(getPwdQuery,
-                (rs, rowNum) -> new User(
+                (rs, rowNum) -> new Store(
                         rs.getInt("id"),
                         rs.getString("name"),
                         rs.getString("birth"),
@@ -107,6 +90,38 @@ public class UserDao {
                 getPwdParams
         ); // 한 개의 회원정보를 얻기 위한 jdbcTemplate 함수(Query, 객체 매핑 정보, Params)의 결과 반환
     }
+
+    // 해당 userIdx를 갖는 유저조회
+    public List<GetStoreSaleRes> getStoreSale (int storeId) {
+        String getUserQuery = "select Product.ImageUrl01, Product.title, Product.price from Product, Store where dealStatus = \"sale\" and Store.id = ?";
+        int getUserParams = storeId;
+        return this.jdbcTemplate.query(getUserQuery,
+                (rs, rowNum) -> new GetStoreSaleRes(
+                        rs.getInt("ImageUrl01"),
+                        rs.getString("title"),
+                        rs.getInt("price")
+                        ), // RowMapper(위의 링크 참조): 원하는 결과값 형태로 받기
+                getUserParams); // 한 개의 회원정보를 얻기 위한 jdbcTemplate 함수(Query, 객체 매핑 정보, Params)의 결과 반환
+    }
+
+//    // 이름 확인
+//    public int checkName(String name) {
+//        String checkPhoneQuery = "select exists(select name from Store where name = ?)";
+//        String checkPhoneParams = name;
+//        return this.jdbcTemplate.queryForObject(checkPhoneQuery,
+//                int.class,
+//                checkPhoneParams);
+//    }
+
+//    // 회원정보 변경
+//    public int modifyUserName(PatchUserReq patchUserReq) {
+//        String modifyUserNameQuery = "update User set nickname = ? where userIdx = ? "; // 해당 userIdx를 만족하는 User를 해당 nickname으로 변경한다.
+//        Object[] modifyUserNameParams = new Object[]{patchUserReq.getNickname(), patchUserReq.getUserIdx()}; // 주입될 값들(nickname, userIdx) 순
+//        return this.jdbcTemplate.update(modifyUserNameQuery, modifyUserNameParams); // 대응시켜 매핑시켜 쿼리 요청(생성했으면 1, 실패했으면 0)
+//    }
+
+
+
 
     // User 테이블에 존재하는 전체 유저들의 정보 조회
     public List<GetUserRes> getUsers() {
@@ -120,31 +135,20 @@ public class UserDao {
         ); // 복수개의 회원정보들을 얻기 위해 jdbcTemplate 함수(Query, 객체 매핑 정보)의 결과 반환(동적쿼리가 아니므로 Parmas부분이 없음)
     }
 
-    // 해당 nickname을 갖는 유저들의 정보 조회
-    public List<GetUserRes> getUsersByNickname(String nickname) {
-        String getUsersByNicknameQuery = "select * from User where nickname =?"; // 해당 이메일을 만족하는 유저를 조회하는 쿼리문
-        String getUsersByNicknameParams = nickname;
-        return this.jdbcTemplate.query(getUsersByNicknameQuery,
-                (rs, rowNum) -> new GetUserRes(
-                        rs.getInt("userIdx"),
-                        rs.getString("nickname"),
-                        rs.getString("Email"),
-                        rs.getString("password")), // RowMapper(위의 링크 참조): 원하는 결과값 형태로 받기
-                getUsersByNicknameParams); // 해당 닉네임을 갖는 모든 User 정보를 얻기 위해 jdbcTemplate 함수(Query, 객체 매핑 정보, Params)의 결과 반환
-    }
+//    // 해당 nickname을 갖는 유저들의 정보 조회
+//    public List<GetUserRes> getUsersByNickname(String nickname) {
+//        String getUsersByNicknameQuery = "select * from User where nickname =?"; // 해당 이메일을 만족하는 유저를 조회하는 쿼리문
+//        String getUsersByNicknameParams = nickname;
+//        return this.jdbcTemplate.query(getUsersByNicknameQuery,
+//                (rs, rowNum) -> new GetUserRes(
+//                        rs.getInt("userIdx"),
+//                        rs.getString("nickname"),
+//                        rs.getString("Email"),
+//                        rs.getString("password")), // RowMapper(위의 링크 참조): 원하는 결과값 형태로 받기
+//                getUsersByNicknameParams); // 해당 닉네임을 갖는 모든 User 정보를 얻기 위해 jdbcTemplate 함수(Query, 객체 매핑 정보, Params)의 결과 반환
+//    }
 
-    // 해당 userIdx를 갖는 유저조회
-    public GetUserRes getUser(int userIdx) {
-        String getUserQuery = "select * from User where userIdx = ?"; // 해당 userIdx를 만족하는 유저를 조회하는 쿼리문
-        int getUserParams = userIdx;
-        return this.jdbcTemplate.queryForObject(getUserQuery,
-                (rs, rowNum) -> new GetUserRes(
-                        rs.getInt("userIdx"),
-                        rs.getString("nickname"),
-                        rs.getString("Email"),
-                        rs.getString("password")), // RowMapper(위의 링크 참조): 원하는 결과값 형태로 받기
-                getUserParams); // 한 개의 회원정보를 얻기 위한 jdbcTemplate 함수(Query, 객체 매핑 정보, Params)의 결과 반환
-    }
+
 
 
 }

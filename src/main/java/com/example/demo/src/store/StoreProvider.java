@@ -1,10 +1,11 @@
-package com.example.demo.src.user;
+package com.example.demo.src.store;
 
 import com.example.demo.config.BaseException;
 import com.example.demo.config.secret.Secret;
-import com.example.demo.src.user.model.*;
+import com.example.demo.src.store.model.*;
 import com.example.demo.utils.AES128;
 import com.example.demo.utils.JwtService;
+import com.example.demo.utils.Verifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,36 +22,41 @@ import static com.example.demo.config.BaseResponseStatus.*;
  * 요청한 작업을 처리하는 관정을 하나의 작업으로 묶음
  * dao를 호출하여 DB CRUD를 처리 후 Controller로 반환
  */
-public class UserProvider {
+public class StoreProvider {
 
 
     // *********************** 동작에 있어 필요한 요소들을 불러옵니다. *************************
-    private final UserDao userDao;
+    private final StoreDao storeDao;
     private final JwtService jwtService; // JWT부분은 7주차에 다루므로 모르셔도 됩니다!
+    private Verifier verifier;
+    @Autowired
+    public void setVerifier(Verifier verifier){
+        this.verifier = verifier;
+    }
 
 
     final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired //readme 참고
-    public UserProvider(UserDao userDao, JwtService jwtService) {
-        this.userDao = userDao;
+    public StoreProvider(StoreDao storeDao, JwtService jwtService) {
+        this.storeDao = storeDao;
         this.jwtService = jwtService; // JWT부분은 7주차에 다루므로 모르셔도 됩니다!
     }
 
 
     // 로그인(password 검사)
     public PostLoginRes logIn(PostLoginReq postLoginReq) throws BaseException {
-        User user = userDao.getPwd(postLoginReq);
+        Store store = storeDao.getPwd(postLoginReq);
         String password;
         try {
-            password = new AES128(Secret.USER_INFO_PASSWORD_KEY).decrypt(user.getPassword()); // 암호화
+            password = new AES128(Secret.USER_INFO_PASSWORD_KEY).decrypt(store.getPassword()); // 암호화
             // 회원가입할 때 비밀번호가 암호화되어 저장되었기 떄문에 로그인을 할때도 암호화된 값끼리 비교를 해야합니다.
         } catch (Exception ignored) {
             throw new BaseException(PASSWORD_DECRYPTION_ERROR);
         }
 
         if (postLoginReq.getPassword().equals(password)) { //비말번호가 일치한다면 userIdx를 가져온다.
-            int userIdx = userDao.getPwd(postLoginReq).getId();
+            int userIdx = storeDao.getPwd(postLoginReq).getId();
             String jwt = jwtService.createJwt(userIdx);
             return new PostLoginRes(userIdx, jwt);
 
@@ -59,52 +65,57 @@ public class UserProvider {
         }
     }
 
-    // 해당 이메일이 이미 User Table에 존재하는지 확인
+    // 해당 핸드폰번호가 이미 User Table에 존재하는지 확인
     public int checkPhone(String phone) throws BaseException {
         try {
-            return userDao.checkPhone(phone);
+            return storeDao.checkPhone(phone);
         } catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR);
         }
     }
-    public int checkName(String name) throws BaseException {
+
+    // 마이페이지에서 판매중인 상품 조회
+    public List<GetStoreSaleRes> getStoreSale(int storeId) throws BaseException {
         try {
-            return userDao.checkName(name);
+            List<GetStoreSaleRes> getStoreSaleRes = storeDao.getStoreSale(storeId);
+            return getStoreSaleRes;
         } catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR);
         }
     }
 
 
-    // User들의 정보를 조회
-    public List<GetUserRes> getUsers() throws BaseException {
-        try {
-            List<GetUserRes> getUserRes = userDao.getUsers();
-            return getUserRes;
-        } catch (Exception exception) {
-            throw new BaseException(DATABASE_ERROR);
-        }
-    }
+
+//    public int checkName(String name) throws BaseException {
+//        try {
+//            return userDao.checkName(name);
+//        } catch (Exception exception) {
+//            throw new BaseException(DATABASE_ERROR);
+//        }
+//    }
+
+
+
 
     // 해당 nickname을 갖는 User들의 정보 조회
-    public List<GetUserRes> getUsersByNickname(String nickname) throws BaseException {
-        try {
-            List<GetUserRes> getUsersRes = userDao.getUsersByNickname(nickname);
-            return getUsersRes;
-        } catch (Exception exception) {
-            throw new BaseException(DATABASE_ERROR);
-        }
-    }
+//    public List<GetUserRes> getUsersByNickname(String nickname) throws BaseException {
+//        try {
+//            List<GetUserRes> getUsersRes = userDao.getUsersByNickname(nickname);
+//            return getUsersRes;
+//        } catch (Exception exception) {
+//            throw new BaseException(DATABASE_ERROR);
+//        }
+//    }
 
 
-    // 해당 userIdx를 갖는 User의 정보 조회
-    public GetUserRes getUser(int userIdx) throws BaseException {
-        try {
-            GetUserRes getUserRes = userDao.getUser(userIdx);
-            return getUserRes;
-        } catch (Exception exception) {
-            throw new BaseException(DATABASE_ERROR);
-        }
-    }
+//    // 해당 userIdx를 갖는 User의 정보 조회
+//    public GetUserRes getUser(int userIdx) throws BaseException {
+//        try {
+//            GetUserRes getUserRes = userDao.getUser(userIdx);
+//            return getUserRes;
+//        } catch (Exception exception) {
+//            throw new BaseException(DATABASE_ERROR);
+//        }
+//    }
 
 }

@@ -1,4 +1,4 @@
-package com.example.demo.src.user.model;
+package com.example.demo.src.store.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,6 +11,6 @@ import lombok.Setter;
  * Res.java: From Server To Client
  * 회원가입의 결과(Respone)를 보여주는 데이터의 형태
  */
-public class PostUserRes {
-    private int userId;
+public class PostStoreRes {
+    private int storeId;
 }

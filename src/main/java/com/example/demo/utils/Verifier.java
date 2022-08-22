@@ -41,6 +41,16 @@ public class Verifier {
         }
     }
 
+    public boolean isPresentStoreId(int uid){
+        try{
+            verifierDao.isPresentStoreId(uid);
+            return true;
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            return false;
+        }
+    }
+
 //    /**
 //     * 채널 cid 검증
 //     */

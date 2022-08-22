@@ -70,16 +70,16 @@ public class VerifierDao {
                 checkPhoneParams);
     }
 
-//    /**
-//     * 채널 cid 검증
-//     */
-//    public void verifyChannelId (long cid){
-//        String From = "Channel";
-//        String Query = "SELECT * FROM "+ From +" WHERE status='active' AND id=?";
-//        this.jdbcTemplate.queryForObject(Query,
-//                (rs, rowNum) -> rs.getLong("id"),
-//                cid);
-//    }
+    /**
+     * 상점,유저 Store.id 검증
+     */
+    public void isPresentStoreId (int uid){
+        String From = "Store";
+        String Query = "SELECT * FROM "+ From +" WHERE status='active' AND id=?";
+        this.jdbcTemplate.queryForObject(Query,
+                (rs, rowNum) -> rs.getLong("id"),
+                uid);
+    }
 //    /**
 //     * 영상 vid 검증
 //     */

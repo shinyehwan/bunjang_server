@@ -1,6 +1,8 @@
 package com.example.demo.src.chat;
 
 
+import com.example.demo.src.chat.model.GetChatRoomRes;
+import com.example.demo.src.chat.model.RecentRoomInfoModel;
 import com.example.demo.src.user.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
@@ -55,6 +57,67 @@ public class ChatDao {
      * https://velog.io/@seculoper235/RowMapper%EC%97%90-%EB%8C%80%ED%95%B4 -> RowMapper에 대한 설명
      */
 
+
+    /**
+     * 채팅방 id 리스트 조회
+     */
+    public List<Integer> getRoomListById(int uid) {
+        String Query = "SELECT chatRoomId,storeId FROM ChatRoomStoreMap WHERE storeId= ? ";
+
+        return this.jdbcTemplate.query(Query,
+                (rs, rowNum) -> rs.getInt("chatRoomId"),
+                uid);
+    }
+
+
+    /**
+     * 채팅방 최근 메시지 정보 조회
+     */
+    public RecentRoomInfoModel getRecentRoomInfo(int roomId) {
+        try {
+            String Query = "SELECT Chat.sendStoreId, description,mediaType, mediaDescriptionUrl, createdAt AS 'uploaded'\n" +
+                    "From Chat\n" +
+                    "JOIN (SELECT chatRoomId, MAX(createdAt) AS 'created'\n" +
+                    "           FROM Chat\n" +
+                    "           WHERE status='active' AND chatRoomId = 2\n" +
+                    "           GROUP BY chatRoomId) recentDate\n" +
+                    "ON Chat.createdAt=recentDate.created AND Chat.chatRoomId=recentDate.chatRoomId";
+            return this.jdbcTemplate.queryForObject(Query,
+                    (rs, rn) -> new RecentRoomInfoModel(
+                            rs.getInt("sendStoreId"),
+                            rs.getString("description"),
+                            rs.getString("mediaType"),
+                            rs.getString("mediaDescriptionUrl"),
+                            rs.getString("uploaded")
+                    ),
+                    roomId);
+        } catch (Exception e) {
+            return new RecentRoomInfoModel(0, "", "", "", "");
+        }
+    }
+
+    /**
+     * 채팅방 상대방 정보 조회
+     */
+    public GetChatRoomRes getChatProfileInfo(int roomId, int uid) {
+        try {
+            String Query = "SELECT id, storeName, profileImgUrl FROM Store\n" +
+                    "JOIN (SELECT storeId FROM ChatRoomStoreMap\n" +
+                    "WHERE status='active' AND chatRoomId=? AND storeId != ?) Id\n" +
+                    "ON Store.id = Id.storeId";
+
+            return this.jdbcTemplate.queryForObject(Query,
+                    (rs,rn)-> new GetChatRoomRes(
+                            roomId,
+                            rs.getInt("id"),
+                            rs.getString("storeName"),
+                            rs.getString("profileImgUrl"),
+                            "",""
+                    ),roomId,uid);
+        } catch (Exception e) {
+            return new GetChatRoomRes( roomId,0, "", "", "","");
+        }
+    }
 
 
 //    // 회원가입

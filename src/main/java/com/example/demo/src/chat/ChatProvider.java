@@ -1,7 +1,10 @@
 package com.example.demo.src.chat;
 
 import com.example.demo.config.BaseException;
+import com.example.demo.config.BaseResponse;
 import com.example.demo.config.secret.Secret;
+import com.example.demo.src.chat.model.GetChatRoomRes;
+import com.example.demo.src.chat.model.RecentRoomInfoModel;
 import com.example.demo.src.user.model.GetUserRes;
 import com.example.demo.src.user.model.PostLoginReq;
 import com.example.demo.src.user.model.PostLoginRes;
@@ -13,20 +16,20 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.example.demo.config.BaseResponseStatus.*;
 
 //Provider : Read의 비즈니스 로직 처리
 @Service    // [Business Layer에서 Service를 명시하기 위해서 사용] 비즈니스 로직이나 respository layer 호출하는 함수에 사용된다.
-            // [Business Layer]는 컨트롤러와 데이터 베이스를 연결
+// [Business Layer]는 컨트롤러와 데이터 베이스를 연결
 /**
  * Provider란?
  * Controller에 의해 호출되어 실제 비즈니스 로직과 트랜잭션을 처리: Read의 비즈니스 로직 처리
  * 요청한 작업을 처리하는 관정을 하나의 작업으로 묶음
  * dao를 호출하여 DB CRUD를 처리 후 Controller로 반환
- */
-public class ChatProvider {
+ */ public class ChatProvider {
 
 
     // *********************** 동작에 있어 필요한 요소들을 불러옵니다. *************************
@@ -40,6 +43,40 @@ public class ChatProvider {
     public ChatProvider(ChatDao chatDao, JwtService jwtService) {
         this.chatDao = chatDao;
         this.jwtService = jwtService; // JWT부분은 7주차에 다루므로 모르셔도 됩니다!
+    }
+
+    /**
+     * 채팅방 목록 조회
+     */
+    public List<GetChatRoomRes> getChatRoomList(int uid) throws BaseException {
+        try {
+            // 채팅방 id 리스트 조회
+            List<Integer> idList = chatDao.getRoomListById(uid);
+
+            // 각 채팅방 정보 조회
+            List<GetChatRoomRes> roomList = new ArrayList<>();
+            for (int roomId : idList) {
+                RecentRoomInfoModel recentRoomInfoModel = chatDao.getRecentRoomInfo(roomId);
+                GetChatRoomRes getChatRoomRes = chatDao.getChatProfileInfo(roomId, uid);
+                String message;
+                if (recentRoomInfoModel.getDescription() != null)
+                    message = recentRoomInfoModel.getDescription();
+                else {
+                    message = recentRoomInfoModel.getMediaType() + recentRoomInfoModel.getMediaDescriptionUrl();
+                }
+
+                if (getChatRoomRes.getTalkerId() != 0) {
+                    getChatRoomRes.setLastMessage(message);
+                    getChatRoomRes.setLastMessageTime(recentRoomInfoModel.getUploaded());
+
+                    roomList.add(getChatRoomRes);
+                }
+            }
+            return roomList;
+        } catch (Exception exception) { // DB에 이상이 있는 경우 에러 메시지를 보냅니다.
+            logger.error(exception.getMessage());
+            throw new BaseException(DATABASE_ERROR);
+        }
     }
 
 //

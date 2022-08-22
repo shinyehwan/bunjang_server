@@ -9,6 +9,8 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class GetChatRoomRes {
+    int roomId;
+    int talkerId;
     String name;
     String thumbnailImgUrl;
     String lastMessage;

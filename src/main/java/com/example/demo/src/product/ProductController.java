@@ -2,9 +2,7 @@ package com.example.demo.src.product;
 
 import com.example.demo.config.BaseException;
 import com.example.demo.config.BaseResponse;
-import com.example.demo.src.product.model.GetCategoryDepth01Res;
-import com.example.demo.src.product.model.GetCategoryDepth02Res;
-import com.example.demo.src.product.model.GetCategoryDepth03Res;
+import com.example.demo.src.product.model.*;
 import com.example.demo.utils.JwtService;
 import com.example.demo.utils.Verifier;
 import org.slf4j.Logger;
@@ -13,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
+import static com.example.demo.config.BaseResponseStatus.INVALID_STORE_ID;
 
 @RestController // Rest API 또는 WebAPI를 개발하기 위한 어노테이션. @Controller + @ResponseBody 를 합친것.
                 // @Controller      [Presentation Layer에서 Contoller를 명시하기 위해 사용]
@@ -53,13 +53,30 @@ public class ProductController {
     // ******************************************************************************
 
 
-    /**
-     * 상품 등록
-     * [POST] /bungae/product/
-     */
+//    /**
+//     * 상품 등록
+//     * [POST] /bungae/product/
+//     */
 //    @ResponseBody
-//    @GetMapping("")
-//    public BaseResponse<>
+//    @PostMapping("")
+//    public BaseResponse<PostNewProductRes> postNewProduct (
+//            @RequestBody PostNewProductReq newProduct ){
+//
+//        try {
+//            // jwt 에서 uid 추출
+//            int uid;
+//            uid = jwtService.getUserIdx();
+//            // 존재하는 상점 아이디인지 검증
+//            if (!verifier.isPresentStoreId(uid))
+//                throw new BaseException(INVALID_STORE_ID); // /3001/존재하지 않는 상점 id 입니다.
+//
+//            //TODO
+//
+//            return new BaseResponse<>(new PostNewProductRes());
+//        } catch (BaseException exception) {
+//            return new BaseResponse<>((exception.getStatus()));
+//        }
+//    }
     //이름
     //사진들
     //태그

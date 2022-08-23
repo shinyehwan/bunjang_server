@@ -1,7 +1,6 @@
 package com.example.demo.src.product;
 
 import com.example.demo.config.BaseException;
-import com.example.demo.src.chat.ChatDao;
 import com.example.demo.src.product.model.GetCategoryDepth01Res;
 import com.example.demo.src.product.model.GetCategoryDepth02Res;
 import com.example.demo.src.product.model.GetCategoryDepth03Res;
@@ -92,8 +91,8 @@ public class ProductProvider {
     public List<GetCategoryDepth03Res> getCategoryDepth03 (int depth1Id, int depth2Id) throws BaseException {
         try {
             // (Validation) 카테고리 아이디 d1 d2 가 일치하는지 확인
-            if (!isMatchCategory(depth1Id, depth2Id))
-                throw new BaseException(NOT_MATCH_CATEGORY_ID);
+            if (!isMatchCategory1and2(depth1Id, depth2Id))
+                throw new BaseException(NOT_MATCH_CATEGORY_12_ID);
 
             List<GetCategoryDepth03Res>  getCategoryDepth03ResList =  productDao.getCategoryDepth03(depth2Id);
 
@@ -110,13 +109,38 @@ public class ProductProvider {
         }
     }
 
+    /**
+     * 카테고리01 정보 확인
+     */
+    public GetCategoryDepth01Res getCategoryInfoDepth01 (int depth1Id) {
+            return productDao.getCategoryInfoDepth01(depth1Id);
+    }
+
+    /**
+     * 카테고리02 정보 확인
+     */
+    public GetCategoryDepth02Res getCategoryInfoDepth02 (int depth1Id) {
+            return productDao.getCategoryInfoDepth02(depth1Id);
+    }
 
     /**
      * (validation) 카테고리 아이디 d1 d2 가 일치하는지 확인
      */
-    public boolean isMatchCategory (int depth1Id,int depth2Id) {
+    public boolean isMatchCategory1and2(int depth1Id, int depth2Id) {
         try {
-            productDao.getMatchCategory(depth1Id, depth2Id);
+            productDao.getMatchCategory1and2(depth1Id, depth2Id);
+            return true;
+        } catch (Exception e){
+            return false;
+        }
+    }
+
+    /**
+     * (validation) 카테고리 아이디 d1 d2 가 일치하는지 확인
+     */
+    public boolean isMatchCategory2and3(int depth2Id, int depth3Id) {
+        try {
+            productDao.getMatchCategory2and3(depth2Id, depth3Id);
             return true;
         } catch (Exception e){
             return false;

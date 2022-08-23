@@ -232,6 +232,67 @@ public class StoreController {
             return new BaseResponse<>((exception.getStatus()));
         }
     }
+    /**
+     * 리뷰 목록 조회 API
+     * [GET] /bungae/stores/:storeId/review
+     */
+    @ResponseBody
+    @GetMapping("/{storeId}/review")
+    public BaseResponse<List<GetStoreReviewRes>> getReview(@PathVariable int storeId) {
+        try {
+            //jwt에서 idx 추출.
+            int userIdxByJwt = jwtService.getUserIdx();
+            //userIdx와 접근한 유저가 같은지 확인
+            if(storeId != userIdxByJwt){
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }
+            List<GetStoreReviewRes> getStoreReviewRes = storeProvider.getStoreReview(storeId);
+            return new BaseResponse<>(getStoreReviewRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     * 팔로워 목록 조회 API
+     * [GET] /bungae/stores/:storeId/following
+     */
+    @ResponseBody
+    @GetMapping("/{storeId}/following")
+    public BaseResponse<List<GetStoreFollowingRes>> getFollowing(@PathVariable int storeId) {
+        try {
+            //jwt에서 idx 추출.
+            int userIdxByJwt = jwtService.getUserIdx();
+            //userIdx와 접근한 유저가 같은지 확인
+            if(storeId != userIdxByJwt){
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }
+            List<GetStoreFollowingRes> getStoreFollowingRes = storeProvider.getStoreFollowing(storeId);
+            return new BaseResponse<>(getStoreFollowingRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+    /**
+     * 팔로워 목록 조회 API
+     * [GET] /bungae/stores/:storeId/follower
+     */
+    @ResponseBody
+    @GetMapping("/{storeId}/follower")
+    public BaseResponse<List<GetStoreFollowerRes>> getFollower(@PathVariable int storeId) {
+        try {
+            //jwt에서 idx 추출.
+            int userIdxByJwt = jwtService.getUserIdx();
+            //userIdx와 접근한 유저가 같은지 확인
+            if(storeId != userIdxByJwt){
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }
+            List<GetStoreFollowerRes> getStoreFollowerRes = storeProvider.getStoreFollower(storeId);
+            return new BaseResponse<>(getStoreFollowerRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
 
 
 //    /**

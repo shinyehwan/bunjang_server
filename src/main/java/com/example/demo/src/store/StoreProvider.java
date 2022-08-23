@@ -120,6 +120,35 @@ public class StoreProvider {
         }
     }
 
+    // 리뷰 상품 조회
+    public List<GetStoreReviewRes> getStoreReview(int storeId) throws BaseException {
+        try {
+            List<GetStoreReviewRes> getStoreReviewRes = storeDao.getStoreReview(storeId);
+            return getStoreReviewRes;
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+    // 팔로잉 계정 조회
+    public List<GetStoreFollowingRes> getStoreFollowing(int storeId) throws BaseException {
+        try {
+            List<GetStoreFollowingRes> getStoreFollowingRes = storeDao.getStoreFollowing(storeId);
+            return getStoreFollowingRes;
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    // 팔로워 계정 조회
+    public List<GetStoreFollowerRes> getStoreFollower(int storeId) throws BaseException {
+        try {
+            List<GetStoreFollowerRes> getStoreFollowerRes = storeDao.getStoreFollower(storeId);
+            return getStoreFollowerRes;
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
 
 
 //    public int checkName(String name) throws BaseException {

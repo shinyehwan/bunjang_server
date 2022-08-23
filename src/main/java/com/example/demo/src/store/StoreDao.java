@@ -170,6 +170,58 @@ public class StoreDao {
                 getUserParams); // 한 개의 회원정보를 얻기 위한 jdbcTemplate 함수(Query, 객체 매핑 정보, Params)의 결과 반환
     }
 
+    // 상점 리뷰 목록 조회
+    public List<GetStoreReviewRes> getStoreReview (int storeId) {
+        String getUserQuery = "select Store.profileImgUrl, Store.storeName, Review.star, Review.content\n" +
+                "from Review, Store\n" +
+                "where Review.purchaserStoreId = Store.id and Review.sellerStoreId = ?";
+        int getUserParams = storeId;
+        return this.jdbcTemplate.query(getUserQuery,
+                (rs, rowNum) -> new GetStoreReviewRes(
+                        rs.getString("profileImgUrl"),
+                        rs.getString("storeName"),
+                        rs.getInt("star"),
+                        rs.getString("content")
+                ), // RowMapper(위의 링크 참조): 원하는 결과값 형태로 받기
+                getUserParams); // 한 개의 회원정보를 얻기 위한 jdbcTemplate 함수(Query, 객체 매핑 정보, Params)의 결과 반환
+    }
+
+    // 팔로잉 목록 조회
+    public List<GetStoreFollowingRes> getStoreFollowing (int storeId) {
+        String getUserQuery = "select Store.profileImgUrl, Store.storeName, COUNT(Product.storeId) as productNumber\n" +
+                "from Follow, Store, Product\n" +
+                "where Follow.followerStoreId = Store.id\n" +
+                "  and Store.id = Product.storeId\n" +
+                "  and Follow.followingStoreId = ?\n" +
+                "group by Store.storeName";
+        int getUserParams = storeId;
+        return this.jdbcTemplate.query(getUserQuery,
+                (rs, rowNum) -> new GetStoreFollowingRes(
+                        rs.getString("profileImgUrl"),
+                        rs.getString("storeName"),
+                        rs.getInt("productNumber")
+                ), // RowMapper(위의 링크 참조): 원하는 결과값 형태로 받기
+                getUserParams); // 한 개의 회원정보를 얻기 위한 jdbcTemplate 함수(Query, 객체 매핑 정보, Params)의 결과 반환
+    }
+    // 팔로워 목록 조회
+    public List<GetStoreFollowerRes> getStoreFollower (int storeId) {
+        String getUserQuery = "select Store.profileImgUrl, Store.storeName, COUNT(Product.storeId) as productNumber\n" +
+                "from Follow, Store, Product\n" +
+                "where Follow.followingStoreId = Store.id\n" +
+                "  and Store.id = Product.storeId\n" +
+                "  and Follow.followerStoreId = ?\n" +
+                "group by Store.storeName";
+        int getUserParams = storeId;
+        return this.jdbcTemplate.query(getUserQuery,
+                (rs, rowNum) -> new GetStoreFollowerRes(
+                        rs.getString("profileImgUrl"),
+                        rs.getString("storeName"),
+                        rs.getInt("productNumber")
+                ), // RowMapper(위의 링크 참조): 원하는 결과값 형태로 받기
+                getUserParams); // 한 개의 회원정보를 얻기 위한 jdbcTemplate 함수(Query, 객체 매핑 정보, Params)의 결과 반환
+    }
+
+
 
 //    // 이름 확인
 //    public int checkName(String name) {

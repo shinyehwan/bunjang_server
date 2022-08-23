@@ -58,6 +58,12 @@ public class ProductController {
 //    @ResponseBody
 //    @GetMapping("")
 //    public BaseResponse<>
+    //이름
+    //사진들
+    //태그
+    //옵션들 -> enum 확인
+    //설명
+
 
 
 

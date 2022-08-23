@@ -120,7 +120,7 @@ public class ChatController {
             uid = jwtService.getUserIdx();
             // 존재하는 상점 아이디인지 검증
             if (!verifier.isPresentStoreId(uid))
-                throw new BaseException(INVALID_STORE_ID);
+                throw new BaseException(INVALID_STORE_ID); // /3001/존재하지 않는 상점 id 입니다.
             // 접속 가능한 채팅방인지 검증
             if (!chatProvider.isAccessableRoom(uid, roomId))
                 throw new BaseException(INVALID_ROOM_ID);

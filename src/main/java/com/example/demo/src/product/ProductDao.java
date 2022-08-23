@@ -1,20 +1,16 @@
 package com.example.demo.src.product;
 
 
-import com.example.demo.config.BaseException;
-import com.example.demo.config.BaseResponse;
 import com.example.demo.src.product.model.GetCategoryDepth01Res;
 import com.example.demo.src.product.model.GetCategoryDepth02Res;
 import com.example.demo.src.product.model.GetCategoryDepth03Res;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
 import java.util.List;
-import java.util.Queue;
-
-import static com.example.demo.config.BaseResponseStatus.DATABASE_ERROR;
 
 @Repository //  [Persistence Layer에서 DAO를 명시하기 위해 사용]
 
@@ -102,14 +98,69 @@ public class ProductDao {
                 depth2Id);
     }
 
+    /**
+     * 카테고리01 정보 확인
+     */
+    public GetCategoryDepth01Res getCategoryInfoDepth01 (int depth1Id) {
+        try {
+            String Query = "SELECT Category.id, Category.name, COUNT(C2.name) AS 'count' FROM Category\n" +
+                    "    LEFT JOIN CategoryDepth2 C2 on Category.id = C2.categoryId\n" +
+                    "WHERE Category.status='active' AND Category.id=? \n" +
+                    "GROUP BY Category.id";
+
+            return this.jdbcTemplate.queryForObject(Query,
+                    (rs, rn) -> new GetCategoryDepth01Res(
+                            rs.getInt("id"),
+                            rs.getString("name"),
+                            (rs.getInt("count") > 0)
+                    ),
+                    depth1Id);
+        } catch (IncorrectResultSizeDataAccessException error) {
+            return new GetCategoryDepth01Res(0,"",false);
+        }
+    }
 
     /**
-     * 카테고리 항목 조회 - 세부 카테고리 1
+     * 카테고리02 정보 확인
      */
-    public void getMatchCategory(int depth1Id, int depth2Id) {
+    public GetCategoryDepth02Res getCategoryInfoDepth02 (int depth1Id) {
+        try {
+            String Query = "SELECT CategoryDepth2.id, CategoryDepth2.name, COUNT(C3.name) AS 'count' FROM CategoryDepth2\n" +
+                    "    LEFT JOIN CategoryDepth3 C3 on CategoryDepth2.id = C3.category2Id\n" +
+                    "WHERE CategoryDepth2.status='active' AND CategoryDepth2.id= ? \n" +
+                    "GROUP BY CategoryDepth2.id";
+
+            return this.jdbcTemplate.queryForObject(Query,
+                    (rs, rn) -> new GetCategoryDepth02Res(
+                            rs.getInt("id"),
+                            rs.getString("name"),
+                            (rs.getInt("count") > 0)
+                    ),
+                    depth1Id);
+        } catch (IncorrectResultSizeDataAccessException error) {
+            return new GetCategoryDepth02Res(0,"",false);
+        }
+    }
+
+    /**
+     * (validation) 카테고리 아이디 d1 d2 가 일치하는지 확인
+     */
+    public void getMatchCategory1and2(int depth1Id, int depth2Id) {
         String Query = "SELECT id,categoryId, name FROM CategoryDepth2 WHERE status='active' AND categoryId = ? And id=?";
         this.jdbcTemplate.queryForObject(Query,
                 (rs, rn) -> rs.getInt("id"),
                 depth1Id, depth2Id);
     }
+
+
+    /**
+     * (validation) 카테고리 아이디 d2 d3 가 일치하는지 확인
+     */
+    public void getMatchCategory2and3(int depth2Id, int depth3Id) {
+        String Query = "SELECT id,category2Id, name FROM CategoryDepth3 WHERE status='active' AND category2Id = ? And id=?";
+        this.jdbcTemplate.queryForObject(Query,
+                (rs, rn) -> rs.getInt("id"),
+                depth2Id, depth3Id);
+    }
+
 }

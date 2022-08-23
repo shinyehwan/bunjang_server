@@ -53,7 +53,7 @@ public enum BaseResponseStatus {
     // 3320 : [POST] /bungae/product/ : 상품 등록하기 API
 
     // 3330 : [GET] /bungae/product/category : 카테고리 항목 조회
-    NOT_MATCH_CATEGORY_ID(false, 3330, "연관되지 않은 depth1Id와 depth2Id입니다."),
+    NOT_MATCH_CATEGORY_12_ID(false, 3330, "연관되지 않은 depth1Id와 depth2Id입니다."),
     NOT_EXIST_CATEGORY_ID(false, 3331, "더이상 데이터가 존재하지 않는 카테고리 id 입니다."),
 
     // 3400 : 번개톡 관련

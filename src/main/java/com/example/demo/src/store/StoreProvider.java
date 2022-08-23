@@ -110,6 +110,15 @@ public class StoreProvider {
             throw new BaseException(DATABASE_ERROR);
         }
     }
+    // 찜한 상품 조회
+    public List<GetStoreBasketRes> getStoreBasket(int storeId) throws BaseException {
+        try {
+            List<GetStoreBasketRes> getStoreBasketRes = storeDao.getStoreBasket(storeId);
+            return getStoreBasketRes;
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
 
 
 

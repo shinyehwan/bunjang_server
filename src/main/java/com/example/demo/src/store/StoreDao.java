@@ -145,6 +145,32 @@ public class StoreDao {
                 getUserParams); // 한 개의 회원정보를 얻기 위한 jdbcTemplate 함수(Query, 객체 매핑 정보, Params)의 결과 반환
     }
 
+    // 상점 정보 변경
+    public int modifyStore(int storeId, PatchStoreDetailReq patchStoreDetailReq) {
+        String modifyUserNameQuery = "update Store set storeName = ?, profileImgUrl = ?, contactTime = ?, introduce = ?, policy = ?, precautions = ?\n" +
+                "             where id = ?"; // 해당 userIdx를 만족하는 User를 해당 nickname으로 변경한다.
+        Object[] modifyUserNameParams = new Object[]{patchStoreDetailReq.getStoreName(), patchStoreDetailReq.getProfileImgUrl(), patchStoreDetailReq.getContactTime(), patchStoreDetailReq.getIntroduce(), patchStoreDetailReq.getPolicy(), patchStoreDetailReq.getPrecautions(), storeId};
+        return this.jdbcTemplate.update(modifyUserNameQuery, modifyUserNameParams); // 대응시켜 매핑시켜 쿼리 요청(생성했으면 1, 실패했으면 0)
+    }
+
+    // 상점 찜한 목록 조회
+    public List<GetStoreBasketRes> getStoreBasket (int storeId) {
+        String getUserQuery = "select Product.imageUrl01, Product.title\n" +
+                "from Store, Basket, Product\n" +
+                "where Basket.storeId = Store.id and Basket.productId = Product.id and basket = \"true\" and\n" +
+                "      Store.id = ?";
+        int getUserParams = storeId;
+        return this.jdbcTemplate.query(getUserQuery,
+                (rs, rowNum) -> new GetStoreBasketRes(
+                        rs.getString("imageUrl01"),
+                        rs.getString("title")
+//                        rs.getString("profileImgUrl"),
+//                        rs.getString("storeName")
+                ), // RowMapper(위의 링크 참조): 원하는 결과값 형태로 받기
+                getUserParams); // 한 개의 회원정보를 얻기 위한 jdbcTemplate 함수(Query, 객체 매핑 정보, Params)의 결과 반환
+    }
+
+
 //    // 이름 확인
 //    public int checkName(String name) {
 //        String checkPhoneQuery = "select exists(select name from Store where name = ?)";
@@ -154,13 +180,7 @@ public class StoreDao {
 //                checkPhoneParams);
 //    }
 
-    // 회원정보 변경
-    public int modifyStore(int storeId, PatchStoreDetailReq patchStoreDetailReq) {
-        String modifyUserNameQuery = "update Store set storeName = ?, profileImgUrl = ?, contactTime = ?, introduce = ?, policy = ?, precautions = ?\n" +
-                "             where id = ?"; // 해당 userIdx를 만족하는 User를 해당 nickname으로 변경한다.
-        Object[] modifyUserNameParams = new Object[]{patchStoreDetailReq.getStoreName(), patchStoreDetailReq.getProfileImgUrl(), patchStoreDetailReq.getContactTime(), patchStoreDetailReq.getIntroduce(), patchStoreDetailReq.getPolicy(), patchStoreDetailReq.getPrecautions(), storeId};
-        return this.jdbcTemplate.update(modifyUserNameQuery, modifyUserNameParams); // 대응시켜 매핑시켜 쿼리 요청(생성했으면 1, 실패했으면 0)
-    }
+
 
 
 

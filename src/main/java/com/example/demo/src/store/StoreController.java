@@ -189,9 +189,9 @@ public class StoreController {
     }
 
     /**
-     //     * 유저정보변경 API
-     //     * [PATCH] /users/:userIdx
-     //     */
+     * 상점 상세 정보변경 API
+     * [PATCH] /stores/:storeId/detail
+     */
     @ResponseBody
     @PatchMapping("/{storeId}/detail")
     public BaseResponse<String> modifyStoreDetail(@PathVariable int storeId, @RequestBody PatchStoreDetailReq patchStoreDetailReq) {
@@ -207,6 +207,27 @@ public class StoreController {
 
             String result = "상점 정보가 수정되었습니다.";
             return new BaseResponse<>(result);
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     * 찜한 목록 조회 API
+     * [GET] /bungae/stores/:storeId/basket
+     */
+    @ResponseBody
+    @GetMapping("/{storeId}/basket")
+    public BaseResponse<List<GetStoreBasketRes>> getBasket(@PathVariable int storeId) {
+        try {
+            //jwt에서 idx 추출.
+            int userIdxByJwt = jwtService.getUserIdx();
+            //userIdx와 접근한 유저가 같은지 확인
+            if(storeId != userIdxByJwt){
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }
+            List<GetStoreBasketRes> getStoreBasketRes = storeProvider.getStoreBasket(storeId);
+            return new BaseResponse<>(getStoreBasketRes);
         } catch (BaseException exception) {
             return new BaseResponse<>((exception.getStatus()));
         }

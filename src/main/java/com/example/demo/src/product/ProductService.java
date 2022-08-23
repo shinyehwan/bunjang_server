@@ -21,15 +21,15 @@ public class ProductService {
     final Logger logger = LoggerFactory.getLogger(this.getClass()); // Log 처리부분: Log를 기록하기 위해 필요한 함수입니다.
 
     // *********************** 동작에 있어 필요한 요소들을 불러옵니다. *************************
-    private final ChatDao chatDao;
-    private final ChatProvider chatProvider;
+    private final ProductDao productDao;
+    private final ProductProvider productProvider;
     private final JwtService jwtService; // JWT부분은 7주차에 다루므로 모르셔도 됩니다!
 
 
     @Autowired //readme 참고
-    public ProductService(ChatDao chatDao, ChatProvider chatProvider, JwtService jwtService) {
-        this.chatDao = chatDao;
-        this.chatProvider = chatProvider;
+    public ProductService(ProductDao productDao, ProductProvider productProvider, JwtService jwtService) {
+        this.productDao = productDao;
+        this.productProvider = productProvider;
         this.jwtService = jwtService; // JWT부분은 7주차에 다루므로 모르셔도 됩니다!
 
     }

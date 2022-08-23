@@ -1,16 +1,18 @@
 package com.example.demo.src.product;
 
-import com.example.demo.src.chat.ChatProvider;
-import com.example.demo.src.chat.ChatService;
+import com.example.demo.config.BaseException;
+import com.example.demo.config.BaseResponse;
+import com.example.demo.src.product.model.GetCategoryDepth01Res;
+import com.example.demo.src.product.model.GetCategoryDepth02Res;
+import com.example.demo.src.product.model.GetCategoryDepth03Res;
 import com.example.demo.utils.JwtService;
 import com.example.demo.utils.Verifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController // Rest API 또는 WebAPI를 개발하기 위한 어노테이션. @Controller + @ResponseBody 를 합친것.
                 // @Controller      [Presentation Layer에서 Contoller를 명시하기 위해 사용]
@@ -27,16 +29,16 @@ public class ProductController {
     final Logger logger = LoggerFactory.getLogger(this.getClass()); // Log를 남기기: 일단은 모르고 넘어가셔도 무방합니다.
 
     @Autowired
-    private final ChatProvider chatProvider;
+    private final ProductProvider productProvider;
     @Autowired
-    private final ChatService chatService;
+    private final ProductService productService;
     @Autowired
     private final JwtService jwtService;
 
 
-    public ProductController(ChatProvider chatProvider, ChatService chatService, JwtService jwtService) {
-        this.chatProvider = chatProvider;
-        this.chatService = chatService;
+    public ProductController(ProductProvider productProvider, ProductService productService, JwtService jwtService) {
+        this.productProvider = productProvider;
+        this.productService = productService;
         this.jwtService = jwtService;
     }
     // ******************************************************************************
@@ -66,8 +68,56 @@ public class ProductController {
 
 
 
+    /**
+     * 카테고리 항목 조회
+     * [GET] /bungae/product/category
+     */
+    @ResponseBody
+    @GetMapping("/category")
+    public BaseResponse<List<GetCategoryDepth01Res>> getCategoryDepth01 () {
+        try{
+            return new BaseResponse<>(productProvider.getCategoryDepth01());
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
 
-//s
+    /**
+     * 카테고리 항목 조회 - 세부 카테고리 1
+     * [GET] /bungae/product/category/:depth1Id
+     */
+    //  |3331|더이상 데이터가 존재하지 않는 카테고리 id 입니다.
+    @ResponseBody
+    @GetMapping("/category/{depth1Id}")
+    public BaseResponse<List<GetCategoryDepth02Res>> getCategoryDepth02 (
+            @PathVariable("depth1Id") Integer depth1Id) {
+        try{
+            return new BaseResponse<>(productProvider.getCategoryDepth02(depth1Id));
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     * 카테고리 항목 조회 - 세부 카테고리 2
+     * [GET] /bungae/product/category/:depth1Id/:depth2Id
+     */
+    //  |3331|더이상 데이터가 존재하지 않는 카테고리 id 입니다.
+    // |3330|연관되지 않은 depth1Id와 depth2Id입니다.
+    @ResponseBody
+    @GetMapping("/category/{depth1Id}/{depth2Id}")
+    public BaseResponse<List<GetCategoryDepth03Res>> getCategoryDepth03 (
+            @PathVariable("depth1Id") Integer depth1Id,
+            @PathVariable("depth2Id") Integer depth2Id) {
+        try{
+            return new BaseResponse<>(productProvider.getCategoryDepth03(depth1Id, depth2Id));
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+
+//
 //    /**
 //     * 회원가입
 //     * [POST] bungae/users/new

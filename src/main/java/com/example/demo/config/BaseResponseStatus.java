@@ -47,6 +47,14 @@ public enum BaseResponseStatus {
     DUPLICATED_EMAIL(false, 3013, "중복된 이메일입니다."),
     FAILED_TO_LOGIN(false,3014,"없는 번호이거나 비밀번호가 틀렸습니다."),
 
+    // 3300 : 상품 관련
+
+    // 3310 : [GET] /bungae/product/:productId : 상품 상세 정보 조회 API(조회수, 찜하기 수, 채팅 수, 상품 관련 내용)
+    // 3320 : [POST] /bungae/product/ : 상품 등록하기 API
+
+    // 3330 : [GET] /bungae/product/category : 카테고리 항목 조회
+    NOT_MATCH_CATEGORY_ID(false, 3330, "연관되지 않은 depth1Id와 depth2Id입니다."),
+    NOT_EXIST_CATEGORY_ID(false, 3331, "더이상 데이터가 존재하지 않는 카테고리 id 입니다."),
 
     // 3400 : 번개톡 관련
     INVALID_ROOM_ID(false, 3400, "이용자가 접속 불가능한 대화방입니다."),

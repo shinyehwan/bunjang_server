@@ -1,11 +1,19 @@
 package com.example.demo.src.product;
 
+import com.example.demo.config.BaseException;
 import com.example.demo.src.chat.ChatDao;
+import com.example.demo.src.product.model.GetCategoryDepth01Res;
+import com.example.demo.src.product.model.GetCategoryDepth02Res;
+import com.example.demo.src.product.model.GetCategoryDepth03Res;
 import com.example.demo.utils.JwtService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+import static com.example.demo.config.BaseResponseStatus.*;
 
 //Provider : Read의 비즈니스 로직 처리
 @Service    // [Business Layer에서 Service를 명시하기 위해서 사용] 비즈니스 로직이나 respository layer 호출하는 함수에 사용된다.
@@ -20,86 +28,98 @@ public class ProductProvider {
 
 
     // *********************** 동작에 있어 필요한 요소들을 불러옵니다. *************************
-    private final ChatDao chatDao;
+    private final ProductDao productDao;
     private final JwtService jwtService; // JWT부분은 7주차에 다루므로 모르셔도 됩니다!
 
 
     final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired //readme 참고
-    public ProductProvider(ChatDao chatDao, JwtService jwtService) {
-        this.chatDao = chatDao;
+    public ProductProvider(ProductDao productDao, JwtService jwtService) {
+        this.productDao = productDao;
         this.jwtService = jwtService; // JWT부분은 7주차에 다루므로 모르셔도 됩니다!
     }
 
-//
-//    // 로그인(password 검사)
-//    public PostLoginRes logIn(PostLoginReq postLoginReq) throws BaseException {
-//        User user = chatDao.getPwd(postLoginReq);
-//        String password;
-//        try {
-//            password = new AES128(Secret.USER_INFO_PASSWORD_KEY).decrypt(user.getPassword()); // 암호화
-//            // 회원가입할 때 비밀번호가 암호화되어 저장되었기 떄문에 로그인을 할때도 암호화된 값끼리 비교를 해야합니다.
-//        } catch (Exception ignored) {
-//            throw new BaseException(PASSWORD_DECRYPTION_ERROR);
-//        }
-//
-//        if (postLoginReq.getPassword().equals(password)) { //비말번호가 일치한다면 userIdx를 가져온다.
-//            int userIdx = chatDao.getPwd(postLoginReq).getId();
-//            String jwt = jwtService.createJwt(userIdx);
-//            return new PostLoginRes(userIdx, jwt);
-//
-//        } else { // 비밀번호가 다르다면 에러메세지를 출력한다.
-//            throw new BaseException(FAILED_TO_LOGIN);
-//        }
-//    }
-//
-//    // 해당 이메일이 이미 User Table에 존재하는지 확인
-//    public int checkPhone(String phone) throws BaseException {
-//        try {
-//            return chatDao.checkPhone(phone);
-//        } catch (Exception exception) {
-//            throw new BaseException(DATABASE_ERROR);
-//        }
-//    }
-//    public int checkName(String name) throws BaseException {
-//        try {
-//            return chatDao.checkName(name);
-//        } catch (Exception exception) {
-//            throw new BaseException(DATABASE_ERROR);
-//        }
-//    }
-//
-//
-//    // User들의 정보를 조회
-//    public List<GetUserRes> getUsers() throws BaseException {
-//        try {
-//            List<GetUserRes> getUserRes = chatDao.getUsers();
-//            return getUserRes;
-//        } catch (Exception exception) {
-//            throw new BaseException(DATABASE_ERROR);
-//        }
-//    }
-//
-//    // 해당 nickname을 갖는 User들의 정보 조회
-//    public List<GetUserRes> getUsersByNickname(String nickname) throws BaseException {
-//        try {
-//            List<GetUserRes> getUsersRes = chatDao.getUsersByNickname(nickname);
-//            return getUsersRes;
-//        } catch (Exception exception) {
-//            throw new BaseException(DATABASE_ERROR);
-//        }
-//    }
-//
-//
-//    // 해당 userIdx를 갖는 User의 정보 조회
-//    public GetUserRes getUser(int userIdx) throws BaseException {
-//        try {
-//            GetUserRes getUserRes = chatDao.getUser(userIdx);
-//            return getUserRes;
-//        } catch (Exception exception) {
-//            throw new BaseException(DATABASE_ERROR);
-//        }
-//    }
 
+    /**
+     * 카테고리 항목 조회
+     */
+    public List<GetCategoryDepth01Res> getCategoryDepth01 () throws BaseException {
+        try {
+            // 카테고리 리스트 조회
+            List<GetCategoryDepth01Res> getCategoryDepth01ResList = productDao.getCategoryDepth01();
+
+            for (GetCategoryDepth01Res category : getCategoryDepth01ResList ){
+                // 세부항목이 있는지 조회
+                if( productDao.getCategoryDepth02(category.getDepth1Id())
+                        .size() != 0)
+                    category.setHasMoreDepth(true); // 있으면 hasMoreDepth = true;
+            }
+            return getCategoryDepth01ResList;
+        } catch (Exception e){
+            logger.error(e.getMessage());
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+    /**
+     * 카테고리 항목 조회 - 세부 카테고리 1
+     */
+    public List<GetCategoryDepth02Res> getCategoryDepth02 (int depth1Id) throws BaseException {
+        try {
+            List<GetCategoryDepth02Res> getCategoryDepth02ResList = productDao.getCategoryDepth02(depth1Id);
+
+            // (Validation) 데이터가 없다면 에러 반환
+            if (getCategoryDepth02ResList.size() == 0)
+                throw new BaseException(NOT_EXIST_CATEGORY_ID);
+
+            for (GetCategoryDepth02Res category : getCategoryDepth02ResList) {
+                // 세부항목이 있는지 조회
+                if( productDao.getCategoryDepth03(category.getDepth2Id())
+                        .size() != 0)
+                    category.setHasMoreDepth(true);
+            }
+            return getCategoryDepth02ResList;
+        } catch (BaseException e){
+            throw e;
+        } catch (Exception e){
+            logger.error(e.getMessage());
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+    /**
+     * 카테고리 항목 조회 - 세부 카테고리 2
+     */
+    public List<GetCategoryDepth03Res> getCategoryDepth03 (int depth1Id, int depth2Id) throws BaseException {
+        try {
+            // (Validation) 카테고리 아이디 d1 d2 가 일치하는지 확인
+            if (!isMatchCategory(depth1Id, depth2Id))
+                throw new BaseException(NOT_MATCH_CATEGORY_ID);
+
+            List<GetCategoryDepth03Res>  getCategoryDepth03ResList =  productDao.getCategoryDepth03(depth2Id);
+
+            // (Validation) 데이터가 없다면 에러 반환
+            if (getCategoryDepth03ResList.size() == 0)
+                throw new BaseException(NOT_EXIST_CATEGORY_ID);
+
+            return getCategoryDepth03ResList;
+        } catch (BaseException e){
+            throw e;
+        } catch (Exception e){
+            logger.error(e.getMessage());
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+
+    /**
+     * (validation) 카테고리 아이디 d1 d2 가 일치하는지 확인
+     */
+    public boolean isMatchCategory (int depth1Id,int depth2Id) {
+        try {
+            productDao.getMatchCategory(depth1Id, depth2Id);
+            return true;
+        } catch (Exception e){
+            return false;
+        }
+    }
 }

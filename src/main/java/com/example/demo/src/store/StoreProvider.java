@@ -74,9 +74,20 @@ public class StoreProvider {
         }
     }
 
+    // 상품, 찜, 리뷰, 팔로잉, 팔로워 갯수 조회
+    public GetStoreCountRes getStoreCount(int storeId) throws BaseException {
+        try {
+            int productCount = storeDao.getStoreProductCount(storeId);
+            int basketCount = storeDao.getStoreBasketCount(storeId);
+            int reviewCount = storeDao.getStoreReviewCount(storeId);
+            int followerCount = storeDao.getStoreFollowerCount(storeId);
+            int followingCount = storeDao.getStoreFollowingCount(storeId);
 
-
-
+            return new GetStoreCountRes(productCount, basketCount, reviewCount, followerCount, followingCount);
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
 
     // 마이페이지에서 판매중인 상품 조회
     public List<GetStoreSaleRes> getStoreSale(int storeId) throws BaseException {
@@ -105,7 +116,8 @@ public class StoreProvider {
             throw new BaseException(DATABASE_ERROR);
         }
     }
-    // 마이페이지에서 판매완료된 상품 조회
+
+    // 마이페이지에서 디테일 조회
     public GetStoreDetailRes getStoreDetail(int storeId) throws BaseException {
         try {
             GetStoreDetailRes getStoreDetailRes = storeDao.getStoreDetail(storeId);
@@ -114,6 +126,7 @@ public class StoreProvider {
             throw new BaseException(DATABASE_ERROR);
         }
     }
+
     // 찜한 상품 조회
     public List<GetStoreBasketRes> getStoreBasket(int storeId) throws BaseException {
         try {
@@ -152,16 +165,23 @@ public class StoreProvider {
             throw new BaseException(DATABASE_ERROR);
         }
     }
-    // 찜, 리뷰, 팔로잉, 팔로워 갯수 조회
-    public GetStoreCountRes getStoreCount(int storeId) throws BaseException {
-        try {
-            int productCount = storeDao.getStoreProductCount(storeId);
-            int basketCount = storeDao.getStoreBasketCount(storeId);
-            int reviewCount = storeDao.getStoreReviewCount(storeId);
-            int followerCount = storeDao.getStoreFollowerCount(storeId);
-            int followingCount = storeDao.getStoreFollowingCount(storeId);
 
-            return new GetStoreCountRes(productCount, basketCount, reviewCount, followerCount, followingCount);
+    // 팔로잉 상품 정보 조회
+    public List<GetStoreFollowingProductRes> getStoreFollowingProduct(int storeId) throws BaseException {
+        try {
+            List<GetStoreFollowingProductRes> getStoreFollowingProductRes = storeDao.getStoreFollowingProduct(storeId);
+            return getStoreFollowingProductRes;
+
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    // 팔로워 상품 정보 조회
+    public List<GetStoreFollowerProductRes> getStoreFollowerProduct(int storeId) throws BaseException {
+        try {
+            List<GetStoreFollowerProductRes> getStoreFollowerProductRes = storeDao.getStoreFollowerProduct(storeId);
+            return getStoreFollowerProductRes;
         } catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR);
         }

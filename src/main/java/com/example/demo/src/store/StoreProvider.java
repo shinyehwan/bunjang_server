@@ -148,6 +148,15 @@ public class StoreProvider {
             throw new BaseException(DATABASE_ERROR);
         }
     }
+//    // 찜, 리뷰, 팔로잉, 팔로워 갯수 조회
+//    public GetStoreCountRes getStoreCount(int storeId) throws BaseException {
+//        try {
+//            GetStoreBasketCountRes getStoreBasketCount = storeDao.getStoreBasketCount(storeId);
+//            return getStoreBasketCount;
+//        } catch (Exception exception) {
+//            throw new BaseException(DATABASE_ERROR);
+//        }
+//    }
 
 
 

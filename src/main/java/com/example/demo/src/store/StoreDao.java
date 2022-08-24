@@ -220,6 +220,69 @@ public class StoreDao {
                 ), // RowMapper(위의 링크 참조): 원하는 결과값 형태로 받기
                 getUserParams); // 한 개의 회원정보를 얻기 위한 jdbcTemplate 함수(Query, 객체 매핑 정보, Params)의 결과 반환
     }
+//    // 찜 갯수 조회
+//    public GetStoreBasketCountRes getStoreBasketCount (int storeId) {
+//        String getUserQuery = "select COUNT(Basket.storeId) as basketCount\n" +
+//                "from Basket, Store, Product\n" +
+//                "where Basket.storeId = Store.id\n" +
+//                "  and Basket.productId = Product.id\n" +
+//                "  and Store.id = ?";
+//        int getUserParams = storeId;
+//        return this.jdbcTemplate.queryForObject(getUserQuery,
+//                (rs, rowNum) -> new GetStoreBasketCountRes(
+//                        rs.getInt("basketCount")
+//                ), // RowMapper(위의 링크 참조): 원하는 결과값 형태로 받기
+//                getUserParams); // 한 개의 회원정보를 얻기 위한 jdbcTemplate 함수(Query, 객체 매핑 정보, Params)의 결과 반환
+//    }
+//    // 리뷰 갯수 조회
+//    public GetStoreReviewCountRes getStoreReviewCount (int storeId) {
+//        String getUserQuery = "select Basket.id, COUNT(Basket.storeId) as basketCount\n" +
+//                "from Basket, Store, Product\n" +
+//                "where Basket.storeId = Store.id\n" +
+//                "  and Basket.productId = Product.id\n" +
+//                "  and Store.id = ?;";
+//
+//        int getUserParams = storeId;
+//        return this.jdbcTemplate.queryForObject(getUserQuery,
+//                (rs, rowNum) -> new GetStoreReviewCountRes(
+//                        rs.getInt("reviewCount")
+//                ), // RowMapper(위의 링크 참조): 원하는 결과값 형태로 받기
+//                getUserParams); // 한 개의 회원정보를 얻기 위한 jdbcTemplate 함수(Query, 객체 매핑 정보, Params)의 결과 반환
+//    }
+//    // 팔로잉 갯수 조회
+//    public GetStoreFollowingCountRes getStoreFollowingCount (int storeId) {
+//        String getUserQuery = "select Basket.id, COUNT(Basket.storeId) as basketCount\n" +
+//                "from Basket, Store, Product\n" +
+//                "where Basket.storeId = Store.id\n" +
+//                "  and Basket.productId = Product.id\n" +
+//                "  and Store.id = ?;";
+//
+//        int getUserParams = storeId;
+//        return this.jdbcTemplate.queryForObject(getUserQuery,
+//                (rs, rowNum) -> new GetStoreCountRes(
+//                        rs.getInt("basketCount"),
+//                        rs.getInt("reviewCount"),
+//                        rs.getInt("followerCount")
+//                ), // RowMapper(위의 링크 참조): 원하는 결과값 형태로 받기
+//                getUserParams); // 한 개의 회원정보를 얻기 위한 jdbcTemplate 함수(Query, 객체 매핑 정보, Params)의 결과 반환
+//    }
+//    // 팔로잉 갯수 조회
+//    public GetStoreCountRes getStoreBasketCount (int storeId) {
+//        String getUserQuery = "select Basket.id, COUNT(Basket.storeId) as basketCount\n" +
+//                "from Basket, Store, Product\n" +
+//                "where Basket.storeId = Store.id\n" +
+//                "  and Basket.productId = Product.id\n" +
+//                "  and Store.id = ?;";
+//
+//        int getUserParams = storeId;
+//        return this.jdbcTemplate.queryForObject(getUserQuery,
+//                (rs, rowNum) -> new GetStoreCountRes(
+//                        rs.getInt("basketCount"),
+//                        rs.getInt("reviewCount"),
+//                        rs.getInt("followerCount")
+//                ), // RowMapper(위의 링크 참조): 원하는 결과값 형태로 받기
+//                getUserParams); // 한 개의 회원정보를 얻기 위한 jdbcTemplate 함수(Query, 객체 매핑 정보, Params)의 결과 반환
+//    }
 
 
 

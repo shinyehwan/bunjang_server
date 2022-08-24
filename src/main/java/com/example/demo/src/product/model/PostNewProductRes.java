@@ -10,4 +10,6 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class PostNewProductRes {
+    private int productId;
+    private String name;
 }

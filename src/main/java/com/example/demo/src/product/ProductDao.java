@@ -4,6 +4,7 @@ package com.example.demo.src.product;
 import com.example.demo.src.product.model.GetCategoryDepth01Res;
 import com.example.demo.src.product.model.GetCategoryDepth02Res;
 import com.example.demo.src.product.model.GetCategoryDepth03Res;
+import com.example.demo.src.product.model.NewProductModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -57,6 +58,113 @@ public class ProductDao {
      * https://velog.io/@seculoper235/RowMapper%EC%97%90-%EB%8C%80%ED%95%B4 -> RowMapper에 대한 설명
      */
 
+
+    /**
+     * 새로운 상품 추가
+     */
+    public int insertNewProduct(int uid, NewProductModel dataModel) {
+        String Query;
+        if (dataModel.getCategoryDepth2Id() == 0) {
+            Query = "INSERT INTO Product (storeId, title, content, categoryDepth1Id, price, deliveryFee, quantity,`change`)\n" +
+                    "VALUES (?,'" + dataModel.getName() + "','"
+                    + dataModel.getContent() + "',?,?,'"
+                    + dataModel.getDeliveryFree() + "',?,'"
+                    + dataModel.getChange() + "');";
+            this.jdbcTemplate.update(Query,
+                    uid,
+                    dataModel.getCategoryDepth1Id(),
+                    dataModel.getPrice(),
+                    dataModel.getQuantity());
+        }
+        else if (dataModel.getCategoryDepth3Id() == 0) {
+            Query = "INSERT INTO Product (storeId, title, content, categoryDepth1Id, categoryDepth2Id, price, deliveryFee, quantity,`change`)\n" +
+                    "VALUES (?,'" + dataModel.getName() + "','"
+                    + dataModel.getContent() + "',?,?,?,'"
+                    + dataModel.getDeliveryFree() + "',?,'"
+                    + dataModel.getChange() + "');";
+            this.jdbcTemplate.update(Query,
+                    uid,
+                    dataModel.getCategoryDepth1Id(),
+                    dataModel.getCategoryDepth2Id(),
+                    dataModel.getPrice(),
+                    dataModel.getQuantity());
+        }
+        else {
+            Query = "INSERT INTO Product (storeId, title, content, categoryDepth1Id, categoryDepth2Id, categoryDepth3Id, price, deliveryFee, quantity,`change`)\n" +
+                    "VALUES (?,'" + dataModel.getName() + "','"
+                    + dataModel.getContent() + "',?,?,?,?,'"
+                    + dataModel.getDeliveryFree() + "',?,'"
+                    + dataModel.getChange() + "');";
+            this.jdbcTemplate.update(Query,
+                    uid,
+                    dataModel.getCategoryDepth1Id(),
+                    dataModel.getCategoryDepth2Id(),
+                    dataModel.getCategoryDepth3Id(),
+                    dataModel.getPrice(),
+                    dataModel.getQuantity());
+        }
+
+        // 새로 생성된 상품의 id 추출
+        return this.jdbcTemplate.queryForObject(
+                "SELECT last_insert_id()",
+                Integer.class);
+    }
+
+    /**
+     * 이미지 Url 입력
+     */
+    public void addImgUrls(int productId, List<String> imageUrls) {
+        String Query;
+        System.out.println(imageUrls.size());
+        for (int i=0; i < imageUrls.size(); i++){
+            if (i == 10)
+                Query = "UPDATE Product SET imageUrl10 = '"+ imageUrls.get(i) +"' WHERE id=?";
+            else
+                Query = "UPDATE Product SET imageUrl0" + (i+1) + " = '"+ imageUrls.get(i) +"' WHERE id=?";
+        this.jdbcTemplate.update(Query, productId);
+        }
+    }
+
+
+    /**
+     * 해시태그 입력
+     */
+    public void addHashTags(int productId, List<String> hashtags) {
+        int tagId;
+        for (String h : hashtags) {
+            try {
+                // 이미 저장된 태그인지 확인
+                tagId = this.jdbcTemplate.queryForObject(
+                        "SELECT * FROM Tag WHERE tag = '" + h +"'",
+                        (rs, rowNum) -> rs.getInt("id")
+                );
+            } catch (IncorrectResultSizeDataAccessException error) {
+                // 저장되지 않은 태그이므로
+                // 새로운 태그 생성
+                this.jdbcTemplate.update(
+                        "INSERT INTO Tag (tag) VALUES ('" + h + "')"
+                );
+                // 새로 생성된 태그의 id 추출
+                tagId = this.jdbcTemplate.queryForObject(
+                        "SELECT last_insert_id()",
+                        Integer.class);
+            }
+
+            // 영상의 id와 해시태그의 id 입력
+            this.jdbcTemplate.update(
+                    "INSERT INTO TagProductMap (productId, tagId) VALUE (?,?)",
+                    productId, tagId);
+        }
+    }
+
+    /**
+     * 주소 입력
+     */
+    public void addLocationInfo(int productId, String location){
+        String Query = "UPDATE Product SET location = '"+location+"' WHERE id=?";
+        this.jdbcTemplate.update(Query,productId);
+    }
+
     /**
      * 카테고리 항목 조회
      */
@@ -101,7 +209,7 @@ public class ProductDao {
     /**
      * 카테고리01 정보 확인
      */
-    public GetCategoryDepth01Res getCategoryInfoDepth01 (int depth1Id) {
+    public GetCategoryDepth01Res getCategoryInfoDepth01(int depth1Id) {
         try {
             String Query = "SELECT Category.id, Category.name, COUNT(C2.name) AS 'count' FROM Category\n" +
                     "    LEFT JOIN CategoryDepth2 C2 on Category.id = C2.categoryId\n" +
@@ -116,14 +224,14 @@ public class ProductDao {
                     ),
                     depth1Id);
         } catch (IncorrectResultSizeDataAccessException error) {
-            return new GetCategoryDepth01Res(0,"",false);
+            return new GetCategoryDepth01Res(0, "", false);
         }
     }
 
     /**
      * 카테고리02 정보 확인
      */
-    public GetCategoryDepth02Res getCategoryInfoDepth02 (int depth1Id) {
+    public GetCategoryDepth02Res getCategoryInfoDepth02(int depth1Id) {
         try {
             String Query = "SELECT CategoryDepth2.id, CategoryDepth2.name, COUNT(C3.name) AS 'count' FROM CategoryDepth2\n" +
                     "    LEFT JOIN CategoryDepth3 C3 on CategoryDepth2.id = C3.category2Id\n" +
@@ -138,9 +246,10 @@ public class ProductDao {
                     ),
                     depth1Id);
         } catch (IncorrectResultSizeDataAccessException error) {
-            return new GetCategoryDepth02Res(0,"",false);
+            return new GetCategoryDepth02Res(0, "", false);
         }
     }
+
 
     /**
      * (validation) 카테고리 아이디 d1 d2 가 일치하는지 확인

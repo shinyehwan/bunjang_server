@@ -52,55 +52,32 @@ public class ProductController {
     public void setVerifier(Verifier verifier) {
         this.verifier = verifier;
     }
-
-    private Utils utils;
-
-    @Autowired
-    public void setUtils(Utils utils) {
-        this.utils = utils;
-    }
-
     // ******************************************************************************
 
-//    /**
-//     * 상품 상세정보 조회
-//     */
-//    @ResponseBody
-//    @GetMapping("/{productId}")
-//    public BaseResponse<GetProductRes> getProductInfo(
-//            @PathVariable("productId") Integer productId) {
-//
-//        try {
-//            System.out.println(utils.getViewCount(4));
-//            System.out.println(
-//                    utils.getBasketCountByProductId(5));
-//            System.out.println(
-//                    utils.getReviewCountByProductId(4));
-//            System.out.println(
-//                    utils.getReviewCountByStoreId(1));
-//            System.out.println(
-//                    utils.getTotalReviewAvgByStoreId(1));
-//            System.out.println(
-//                    utils.getFollowByStoreId(14));
-//            System.out.println(
-//                    utils.getFollowingByStoreId(1));
-//
-//
-//            // jwt 에서 uid 추출
-//            int uid;
-//            uid = jwtService.getUserIdx();
-//            // 존재하는 상점 아이디인지 검증
-//            if (!verifier.isPresentStoreId(uid))
-//                throw new BaseException(INVALID_STORE_ID); // /3001/존재하지 않는 상점 id 입니다.
-//
-//            //TODO
-//            return new BaseResponse<>(new GetProductRes());
-////            return new BaseResponse<>(productService.postNewProduct(uid, newProduct));
-//        } catch (BaseException exception) {
-//            return new BaseResponse<>((exception.getStatus()));
-//        }
-//
-//    }
+    /**
+     * 상품 상세정보 조회
+     */
+    @ResponseBody
+    @GetMapping("/{productId}")
+    public BaseResponse<GetProductRes> getProductInfo(
+            @PathVariable("productId") Integer productId) {
+
+        try {
+            // jwt 에서 uid 추출
+            int uid;
+            uid = jwtService.getUserIdx();
+            // 존재하는 상점 아이디인지 검증
+            if (!verifier.isPresentStoreId(uid))
+                throw new BaseException(INVALID_STORE_ID); // /3001/존재하지 않는 상점 id 입니다.
+
+            //TODO
+
+            return new BaseResponse<>(productProvider.getProductDetailInfo(productId));
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+
+    }
 
 
     /**

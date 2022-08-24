@@ -1,16 +1,16 @@
 package com.example.demo.src.product;
 
 
-import com.example.demo.src.product.model.GetCategoryDepth01Res;
-import com.example.demo.src.product.model.GetCategoryDepth02Res;
-import com.example.demo.src.product.model.GetCategoryDepth03Res;
-import com.example.demo.src.product.model.NewProductModel;
+import com.example.demo.src.product.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @Repository //  [Persistence Layer에서 DAO를 명시하기 위해 사용]
@@ -58,6 +58,81 @@ public class ProductDao {
      * https://velog.io/@seculoper235/RowMapper%EC%97%90-%EB%8C%80%ED%95%B4 -> RowMapper에 대한 설명
      */
 
+    /**
+     * 상품 상세정보 조회 - 상품정보
+     */
+    public ProductDetailInfoModel getProductDetailInfo(int productId) {
+        String Query = "SELECT storeId, id, title, dealStatus, price, location, createdAt,\n" +
+                "-- 업로드날짜 표시 형식\n" +
+                "        CASE\n" +
+                "            WHEN TIMESTAMPDIFF (MINUTE,createdAt, CURRENT_TIMESTAMP) < 60\n" +
+                "            THEN CONCAT(TIMESTAMPDIFF (MINUTE,createdAt, CURRENT_TIMESTAMP), '분 전')\n" +
+                "            WHEN TIMESTAMPDIFF(HOUR,createdAt, CURRENT_TIMESTAMP) < 24\n" +
+                "            THEN CONCAT(TIMESTAMPDIFF(HOUR,createdAt, CURRENT_TIMESTAMP), '시간 전')\n" +
+                "            WHEN TIMESTAMPDIFF(DAY,createdAt, CURRENT_TIMESTAMP)< 30\n" +
+                "            THEN CONCAT(TIMESTAMPDIFF(DAY,createdAt, CURRENT_TIMESTAMP), '일 전')\n" +
+                "            WHEN TIMESTAMPDIFF(MONTH,createdAt, CURRENT_TIMESTAMP)< 12\n" +
+                "            THEN CONCAT(TIMESTAMPDIFF(MONTH,createdAt, CURRENT_TIMESTAMP), '개월 전')\n" +
+                "            ELSE CONCAT(TIMESTAMPDIFF(YEAR,createdAt, CURRENT_TIMESTAMP ), '년 전')\n" +
+                "        END AS 'uploadedEasyText',\n" +
+                "`condition`, quantity, deliveryFee,`change`, content, categoryDepth1Id, categoryDepth2Id, categoryDepth3Id FROM Product\n" +
+                "WHERE status='active' AND id=?";
+
+        return this.jdbcTemplate.queryForObject(Query, (rs,rn)->
+            new ProductDetailInfoModel(
+                    rs.getInt("storeId"),
+                    rs.getInt("id"),
+                    rs.getString("title"),
+                    rs.getString("dealStatus"),
+                    Collections.emptyList(),
+                    rs.getInt("price"),
+                    rs.getString("location"),
+                    rs.getString("createdAt"),
+                    rs.getString("uploadedEasyText"),
+                    rs.getString("condition"),
+                    rs.getInt("quantity"),
+                    rs.getString("deliveryFee"),
+                    rs.getString("change"),
+                    rs.getString("content"),
+                    Collections.emptyList(),
+                    rs.getInt("categoryDepth1Id"),
+                    rs.getInt("categoryDepth2Id"),
+                    rs.getInt("categoryDepth3Id")
+            ) ,productId);
+    }
+
+    /**
+     * 상품 이미지 리스트 ImageUrls 조회
+     */
+    public List<String> getImageUrls (int productId){
+        String Query = "SELECT imageUrl01, imageUrl02, imageUrl03, imageUrl04,imageUrl05,imageUrl06,imageUrl07,imageUrl08,imageUrl09,imageUrl10 FROM Product\n" +
+                "WHERE status='active' AND id=?";
+        return this.jdbcTemplate.queryForObject(Query,
+                (rs,rn)-> new ArrayList<>(Arrays.asList(
+                        rs.getString("imageUrl01"),
+                        rs.getString("imageUrl02"),
+                        rs.getString("imageUrl03"),
+                        rs.getString("imageUrl04"),
+                        rs.getString("imageUrl05"),
+                        rs.getString("imageUrl06"),
+                        rs.getString("imageUrl07"),
+                        rs.getString("imageUrl08"),
+                        rs.getString("imageUrl09"),
+                        rs.getString("imageUrl10")
+                )), productId);
+    }
+
+    /**
+     * 상품 태그 리스트 조회
+     */
+    public List<String> getTags(int productId) {
+        String Query = "SELECT TPM.productId, Tag.tag  FROM Tag\n" +
+                "LEFT JOIN TagProductMap TPM on Tag.id = TPM.tagId\n" +
+                "WHERE TPM.status='active' AND TPM.productId = ?";
+        return this.jdbcTemplate.query(Query,
+                (rs,rn)-> rs.getString("tag"),
+                productId);
+    }
 
     /**
      * 새로운 상품 추가
@@ -68,7 +143,7 @@ public class ProductDao {
             Query = "INSERT INTO Product (storeId, title, content, categoryDepth1Id, price, deliveryFee, quantity,`change`)\n" +
                     "VALUES (?,'" + dataModel.getName() + "','"
                     + dataModel.getContent() + "',?,?,'"
-                    + dataModel.getDeliveryFree() + "',?,'"
+                    + dataModel.getDeliveryFee() + "',?,'"
                     + dataModel.getChange() + "');";
             this.jdbcTemplate.update(Query,
                     uid,
@@ -80,7 +155,7 @@ public class ProductDao {
             Query = "INSERT INTO Product (storeId, title, content, categoryDepth1Id, categoryDepth2Id, price, deliveryFee, quantity,`change`)\n" +
                     "VALUES (?,'" + dataModel.getName() + "','"
                     + dataModel.getContent() + "',?,?,?,'"
-                    + dataModel.getDeliveryFree() + "',?,'"
+                    + dataModel.getDeliveryFee() + "',?,'"
                     + dataModel.getChange() + "');";
             this.jdbcTemplate.update(Query,
                     uid,
@@ -93,7 +168,7 @@ public class ProductDao {
             Query = "INSERT INTO Product (storeId, title, content, categoryDepth1Id, categoryDepth2Id, categoryDepth3Id, price, deliveryFee, quantity,`change`)\n" +
                     "VALUES (?,'" + dataModel.getName() + "','"
                     + dataModel.getContent() + "',?,?,?,?,'"
-                    + dataModel.getDeliveryFree() + "',?,'"
+                    + dataModel.getDeliveryFee() + "',?,'"
                     + dataModel.getChange() + "');";
             this.jdbcTemplate.update(Query,
                     uid,
@@ -231,7 +306,7 @@ public class ProductDao {
     /**
      * 카테고리02 정보 확인
      */
-    public GetCategoryDepth02Res getCategoryInfoDepth02(int depth1Id) {
+    public GetCategoryDepth02Res getCategoryInfoDepth02(int depth2Id) {
         try {
             String Query = "SELECT CategoryDepth2.id, CategoryDepth2.name, COUNT(C3.name) AS 'count' FROM CategoryDepth2\n" +
                     "    LEFT JOIN CategoryDepth3 C3 on CategoryDepth2.id = C3.category2Id\n" +
@@ -244,9 +319,28 @@ public class ProductDao {
                             rs.getString("name"),
                             (rs.getInt("count") > 0)
                     ),
-                    depth1Id);
+                    depth2Id);
         } catch (IncorrectResultSizeDataAccessException error) {
             return new GetCategoryDepth02Res(0, "", false);
+        }
+    }
+
+    /**
+     * 카테고리03 정보 확인
+     */
+    public GetCategoryDepth03Res getCategoryInfoDepth03(int depth3Id) {
+        try {
+            String Query = "SELECT id,name FROM CategoryDepth3 WHERE status='active' AND id=?";
+
+            return this.jdbcTemplate.queryForObject(Query,
+                    (rs, rn) -> new GetCategoryDepth03Res(
+                            rs.getInt("id"),
+                            rs.getString("name"),
+                            false
+                    ),
+                    depth3Id);
+        } catch (IncorrectResultSizeDataAccessException error) {
+            return new GetCategoryDepth03Res(0, "", false);
         }
     }
 

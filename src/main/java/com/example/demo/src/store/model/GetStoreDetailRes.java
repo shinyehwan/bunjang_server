@@ -10,9 +10,12 @@ import lombok.Setter;
 public class GetStoreDetailRes {
     private String storeName;
     private String profileImgUrl;
+    private int star;
+
     private String contactTime;
     private String introduce;
     private String policy;
     private String precautions;
+
 
 }

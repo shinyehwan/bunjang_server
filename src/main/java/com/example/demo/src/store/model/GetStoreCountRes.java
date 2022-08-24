@@ -18,6 +18,7 @@ import lombok.Setter;
  * User 클래스는 스프링에서 사용하는 Objec이다.
  */
 public class GetStoreCountRes {
+    private int productCount;
     private int basketCount;
     private int reviewCount;
     private int followerCount;

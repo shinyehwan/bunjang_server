@@ -129,14 +129,16 @@ public class StoreDao {
     }
     // 상점 상세 정보 조회
     public GetStoreDetailRes getStoreDetail (int storeId) {
-        String getUserQuery = "select Store.storeName, Store.profileImgUrl, Store.contactTime, Store.introduce, Store.policy, Store.precautions\n" +
-                "from Store\n" +
-                "where Store.id = ?\n";
+        String getUserQuery = "select Store.storeName, Store.profileImgUrl, round(avg(Review.star)) as star, Store.contactTime, Store.introduce, Store.policy, Store.precautions\n" +
+                "from Store, Review\n" +
+                "where Review.sellerStoreId = Store.id\n" +
+                "    and Store.id = ?";
         int getUserParams = storeId;
         return this.jdbcTemplate.queryForObject(getUserQuery,
                 (rs, rowNum) -> new GetStoreDetailRes(
                         rs.getString("storeName"),
                         rs.getString("profileImgUrl"),
+                        rs.getInt("star"),
                         rs.getString("contactTime"),
                         rs.getString("introduce"),
                         rs.getString("policy"),
@@ -226,6 +228,19 @@ public class StoreDao {
      * @param storeId
      * @return
      */
+    // 상품 갯수 조회
+    public int getStoreProductCount (int storeId) {
+        String getUserQuery = "select COUNT(Product.storeId) as productCount\n" +
+                "    from Store, Product\n" +
+                "    where Store.id = Product.storeId\n" +
+                "        and Store.id = ?";
+        int getUserParams = storeId;
+        return this.jdbcTemplate.queryForObject(getUserQuery,
+                (rs, rowNum) -> (
+                        rs.getInt("productCount")
+                ), // RowMapper(위의 링크 참조): 원하는 결과값 형태로 받기
+                getUserParams); // 한 개의 회원정보를 얻기 위한 jdbcTemplate 함수(Query, 객체 매핑 정보, Params)의 결과 반환
+    }
     // 찜 갯수 조회
     public int getStoreBasketCount (int storeId) {
         String getUserQuery = "select COUNT(Basket.storeId) as basketCount\n" +

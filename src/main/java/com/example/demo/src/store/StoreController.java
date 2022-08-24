@@ -108,7 +108,7 @@ public class StoreController {
 
     /**
      * 마이페이지 화면 조회 API(판매중)
-     * [GET] /bungae/stores/sale
+     * [GET] /bungae/stores/:storeId/sale
      */
     @ResponseBody
     @GetMapping("/{storeId}/sale")
@@ -295,10 +295,10 @@ public class StoreController {
     }
     /**
      * 마이페이지 목록 조회 API
-     * [GET] /bungae/stores/:storeId/mypage
+     * [GET] /bungae/stores/:storeId/count
      */
     @ResponseBody
-    @GetMapping("/{storeId}/mypage")
+    @GetMapping("/{storeId}/count")
     public BaseResponse<GetStoreCountRes> getCount(@PathVariable int storeId) {
         try {
             //jwt에서 idx 추출.

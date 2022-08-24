@@ -1,10 +1,9 @@
 package com.example.demo.src.product;
 
 import com.example.demo.config.BaseException;
-import com.example.demo.src.product.model.GetCategoryDepth01Res;
-import com.example.demo.src.product.model.GetCategoryDepth02Res;
-import com.example.demo.src.product.model.GetCategoryDepth03Res;
+import com.example.demo.src.product.model.*;
 import com.example.demo.utils.JwtService;
+import com.example.demo.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +36,85 @@ public class ProductProvider {
     public ProductProvider(ProductDao productDao, JwtService jwtService) {
         this.productDao = productDao;
         this.jwtService = jwtService; // JWT부분은 7주차에 다루므로 모르셔도 됩니다!
+    }
+    // ******************************************************************************
+    private Utils utils;
+    @Autowired
+    public void setUtils(Utils utils) {
+        this.utils = utils;
+    }
+    // ******************************************************************************
+
+    /**
+     * 상품 상세정보 조회 - 상품정보
+     */
+    public GetProductRes getProductDetailInfo(int productId) throws BaseException {
+        ProductDetailInfoModel productInfoModel;
+        try {
+            productInfoModel = productDao.getProductDetailInfo(productId);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            throw new BaseException(INVALID_PRODUCT_ID); // 3xxx|존재하지 않는 상품입니다.
+        }
+
+        GetProductRes result = new GetProductRes();
+        result.setProductId(productInfoModel.getProductId());
+        result.setStoreId(productInfoModel.getStoreId());
+        result.setName(productInfoModel.getName());
+        result.setDealStatus(productInfoModel.getDealStatus());
+        result.setPrice(productInfoModel.getPrice());
+        if (productInfoModel.getLocation() != null)
+            result.setLocation(productInfoModel.getLocation());
+        result.setUploaded(productInfoModel.getUploaded());
+        result.setUploadedEasyText(productInfoModel.getUploadedEasyText());
+        result.setCondition(productInfoModel.getCondition());
+        result.setQuantity(productInfoModel.getQuantity());
+        if (productInfoModel.getDeliveryFee().equals("true"))
+            result.setDeliveryFee(true);
+        else
+            result.setDeliveryFee(false);
+        if (productInfoModel.getChange().equals("true"))
+            result.setChange(true);
+        else
+            result.setChange(false);
+        result.setContent(productInfoModel.getContent());
+        result.setCategoryDepth1Id(productInfoModel.getCategoryDepth1Id());
+        result.setCategoryDepth2Id(productInfoModel.getCategoryDepth2Id());
+        result.setCategoryDepth3Id(productInfoModel.getCategoryDepth3Id());
+
+        try {
+            // categoryText
+            String categoryText = this.getCategoryInfoDepth01(productInfoModel.getCategoryDepth1Id()).getName();
+            if (productInfoModel.getCategoryDepth2Id() != null && productInfoModel.getCategoryDepth2Id() != 0) {
+                categoryText += " > ";
+                categoryText += this.getCategoryInfoDepth02(productInfoModel.getCategoryDepth2Id()).getName();
+            }
+            if (productInfoModel.getCategoryDepth3Id() != null && productInfoModel.getCategoryDepth3Id() != 0) {
+                categoryText += " > ";
+                categoryText += this.getCategoryInfoDepth03(productInfoModel.getCategoryDepth3Id()).getName();
+            }
+            result.setCategoryText(categoryText);
+
+            // views
+            result.setViews(utils.getViewCount(productId));
+            // dibs
+            result.setDibs(utils.getBasketCountByProductId(productId));
+            // talks // TODO : talks 수 세기!!
+            result.setTalks(0);
+            // imagUrls
+            List<String> imageUrls =  productDao.getImageUrls(productId);
+            for(int i=0; i<imageUrls.size(); i++){
+                if (imageUrls.get(i) == null)
+                    imageUrls.remove(i--);
+            }
+            result.setImageUrls(imageUrls);
+            // tags
+            result.setTags(productDao.getTags(productId));
+
+            return result;
+        } catch (BaseException e) {
+            throw e;
+        }
     }
 
 
@@ -121,6 +199,14 @@ public class ProductProvider {
      */
     public GetCategoryDepth02Res getCategoryInfoDepth02 (int depth1Id) {
             return productDao.getCategoryInfoDepth02(depth1Id);
+    }
+
+
+    /**
+     * 카테고리03 정보 확인
+     */
+    public GetCategoryDepth03Res getCategoryInfoDepth03 (int depth3Id) {
+            return productDao.getCategoryInfoDepth03(depth3Id);
     }
 
     /**

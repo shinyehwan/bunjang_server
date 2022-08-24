@@ -18,7 +18,7 @@ public class PostNewProductReq {
     private Integer categoryDepth3Id;
     private List<String> tags;
     private Integer price;
-    private Boolean deliveryFree;
+    private Boolean deliveryFee;
     private Integer quantity;
     private String condition;
     private Boolean change;

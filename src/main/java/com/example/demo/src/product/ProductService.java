@@ -39,7 +39,6 @@ public class ProductService {
 
     }
 
-
     /**
      * 상품 등록
      */
@@ -156,13 +155,13 @@ public class ProductService {
             else
                 newProductModel.setPrice(newProduct.getPrice());
 
-            // deliveryFree Validation
-            if (newProduct.getDeliveryFree() == null)
+            // deliveryFee Validation
+            if (newProduct.getDeliveryFee() == null)
                 throw new BaseException(EMPTY_DELIVERYFREE); // |2XXX|deliveryFree를 입력해주세요
-            else if (newProduct.getDeliveryFree())
-                newProductModel.setDeliveryFree("true");
+            else if (newProduct.getDeliveryFee())
+                newProductModel.setDeliveryFee("true");
             else
-                newProductModel.setDeliveryFree("false");
+                newProductModel.setDeliveryFee("false");
 
             // quantity Validation
             if (newProduct.getQuantity() == null)

@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
 @Getter
 @Setter
 @AllArgsConstructor
@@ -17,7 +16,7 @@ public class NewProductModel {
     private Integer categoryDepth2Id;
     private Integer categoryDepth3Id;
     private Integer price;
-    private String deliveryFree;
+    private String deliveryFee;
     private Integer quantity;
     private String condition;
     private String change;

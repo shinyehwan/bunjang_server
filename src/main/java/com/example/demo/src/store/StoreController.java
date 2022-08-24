@@ -297,23 +297,23 @@ public class StoreController {
      * 마이페이지 목록 조회 API
      * [GET] /bungae/stores/:storeId/mypage
      */
-//    @ResponseBody
-//    @GetMapping("/{storeId}/mypage")
-//    public BaseResponse<GetStoreCountRes> getCount(@PathVariable int storeId) {
-//        try {
-//            //jwt에서 idx 추출.
-//            int userIdxByJwt = jwtService.getUserIdx();
-//            //userIdx와 접근한 유저가 같은지 확인
-//            if(storeId != userIdxByJwt){
-//                return new BaseResponse<>(INVALID_USER_JWT);
-//            }
-//
-//            GetStoreCountRes getStoreCountRes = storeProvider.getStoreCount(storeId);
-//            return new BaseResponse<>(getStoreCountRes);
-//        } catch (BaseException exception) {
-//            return new BaseResponse<>((exception.getStatus()));
-//        }
-//    }
+    @ResponseBody
+    @GetMapping("/{storeId}/mypage")
+    public BaseResponse<GetStoreCountRes> getCount(@PathVariable int storeId) {
+        try {
+            //jwt에서 idx 추출.
+            int userIdxByJwt = jwtService.getUserIdx();
+            //userIdx와 접근한 유저가 같은지 확인
+            if(storeId != userIdxByJwt){
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }
+
+            GetStoreCountRes getStoreCountRes = storeProvider.getStoreCount(storeId);
+            return new BaseResponse<>(getStoreCountRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
 
 
 

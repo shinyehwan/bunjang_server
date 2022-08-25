@@ -245,6 +245,20 @@ public class StoreDao {
                 getUserParams); // 한 개의 회원정보를 얻기 위한 jdbcTemplate 함수(Query, 객체 매핑 정보, Params)의 결과 반환
     }
 
+//    // 상점 찜한 목록 조회(해당 제품 프로필 이미지, 상점 이름, updatedAt)
+//    public List<String> getStoreBasket2 (int storeId) {
+//        String getUserQuery = "select Product.imageUrl01, Product.title\n" +
+//                "from Store, Basket, Product\n" +
+//                "where Basket.storeId = Store.id and Basket.productId = Product.id and basket = \"true\" and\n" +
+//                "      Store.id = ?";
+//        int getUserParams = storeId;
+//        return this.jdbcTemplate.query(getUserQuery,
+//                (rs, rowNum) -> (
+//                        rs.getString("profileImgUrl")
+//                ), // RowMapper(위의 링크 참조): 원하는 결과값 형태로 받기
+//                getUserParams); // 한 개의 회원정보를 얻기 위한 jdbcTemplate 함수(Query, 객체 매핑 정보, Params)의 결과 반환
+//    }
+
     // 상점 리뷰 목록 조회
     public List<GetStoreReviewRes> getStoreReview (int storeId) {
         String getUserQuery = "select Store.profileImgUrl, Store.storeName, Review.star, Review.content\n" +

@@ -79,6 +79,76 @@ public class ProductController {
 
     }
 
+    /**
+     * 상품 상세정보 조회 - 판매자 정보(프로필)
+     */
+    @GetMapping("/{productId}/store")
+    public BaseResponse<List<GetProductStoreRes>> getProductStore(
+            @PathVariable("productId") Integer productId) {
+
+        try {
+            // jwt 에서 uid 추출
+            int uid;
+            uid = jwtService.getUserIdx();
+            // 존재하는 상점 아이디인지 검증
+            if (!verifier.isPresentStoreId(uid)){
+                throw new BaseException(INVALID_STORE_ID); // /3001/존재하지 않는 상점 id 입니다.
+            }
+            List<GetProductStoreRes> getProductStoreRes = productProvider.getProductStore(productId);
+            return new BaseResponse<>(getProductStoreRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+
+    }
+    /**
+     * 상품 상세정보 조회 - 판매자 정보(상품)
+     */
+    @ResponseBody
+    @GetMapping("/{productId}/store/product")
+    public BaseResponse<List<GetProductStoreProductRes>> getProductStoreProduct(
+            @PathVariable("productId") Integer productId) {
+
+        try {
+            // jwt 에서 uid 추출
+            int uid;
+            uid = jwtService.getUserIdx();
+            // 존재하는 상점 아이디인지 검증
+            if (!verifier.isPresentStoreId(uid))
+                throw new BaseException(INVALID_STORE_ID); // /3001/존재하지 않는 상점 id 입니다.
+
+            //TODO
+            List<GetProductStoreProductRes> getProductStoreProductRes = productProvider.getProductStoreProduct(productId);
+            return new BaseResponse<>(getProductStoreProductRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+
+    }
+
+    /**
+     * 상품 상세정보 조회 - 판매자 정보(최근 리뷰 정보)
+     */
+    @GetMapping("/{productId}/store/review")
+    public BaseResponse<List<GetProductStoreReviewRes>> getProductReview(
+            @PathVariable("productId") Integer productId) {
+
+        try {
+            // jwt 에서 uid 추출
+            int uid;
+            uid = jwtService.getUserIdx();
+            // 존재하는 상점 아이디인지 검증
+            if (!verifier.isPresentStoreId(uid)){
+                throw new BaseException(INVALID_STORE_ID); // /3001/존재하지 않는 상점 id 입니다.
+            }
+            List<GetProductStoreReviewRes> getProductStoreReviewRes = productProvider.getProductStoreReview(productId);
+            return new BaseResponse<>(getProductStoreReviewRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+
+    }
+
 
     /**
      * 상품 등록

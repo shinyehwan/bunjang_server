@@ -105,6 +105,27 @@ public class StoreController {
         }
     }
 
+    /**
+     * 마이페이지 갯수 조회 API
+     * [GET] /bungae/stores/:storeId/count
+     */
+    @ResponseBody
+    @GetMapping("/{storeId}/count")
+    public BaseResponse<GetStoreCountRes> getCount(@PathVariable int storeId) {
+        try {
+            //jwt에서 idx 추출.
+            int userIdxByJwt = jwtService.getUserIdx();
+            //userIdx와 접근한 유저가 같은지 확인
+            if(storeId != userIdxByJwt){
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }
+
+            GetStoreCountRes getStoreCountRes = storeProvider.getStoreCount(storeId);
+            return new BaseResponse<>(getStoreCountRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
 
     /**
      * 마이페이지 화면 조회 API(판매중)
@@ -293,13 +314,15 @@ public class StoreController {
             return new BaseResponse<>((exception.getStatus()));
         }
     }
+
+
     /**
-     * 마이페이지 목록 조회 API
-     * [GET] /bungae/stores/:storeId/count
+     * 팔로잉한 상품 정보 조회 API
+     * [GET] /bungae/stores/:storeId/following/product
      */
     @ResponseBody
-    @GetMapping("/{storeId}/count")
-    public BaseResponse<GetStoreCountRes> getCount(@PathVariable int storeId) {
+    @GetMapping("/{storeId}/following/product")
+    public BaseResponse<List<GetStoreFollowingProductRes>> getFollowingProduct(@PathVariable int storeId) {
         try {
             //jwt에서 idx 추출.
             int userIdxByJwt = jwtService.getUserIdx();
@@ -307,9 +330,28 @@ public class StoreController {
             if(storeId != userIdxByJwt){
                 return new BaseResponse<>(INVALID_USER_JWT);
             }
-
-            GetStoreCountRes getStoreCountRes = storeProvider.getStoreCount(storeId);
-            return new BaseResponse<>(getStoreCountRes);
+            List<GetStoreFollowingProductRes> getStoreFollowingProductRes = storeProvider.getStoreFollowingProduct(storeId);
+            return new BaseResponse<>(getStoreFollowingProductRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+    /**
+     * 팔로워한 상품 정보 조회 API
+     * [GET] /bungae/stores/:storeId/follower/product
+     */
+    @ResponseBody
+    @GetMapping("/{storeId}/follower/product")
+    public BaseResponse<List<GetStoreFollowerProductRes>> getFollowerProduct(@PathVariable int storeId) {
+        try {
+            //jwt에서 idx 추출.
+            int userIdxByJwt = jwtService.getUserIdx();
+            //userIdx와 접근한 유저가 같은지 확인
+            if(storeId != userIdxByJwt){
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }
+            List<GetStoreFollowerProductRes> getStoreFollowerProductRes = storeProvider.getStoreFollowerProduct(storeId);
+            return new BaseResponse<>(getStoreFollowerProductRes);
         } catch (BaseException exception) {
             return new BaseResponse<>((exception.getStatus()));
         }

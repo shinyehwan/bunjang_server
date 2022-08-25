@@ -37,6 +37,19 @@ public class Utils {
     }
 
     /**
+     * 상품 고유 아이디에 해당하는 상점, 제품 갯수 조회
+     */
+
+    public int getProductCount(int productId) throws BaseException {
+        try {
+            return utilsDao.getProductCount(productId);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    /**
      * 제품 찜수 조회
      */
     public int getBasketCountByProductId (int productId) throws BaseException {

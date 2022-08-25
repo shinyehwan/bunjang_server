@@ -69,6 +69,28 @@ public class UtilsDao {
     }
 
     /**
+     * 상품 고유 아이디에 해당하는 상점, 제품 갯수 조회
+     */
+    public int getProductCount (int productId){
+        try {
+            String Query = "select COUNT(Product.storeId) as productCount\n" +
+                    "                from Store, Product\n" +
+                    "                where Store.id = Product.storeId\n" +
+                    "                and Store.id = (\n" +
+                    "                    select Store.id as storeId\n" +
+                    "                    from Store, Product\n" +
+                    "                    where Store.id = Product.storeId\n" +
+                    "                    and Product.id = ?\n" +
+                    "                    )";
+            return this.jdbcTemplate.queryForObject(Query,
+                    (rs,rn) -> rs.getInt("productCount")
+                    , productId);
+        } catch (Exception e){
+            return 0;
+        }
+    }
+
+    /**
      * 제품 찜수 조회
      */
     public int getBasketCountByProductId (int productId){

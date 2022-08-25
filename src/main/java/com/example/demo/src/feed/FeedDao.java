@@ -5,6 +5,7 @@ import com.example.demo.src.feed.model.GetFeedRes;
 import com.example.demo.src.product.model.GetCategoryDepth01Res;
 import com.example.demo.src.product.model.GetCategoryDepth02Res;
 import com.example.demo.src.product.model.GetCategoryDepth03Res;
+import com.example.demo.src.store.model.GetStoreFollowingProductRes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -59,7 +60,7 @@ public class FeedDao {
      */
 
     /**
-     * 상품 검색
+     * 상품 검색 (간단)
      */
     public List<GetFeedRes> FeedByKeywordOrderByDate(String k, int p) {
         String Query = "SELECT id, title, imageUrl01,price,location,createdAt,\n" +
@@ -98,9 +99,8 @@ public class FeedDao {
                         false
                 ), 20*(p-1), 20);
     }
-
     /**
-     * 상품 검색
+     * 상품 검색 (복잡)
      */
     public List<GetFeedRes> getFeed(String whereQuery, String orderQuery, int p) {
         String selectQuery = "SELECT id, title, imageUrl01,price,location,createdAt,\n" +
@@ -142,6 +142,27 @@ public class FeedDao {
     }
 
     /**
+     * 팔로잉 상품 조회
+     */
+    public List<Integer> productIdsByFollowingStore (int uid) {
+        String getUserQuery = "select Follow.followerStoreId as followingId, Store.storeName, Product.id as productId, Product.imageUrl01, Product.price\n" +
+                "    from Follow, Store, Product\n" +
+                "where Follow.followerStoreId = Store.id\n" +
+                "    and Store.id = Product.storeId\n" +
+                "    and Follow.followingStoreId = ?";
+        int getUserParams = uid;
+        return this.jdbcTemplate.query(getUserQuery,
+                (rs, rowNum) -> rs.getInt("productId") ,
+                getUserParams);
+    }
+//
+//    public List<Integer> productIdsByView (int uid) {}
+//    public List<Integer> productIdsByBasket (int uid) {}
+//    public List<Integer> productIdsByPurchase (int uid) {}
+
+
+
+    /**
      *  사용자 찜 여부 조회
      */
     public void isBasketByUid (int uid, int productId){
@@ -152,10 +173,6 @@ public class FeedDao {
                 (rs,rn)-> rs.getInt("id"),
                 uid,productId);
     }
-
-
-
-
 
     /**
      * 카테고리01 정보 확인

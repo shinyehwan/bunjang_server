@@ -86,6 +86,7 @@ public enum BaseResponseStatus {
     // 3300 : 상품 관련
     // 3300 : [GET] /bungae/product/:productId : 상품 상세 정보 조회 API(조회수, 찜하기 수, 채팅 수, 상품 관련 내용)
     INVALID_PRODUCT_ID(false, 3301, "존재하지 않는 상품입니다."),
+    USER_NOT_PERMITTED(false, 3302, "해당 사용자가 접근할 수 없는 상품입니다."),
     // 3310 : [POST] /bungae/product/ : 상품 등록하기 API
     // 3330 : [GET] /bungae/product/category : 카테고리 항목 조회
     NOT_MATCH_CATEGORY_12_ID(false, 3330, "연관되지 않은 depth1Id와 depth2Id입니다."),

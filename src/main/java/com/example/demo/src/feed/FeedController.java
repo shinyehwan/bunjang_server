@@ -54,28 +54,28 @@ public class FeedController {
     }
     // ******************************************************************************
 
-    /**
-     * 홈화면 피드
-     * [GET] /bungae/feed/
-     */
-    public BaseResponse<List<GetFeedRes>> recommendFeedByUser(@RequestParam(required = false) Integer p) {
-        try {
-            int uid = jwtService.getUserIdx();
-            // uid 검증
-            if (!verifier.isPresentStoreId(uid))
-                throw new BaseException(INVALID_STORE_ID); // /3001/존재하지 않는 상점 id 입니다.
-
-            if (p == null) p=1;
-
-            // 나의 조회, 좋아요, 구매, 팔로우 와 관련된 모든 상품 조회 -> pid 모아오기
-            // 중복제거
-            // 정보 가져오기
-
-            return new BaseResponse<>();
-        } catch (BaseException exception) {
-            return new BaseResponse<>((exception.getStatus()));
-        }
-    }
+//    /**
+//     * 홈화면 피드
+//     * [GET] /bungae/feed/
+//     */
+//    public BaseResponse<List<GetFeedRes>> recommendFeedByUser(@RequestParam(required = false) Integer p) {
+//        try {
+//            int uid = jwtService.getUserIdx();
+//            // uid 검증
+//            if (!verifier.isPresentStoreId(uid))
+//                throw new BaseException(INVALID_STORE_ID); // /3001/존재하지 않는 상점 id 입니다.
+//
+//            if (p == null) p=1;
+//
+//            // 나의 조회, 좋아요, 구매, 팔로우 와 관련된 모든 상품 조회 -> pid 모아오기
+//            // 중복제거
+//            // 정보 가져오기
+//
+//            return new BaseResponse<>();
+//        } catch (BaseException exception) {
+//            return new BaseResponse<>((exception.getStatus()));
+//        }
+//    }
 
     /**
      * 상품 검색

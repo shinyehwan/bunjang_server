@@ -114,6 +114,9 @@ public class ProductProvider {
             return result;
         } catch (BaseException e) {
             throw e;
+        } catch (Exception e){
+            logger.error(e.getMessage());
+            throw new BaseException(DATABASE_ERROR);
         }
     }
 
@@ -153,6 +156,48 @@ public class ProductProvider {
     }
 
 
+    /**
+     * 상품 세부정보 조회
+     * [GET] /bungae/product/registration
+     */
+     public GetProductRegistrationRes getProductRegiInfo (int uid,int productId) throws BaseException {
+         ProductDetailInfoModel productInfoModel;
+         try {
+             productInfoModel = productDao.getProductDetailInfo(productId);
+         } catch (Exception e) {
+             logger.error(e.getMessage());
+             throw new BaseException(INVALID_PRODUCT_ID); // INVALID_PRODUCT_ID|3301|존재하지 않는 상품입니다.
+         }
+         GetProductRegistrationRes result = new GetProductRegistrationRes(
+                 productInfoModel.getProductId(),
+                 productInfoModel.getStoreId(),
+                 productInfoModel.getName(),
+                 productInfoModel.getContent(),
+                 null,
+                 productInfoModel.getCategoryDepth1Id(),
+                 productInfoModel.getCategoryDepth2Id(),
+                 productInfoModel.getCategoryDepth3Id(),
+                 null,
+                 productInfoModel.getPrice(),
+                 productInfoModel.getDeliveryFee().equals("true"),
+                 productInfoModel.getQuantity(),
+                 productInfoModel.getCondition(),
+                 productInfoModel.getChange().equals("true"),
+                 productInfoModel.getLocation()
+         );
+
+         // imagUrls
+         List<String> imageUrls =  productDao.getImageUrls(productId);
+         for(int i=0; i<imageUrls.size(); i++){
+             if (imageUrls.get(i) == null)
+                 imageUrls.remove(i--);
+         }
+         result.setImageUrls(imageUrls);
+         // tags
+         result.setTags(productDao.getTags(productId));
+
+         return result;
+     }
 
     /**
      * 카테고리 항목 조회

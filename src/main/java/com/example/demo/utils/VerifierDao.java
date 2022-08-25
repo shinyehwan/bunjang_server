@@ -77,9 +77,29 @@ public class VerifierDao {
         String From = "Store";
         String Query = "SELECT * FROM "+ From +" WHERE status='active' AND id=?";
         this.jdbcTemplate.queryForObject(Query,
-                (rs, rowNum) -> rs.getLong("id"),
+                (rs, rowNum) -> rs.getInt("id"),
                 uid);
     }
+    /**
+     * 존재하는 상품인지 검증
+     */
+    public void isPresentProductId (int productId){
+        String From = "Product";
+        String Query = "SELECT * FROM "+ From +" WHERE status='active' AND id=?";
+        this.jdbcTemplate.queryForObject(Query,
+                (rs, rowNum) -> rs.getInt("id"),
+                productId);
+    }
+    /**
+     * 상품이 해당 스토어의 상품인지 검증
+     */
+    public void isUsersProductId(int uid, int productId){
+        String Query = "SELECT * FROM Product WHERE status='active' AND storeId=? AND id=?";
+        this.jdbcTemplate.queryForObject(Query,
+                (rs, rowNum) -> rs.getInt("id"),
+                uid, productId);
+    }
+
 //    /**
 //     * 영상 vid 검증
 //     */

@@ -152,7 +152,7 @@ public class ProductController {
 
     /**
      * 상품 등록
-     * [POST] /bungae/product/
+     * [POST] /bungae/product//registration
      */
     @ResponseBody
     @PostMapping("/registration")
@@ -175,16 +175,38 @@ public class ProductController {
         }
     }
 
-//    /**
-//     * 상품 세부정보 조회
-//     * [POST] /bungae/product/
-//     */
-//    @ResponseBody
-//    @GetMapping("/registration")
-//    /**
+    /**
+     * 상품 세부정보 조회
+     * [GET] /bungae/product/registration?productId=
+     */
+    @ResponseBody
+    @GetMapping("/registration")
+    public BaseResponse<GetProductRegistrationRes> getProductRegiInfo(
+            @RequestParam Integer productId) {
+        try {
+            // jwt 에서 uid 추출
+            int uid;
+            uid = jwtService.getUserIdx();
+            // 존재하는 상점 아이디인지 검증
+            if (!verifier.isPresentStoreId(uid))
+                throw new BaseException(INVALID_STORE_ID); // /3001/존재하지 않는 상점 id 입니다.
 
+            // 내 상품인지 확인
+            if (!verifier.isPresentProductId(productId))
+                throw new BaseException(INVALID_PRODUCT_ID); // INVALID_PRODUCT_ID|3301|존재하지 않는 상품입니다.
+            if (!verifier.isUsersProductId(uid, productId))
+                throw new BaseException(USER_NOT_PERMITTED); // USER_NOT_PERMITTED|3302|해당 사용자가 접근할 수 없는 상품입니다.
+
+            return new BaseResponse<>(productProvider.getProductRegiInfo(uid, productId));
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+
+//    /**
 //     * 상품 정보 수정
-//     * [POST] /bungae/product/
+//     * [PATCH] /bungae/product/registration
 //     */
 //    @ResponseBody
 //    @PatchMapping("/registration")

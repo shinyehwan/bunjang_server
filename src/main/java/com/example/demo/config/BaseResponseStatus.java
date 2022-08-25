@@ -32,6 +32,12 @@ public enum BaseResponseStatus {
     POST_USERS_EXISTS_USER(false,2017,"이미 등록된 전화번호 입니다."),
     POST_USERS_EMPTY_BIRTH(false,2018,"생년월일을 입력해 주세요"),
     POST_USERS_INVALID_BIRTH(false,2019,"생년월일 형식을 확인해 주세요."),
+    EMPTY_STORENAME(false,2020,"상점 이름을 입력해주세요."),
+    TOO_LONG_STORENAME(false,2021,"상점 이름의 길이가 10자를 초과하였습니다."),
+    TOO_LONG_INTRODUCE(false,2022,"상점 소개의 길이가 1000자를 초과하였습니다."),
+    TOO_LONG_POLICY(false,2023,"교환/환불/반품 정책의 길이가 1000자를 초과하였습니다."),
+    TOO_LONG_PRECAUTIONS(false,2024,"구매전 유의 사항의 길이가 1000자를 초과하였습니다."),
+
 
 
     // 2300 : 상품 관련

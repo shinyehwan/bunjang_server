@@ -16,7 +16,7 @@ public class PostNewProductReq {
     private Integer categoryDepth1Id; // M
     private Integer categoryDepth2Id;
     private Integer categoryDepth3Id;
-    private List<String> tags;
+    public List<String> tags;
     private Integer price;
     private Boolean deliveryFee;
     private Integer quantity;

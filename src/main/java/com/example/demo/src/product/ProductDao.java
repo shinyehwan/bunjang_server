@@ -284,7 +284,7 @@ public class ProductDao {
         String Query;
         System.out.println(imageUrls.size());
         for (int i=0; i < imageUrls.size(); i++){
-            if (i == 10)
+            if (i == 9)
                 Query = "UPDATE Product SET imageUrl10 = '"+ imageUrls.get(i) +"' WHERE id=?";
             else
                 Query = "UPDATE Product SET imageUrl0" + (i+1) + " = '"+ imageUrls.get(i) +"' WHERE id=?";
@@ -325,12 +325,44 @@ public class ProductDao {
     }
 
     /**
+     * 해시태그 삭제
+     */
+    public void delHashTags(int productId, List<String> hashtags) {
+        int tagId;
+        for (String h : hashtags) {
+            try {
+                String Query = "SELECT TPM.id, tag, TPM.status FROM TagProductMap TPM\n" +
+                        "LEFT JOIN Product P on P.id = TPM.productId\n" +
+                        "LEFT JOIN Tag T on TPM.tagId = T.id\n" +
+                        "WHERE TPM.status='active' AND P.id=? AND T.tag = '" + h + "' ";
+                tagId = this.jdbcTemplate.queryForObject(Query, (rs,rn)-> rs.getInt("id"), productId);
+
+                Query = "UPDATE TagProductMap SET status = 'deleted' WHERE id = ?";
+                this.jdbcTemplate.update(Query,tagId);
+            } catch (IncorrectResultSizeDataAccessException error) {
+                continue;
+            }
+        }
+    }
+
+    /**
      * 주소 입력
      */
     public void addLocationInfo(int productId, String location){
         String Query = "UPDATE Product SET location = '"+location+"' WHERE id=?";
         this.jdbcTemplate.update(Query,productId);
     }
+
+    /**
+     * 상품 정보 수정
+     */
+    public void updateProductInfo(int productId, String updateQuery){
+        String initQuery = "UPDATE Product SET \n ";
+        String finlQuery = " \n status='active' WHERE status='active' AND id=?";
+        String Query = initQuery + updateQuery + finlQuery;
+        this.jdbcTemplate.update(Query,productId);
+    }
+
 
     /**
      * 카테고리 항목 조회

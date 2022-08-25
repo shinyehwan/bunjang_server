@@ -221,7 +221,7 @@ public class ProductController {
             if (!verifier.isPresentStoreId(uid))
                 throw new BaseException(INVALID_STORE_ID); // /3001/존재하지 않는 상점 id 입니다.
 
-            return new BaseResponse<>(productService.patchNewProduct(uid, newProduct));
+            return new BaseResponse<>(productService.patchNewProduct(uid, productId, newProduct));
         } catch (BaseException exception) {
             return new BaseResponse<>((exception.getStatus()));
         }

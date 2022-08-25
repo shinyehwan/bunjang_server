@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.example.demo.config.BaseResponseStatus.*;
@@ -238,33 +239,115 @@ public class ProductService {
     /**
      * 상품 정보 수정
      */
-    public PostNewProductRes patchNewProduct(int uid, PostNewProductReq newProduct) throws BaseException {
-        NewProductModel newProductModel = new NewProductModel();
-        List<String> checkExistOptions = new ArrayList<>();
+    public PostNewProductRes patchNewProduct(int uid, int productId, PostNewProductReq newProduct) throws BaseException {
+        String updateQuery = "";
 
-        try {
-            // name Validation
-            if (newProduct.getName() == null)
-                throw new BaseException(EMPTY_NAME); // EMPTY_NAME|2XXX|name을 입력해주세요.
-            else if (newProduct.getName().length() > 100) // (Validation) 길이 확인
+        // 1. name 존재하는지 확인
+        if (newProduct.getName() != null){
+            // (Validation) 길이 확인
+            if (newProduct.getName().length() > 100)
                 throw new BaseException(TOO_LONG_TITLE); // TOO_LONG_TITLE| |name의 길이가 100자를 초과하였습니다.
             else
-                newProductModel.setName(newProduct.getName());
+                updateQuery += "  title = '"+newProduct.getName()+"',  ";
+        }
 
-            // content Validation
-            if (newProduct.getContent() == null)
-                throw new BaseException(EMPTY_CONTENT); // EMPTY_CONTENT|2XXX|content를 입력해주세요.
-            else if (newProduct.getContent().length() > 1000) // (Validation) 길이 확인
+        // 2. content
+        if (newProduct.getContent() != null){
+            if (newProduct.getContent().length() > 1000) // (Validation) 길이 확인
                 throw new BaseException(TOO_LONG_CONTENT); // TOO_LONG_CONTENT| |content의 길이가 1000자를 초과하였습니다.
             else
-                newProductModel.setContent(newProduct.getContent());
+                updateQuery += "  content = '"+newProduct.getContent()+"',  ";
+        }
 
-            // imageUrls Validation
-            if (newProduct.getImageUrls() == null)
-                throw new BaseException(EMPTY_IMAGEURL_LIST); // EMPTY_IMAGEURL_LIST|| imageUrls 리스트를 입력해주세요
-            else if (newProduct.getImageUrls().size() == 0)
-                throw new BaseException(EMPTY_IMAGEURL); // EMPTY_IMAGEURL|2XXX|imageUrl을 한 개 이상 입력해주세요.
-            else if (newProduct.getImageUrls().size() > 10)
+        // 3. price
+        if (newProduct.getPrice() != null) {
+            updateQuery += "  price = "+ newProduct.getPrice() +",  ";
+        }
+
+        // 4. deliveryFee
+        if (newProduct.getDeliveryFee() != null) {
+            if (newProduct.getDeliveryFee())
+                updateQuery += " deliveryFee='true',  ";
+            else
+                updateQuery += " deliveryFee='false',  ";
+        }
+
+        // 5. quantity
+        if (newProduct.getQuantity() != null)
+            updateQuery += "  quantity = "+newProduct.getQuantity()+",  " ;
+
+        // 6. condition
+        if (newProduct.getCondition() != null) {
+            if (newProduct.getCondition().equals("새상품") || newProduct.getCondition().equals("중고상품"))
+                updateQuery += "  `condition` = '"+newProduct.getCondition()+"', ";
+            else
+                throw new BaseException(INVALID_CONDITION); // |2XXX|condition은 '새상품' 혹은 '중고상품' 으로 기록해주세요
+        }
+
+        // 7. change
+        if (newProduct.getChange() != null) {
+            if (newProduct.getChange())
+                updateQuery += "  `change` = 'true', ";
+            else
+                updateQuery += "  `change` = 'false', ";
+        }
+
+        // 8. location
+        if (newProduct.getLocation() != null) {
+            if (newProduct.getLocation().length() > 50)
+                throw new BaseException(TOO_LONG_LOCATION); // |2XXX|location의 길이가 50자를 초과하였습니다.
+            updateQuery += " location = '"+newProduct.getLocation()+"', ";
+        }
+
+        // 9. category
+        if (newProduct.getCategoryDepth1Id() == null);
+
+        GetCategoryDepth01Res category01Info = productProvider.getCategoryInfoDepth01(newProduct.getCategoryDepth1Id());
+        if (category01Info.getDepth1Id() == 0)
+            throw new BaseException(INVALID_CATEGORYD1ID); // |3XXX|잘못된 categoryDepth1Id 입니다.
+        else if (!category01Info.isHasMoreDepth()) { // 더 이상 세부항목이 없다면
+            updateQuery += "  categoryDepth1Id = "+newProduct.getCategoryDepth1Id()+", ";
+            updateQuery += "  categoryDepth2Id = NULL, ";
+            updateQuery += "  categoryDepth3Id = NULL, ";
+        } else if (newProduct.getCategoryDepth2Id() == null) // d1.hasD 있음 && d2 있는지 체크
+            throw new BaseException(EMPTY_CATEGORYD2ID); // |2XXX|categoryDepth2Id을 입력해주세요.
+
+        else { // d1.hasD 있음 && d2 있음
+            if (!productProvider.isMatchCategory1and2(newProduct.getCategoryDepth1Id(), newProduct.getCategoryDepth2Id()))
+                throw new BaseException(NOT_MATCH_CATEGORY_12_ID); // NOT_MATCH_CATEGORY_ID|3330|연관되지 않은 depth1Id와 depth2Id입니다.
+            GetCategoryDepth02Res category02Info = productProvider.getCategoryInfoDepth02(newProduct.getCategoryDepth2Id());
+            if (category02Info.getDepth2Id() == 0)
+                throw new BaseException(INVALID_CATEGORYD2ID); // |3XXX|잘못된 categoryDept2Id 입니다.
+            else if (!category02Info.isHasMoreDepth()) {// 더 이상 세부항목이 없다면
+                updateQuery += "  categoryDepth1Id = "+newProduct.getCategoryDepth1Id()+", ";
+                updateQuery += "  categoryDepth2Id = "+newProduct.getCategoryDepth2Id()+", ";
+                updateQuery += "  categoryDepth3Id = NULL, ";
+            } else if (newProduct.getCategoryDepth3Id() == null)
+                throw new BaseException(EMPTY_CATEGORYD3ID); // |2XXX|categoryDepth3Id을 입력해주세요.
+            else { // d2.hasD 있음 && d3 있음
+                if (!productProvider.isMatchCategory2and3(newProduct.getCategoryDepth2Id(), newProduct.getCategoryDepth3Id()))
+                    throw new BaseException(NOT_MATCH_CATEGORY_23_ID); // NOT_MATCH_CATEGORY_ID|3330|연관되지 않은 depth2Id와 depth3Id입니다.
+                else {
+                    updateQuery += "  categoryDepth1Id = "+newProduct.getCategoryDepth1Id()+", ";
+                    updateQuery += "  categoryDepth2Id = "+newProduct.getCategoryDepth2Id()+", ";
+                    updateQuery += "  categoryDepth3Id = "+newProduct.getCategoryDepth3Id()+", ";
+                }
+            }
+        }
+
+        // 정보 수정
+        try {
+            productDao.updateProductInfo(productId, updateQuery);
+        } catch (Exception exception) { // DB에 이상이 있는 경우 에러 메시지를 보냅니다.
+            logger.error(exception.getMessage());
+            throw new BaseException(DATABASE_ERROR);
+        }
+
+
+
+        // 10. ImageUrls
+        if (newProduct.getImageUrls() != null && newProduct.getImageUrls().size() != 0) {
+            if (newProduct.getImageUrls().size() > 10)
                 throw new BaseException(TOO_MANY_IMAGEURL); // TOO_MANY_IMAGEURL|2XXX|imageUrl의 수가 10개를 초과하였습니다.
             for (int i = 0; i < newProduct.getImageUrls().size(); i++) {
                 if (newProduct.getImageUrls().get(i).length() > 500)
@@ -292,145 +375,58 @@ public class ProductService {
                     }
             }
 
-            // category Validation
-            // v d1 있는지 체크
-            // v d1 존재하는지 체크
-            // v d1.hasD 체크 && d2 있는지 체크 v
-            // v d1 d2 연관성 체크v
-            // v d2.hasD 체크 && d3 있는지 체크
-            // v d2 d3 연관성 체크
-            if (newProduct.getCategoryDepth1Id() == null)
-                throw new BaseException(EMPTY_CATEGORYD1ID); // |2XXX|categoryDepth1Id을 입력해주세요.
-            GetCategoryDepth01Res category01Info = productProvider.getCategoryInfoDepth01(newProduct.getCategoryDepth1Id());
-            if (category01Info.getDepth1Id() == 0)
-                throw new BaseException(INVALID_CATEGORYD1ID); // |3XXX|잘못된 categoryDepth1Id 입니다.
-            else if (!category01Info.isHasMoreDepth()) { // 더 이상 세부항목이 없다면
-                newProductModel.setCategoryDepth1Id(newProduct.getCategoryDepth1Id());
-                newProductModel.setCategoryDepth2Id(0);
-                newProductModel.setCategoryDepth3Id(0);
-            } else if (newProduct.getCategoryDepth2Id() == null) // d1.hasD 있음 && d2 있는지 체크
-                throw new BaseException(EMPTY_CATEGORYD2ID); // |2XXX|categoryDepth2Id을 입력해주세요.
-            else { // d1.hasD 있음 && d2 있음
-                if (!productProvider.isMatchCategory1and2(newProduct.getCategoryDepth1Id(), newProduct.getCategoryDepth2Id()))
-                    throw new BaseException(NOT_MATCH_CATEGORY_12_ID); // NOT_MATCH_CATEGORY_ID|3330|연관되지 않은 depth1Id와 depth2Id입니다.
-                GetCategoryDepth02Res category02Info = productProvider.getCategoryInfoDepth02(newProduct.getCategoryDepth2Id());
-                if (category02Info.getDepth2Id() == 0)
-                    throw new BaseException(INVALID_CATEGORYD2ID); // |3XXX|잘못된 categoryDept2Id 입니다.
-                else if (!category02Info.isHasMoreDepth()) {// 더 이상 세부항목이 없다면
-                    newProductModel.setCategoryDepth1Id(newProduct.getCategoryDepth1Id());
-                    newProductModel.setCategoryDepth2Id(newProduct.getCategoryDepth2Id());
-                    newProductModel.setCategoryDepth3Id(0);
-                } else if (newProduct.getCategoryDepth3Id() == null)
-                    throw new BaseException(EMPTY_CATEGORYD3ID); // |2XXX|categoryDepth3Id을 입력해주세요.
-                else { // d2.hasD 있음 && d3 있음
-                    if (!productProvider.isMatchCategory2and3(newProduct.getCategoryDepth2Id(), newProduct.getCategoryDepth3Id()))
-                        throw new BaseException(NOT_MATCH_CATEGORY_23_ID); // NOT_MATCH_CATEGORY_ID|3330|연관되지 않은 depth2Id와 depth3Id입니다.
-                    else {
-                        newProductModel.setCategoryDepth1Id(newProduct.getCategoryDepth1Id());
-                        newProductModel.setCategoryDepth2Id(newProduct.getCategoryDepth2Id());
-                        newProductModel.setCategoryDepth3Id(newProduct.getCategoryDepth3Id());
-                    }
-                }
+            // image 추가
+            try {
+                List<String> impList = new ArrayList<>();
+                // 기존 images 삭제
+                productDao.addImgUrls(productId, Arrays.asList("","","","","","","","","",""));
+                productDao.addImgUrls(productId, newProduct.getImageUrls());
+            } catch (Exception exception) { // DB에 이상이 있는 경우 에러 메시지를 보냅니다.
+                logger.error(exception.getMessage());
+                throw new BaseException(NEW_IMAGES_ERROR);
+            }
+        }
+
+
+
+        // tags Validation
+        if (newProduct.getTags() != null) {
+            if (newProduct.getTags().size() > 5)
+                throw new BaseException(TOO_MANY_TAGS); // TOO_MANY_TAGS|2XXX|tag의 수가 5개를 초과하였습니다.
+
+            for (String tag : newProduct.getTags()) {
+                if (tag.length() > 15)
+                    throw new BaseException(TOO_LONG_TAGS); // TOO_LONG_TAGS|2XXX|tag의 글자수가 15자를 초과하였습니다.
             }
 
-            // tags Validation
-            if (newProduct.getTags() != null) {
-                if (newProduct.getTags().size() > 5)
-                    throw new BaseException(TOO_MANY_TAGS); // TOO_MANY_TAGS|2XXX|tag의 수가 5개를 초과하였습니다.
-                else if (newProduct.getTags().size() > 0)
-                    checkExistOptions.add("tags");
-                for (String tag : newProduct.getTags()) {
-                    if (tag.length() > 15)
-                        throw new BaseException(TOO_LONG_TAGS); // TOO_LONG_TAGS|2XXX|tag의 글자수가 15자를 초과하였습니다.
-                }
+            List<String> addTags ;
+            List<String> delTags ;
+            List<String> remove = new ArrayList<>();
+            List<String> oldTags = productDao.getTags(productId);
+            for(String t : newProduct.getTags()) {
+                if (oldTags.contains(t))
+                    remove.add(t);
             }
+            oldTags.removeAll(remove);
+            newProduct.tags.removeAll(remove);
+            addTags = newProduct.getTags();
+            delTags = oldTags;
 
-            // price Validation
-            if (newProduct.getPrice() == null)
-                throw new BaseException(EMPTY_PRICE); // |2XXX|price를 입력해주세요
-            else
-                newProductModel.setPrice(newProduct.getPrice());
-
-            // deliveryFee Validation
-            if (newProduct.getDeliveryFee() == null)
-                throw new BaseException(EMPTY_DELIVERYFREE); // |2XXX|deliveryFree를 입력해주세요
-            else if (newProduct.getDeliveryFee())
-                newProductModel.setDeliveryFee("true");
-            else
-                newProductModel.setDeliveryFee("false");
-
-            // quantity Validation
-            if (newProduct.getQuantity() == null)
-                throw new BaseException(EMPTY_QUANTITY); // |2XXX|quantity를 입력해주세요
-            else
-                newProductModel.setQuantity(newProduct.getQuantity());
-
-            if (newProduct.getCondition() == null)
-                throw new BaseException(EMPTY_CONDITION); // |2XXX|condition를 입력해주세요
-            else if (newProduct.getCondition().equals("새상품") || newProduct.getCondition().equals("중고상품"))
-                newProductModel.setCondition(newProduct.getCondition());
-            else
-                throw new BaseException(INVALID_CONDITION); // |2XXX|condition은 '새상품' 혹은 '중고상품' 으로 기록해주세요
-
-
-            // change Validation
-            if (newProduct.getChange() == null)
-                throw new BaseException(EMPTY_CHANGE); // |2XXX|change를 입력해주세요
-            else if (newProduct.getChange())
-                newProductModel.setChange("true");
-            else
-                newProductModel.setChange("false");
-
-            // location Validation
-            if (newProduct.getLocation() != null) {
-                if (newProduct.getLocation().length() > 50)
-                    throw new BaseException(TOO_LONG_LOCATION); // |2XXX|location의 길이가 50자를 초과하였습니다.
-                checkExistOptions.add("location");
+            try {
+                // 태그 삭제
+                if (delTags.size() > 0)
+                    productDao.delHashTags(productId, delTags);
+                // 태그 추가
+                if (addTags.size() > 0)
+                    productDao.addHashTags(productId, addTags);
+            } catch (Exception exception) { // DB에 이상이 있는 경우 에러 메시지를 보냅니다.
+                logger.error(exception.getMessage());
+                throw new BaseException(NEW_TAGS_ERROR);
             }
-        } catch (BaseException exception) {
-            throw exception;
-        } catch (Exception exception) { // DB에 이상이 있는 경우 에러 메시지를 보냅니다.
-            logger.error(exception.getMessage());
-            throw new BaseException(VALIDATION_ERROR);
-        }
-
-        int productId;
-        // 새로운 Product 생성
-        try {
-            productId = productDao.insertNewProduct(uid, newProductModel);
-
-        } catch (Exception exception) { // DB에 이상이 있는 경우 에러 메시지를 보냅니다.
-            logger.error(exception.getMessage());
-            logger.error(exception.toString());
-            throw new BaseException(NEW_PRODUCT_ERROR);
-        }
-        // 태그 추가
-        try {
-            if (checkExistOptions.contains("tags"))
-                productDao.addHashTags(productId, newProduct.getTags());
-        } catch (Exception exception) { // DB에 이상이 있는 경우 에러 메시지를 보냅니다.
-            logger.error(exception.getMessage());
-            throw new BaseException(NEW_TAGS_ERROR);
-        }
-        // image 추가
-        try {
-            productDao.addImgUrls(productId, newProduct.getImageUrls());
-        } catch (Exception exception) { // DB에 이상이 있는 경우 에러 메시지를 보냅니다.
-            logger.error(exception.getMessage());
-            throw new BaseException(NEW_IMAGES_ERROR);
-        }
-        // location 추가
-        try {
-            productDao.addLocationInfo(productId, newProduct.getLocation());
-        } catch (Exception exception) { // DB에 이상이 있는 경우 에러 메시지를 보냅니다.
-            logger.error(exception.getMessage());
-            throw new BaseException(NEW_LOCATION_ERROR);
         }
 
         // 결과 반환
         return new PostNewProductRes(productId, newProduct.getName()); // TODO: getName db조회후 반환하기
     }
-
-
 
 }

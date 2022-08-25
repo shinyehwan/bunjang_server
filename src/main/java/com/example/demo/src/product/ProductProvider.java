@@ -54,7 +54,7 @@ public class ProductProvider {
             productInfoModel = productDao.getProductDetailInfo(productId);
         } catch (Exception e) {
             logger.error(e.getMessage());
-            throw new BaseException(INVALID_PRODUCT_ID); // 3xxx|존재하지 않는 상품입니다.
+            throw new BaseException(INVALID_PRODUCT_ID); // INVALID_PRODUCT_ID|3301|존재하지 않는 상품입니다.
         }
 
         GetProductRes result = new GetProductRes();

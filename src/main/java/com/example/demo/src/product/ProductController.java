@@ -13,8 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static com.example.demo.config.BaseResponseStatus.INVALID_CONDITION;
-import static com.example.demo.config.BaseResponseStatus.INVALID_STORE_ID;
+import static com.example.demo.config.BaseResponseStatus.*;
 
 @RestController // Rest API 또는 WebAPI를 개발하기 위한 어노테이션. @Controller + @ResponseBody 를 합친것.
 // @Controller      [Presentation Layer에서 Contoller를 명시하기 위해 사용]
@@ -70,7 +69,8 @@ public class ProductController {
             if (!verifier.isPresentStoreId(uid))
                 throw new BaseException(INVALID_STORE_ID); // /3001/존재하지 않는 상점 id 입니다.
 
-            //TODO
+            //TODO : 조회수 추가하기
+
 
             return new BaseResponse<>(productProvider.getProductDetailInfo(productId));
         } catch (BaseException exception) {

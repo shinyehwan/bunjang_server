@@ -102,6 +102,98 @@ public class ProductDao {
     }
 
     /**
+     * 상품 상세정보 조회 - 판매자 정보(프로필)
+     */
+    public List<GetProductStoreRes> getProductStore(int productId) {
+        String Query = "select Store.id as storeId, Store.profileImgUrl, Store.storeName,  round(avg(Review.star)) as star, Store.contactTime, Store.introduce, Store.policy, Store.precautions\n" +
+                "from Store, Review\n" +
+                "where Review.sellerStoreId = Store.id\n" +
+                "    and Store.id = (select Product.storeId\n" +
+                "                                  from Product, Store\n" +
+                "                                  where Product.storeId = Store.id\n" +
+                "                                  and Product.id = ?)";
+
+        return this.jdbcTemplate.query(Query, (rs,rn)->
+            new GetProductStoreRes(
+                    rs.getInt("storeId"),
+                    rs.getString("profileImgUrl"),
+                    rs.getString("storeName"),
+                    rs.getInt("star"),
+                    rs.getString("contactTime"),
+                    rs.getString("introduce"),
+                    rs.getString("policy"),
+                    rs.getString("precautions")
+            ) ,productId);
+    }
+
+    /**
+     * 상품 상세정보 조회 - 판매자 정보(상품)
+     */
+    public List<GetProductStoreProductRes> getProductStoreProduct(int productId) {
+        String Query = "select Store.id as storeId, Product.id as productId, Product.imageUrl01,\n" +
+                "                Product.price, Product.title\n" +
+                "                from Product, Store\n" +
+                "                where Product.storeId = Store.id\n" +
+                "                    and Product.dealStatus = \"sale\"\n" +
+                "                    and Store.id = (select Product.storeId\n" +
+                "                                  from Product, Store\n" +
+                "                                  where Product.storeId = Store.id\n" +
+                "                                  and Product.id = ?)";
+
+        return this.jdbcTemplate.query(Query, (rs,rn)->
+            new GetProductStoreProductRes(
+                    rs.getInt("storeId"),
+                    rs.getInt("productId"),
+                    rs.getString("imageUrl01"),
+                    rs.getInt("price"),
+                    rs.getString("title")
+            ) ,productId);
+    }
+    /**
+     * 상품 상세정보 조회 - 판매자 정보(리뷰)
+     */
+    public List<GetProductStoreReviewRes> getProductStoreReview(int productId) {
+        String Query = "select distinct Review.purchaserStoreId, A.profileImgUrl, A.storeName, Review.star, Review.content, Review.productId, Product.title,\n" +
+                "                CASE\n" +
+                "                    WHEN TIMESTAMPDIFF (MINUTE,Review.createdAt, CURRENT_TIMESTAMP) < 60\n" +
+                "                    THEN CONCAT(TIMESTAMPDIFF (MINUTE,Review.createdAt, CURRENT_TIMESTAMP), '분 전')\n" +
+                "                    WHEN TIMESTAMPDIFF(HOUR,Review.createdAt, CURRENT_TIMESTAMP) < 24\n" +
+                "                    THEN CONCAT(TIMESTAMPDIFF(HOUR,Review.createdAt, CURRENT_TIMESTAMP), '시간 전')\n" +
+                "                    WHEN TIMESTAMPDIFF(DAY,Review.createdAt, CURRENT_TIMESTAMP)< 30\n" +
+                "                    THEN CONCAT(TIMESTAMPDIFF(DAY,Review.createdAt, CURRENT_TIMESTAMP), '일 전')\n" +
+                "                    WHEN TIMESTAMPDIFF(MONTH,Review.createdAt, CURRENT_TIMESTAMP)< 12\n" +
+                "                    THEN CONCAT(TIMESTAMPDIFF(MONTH,Review.createdAt, CURRENT_TIMESTAMP), '개월 전')\n" +
+                "                    ELSE CONCAT(TIMESTAMPDIFF(YEAR,Review.createdAt, CURRENT_TIMESTAMP ), '년 전')\n" +
+                "                    END AS 'createdAt'\n" +
+                "from Store, Review, Product,(\n" +
+                "    select Store.id as purchaserStoreId, Store.profileImgUrl, Store.storeName,\n" +
+                "       Review.star, Review.content, Review.productId, Product.title\n" +
+                "    from Store, Review, Product\n" +
+                "    where Review.purchaserStoreId = Store.id\n" +
+                "    and Review.productId = Product.id\n" +
+                ") A\n" +
+                "where Review.sellerStoreId = Store.id\n" +
+                "    and Review.productId = Product.id\n" +
+                "    and A.purchaserStoreId = Review.purchaserStoreId\n" +
+                "    and Store.id = (select Product.storeId\n" +
+                "                                  from Product, Store\n" +
+                "                                  where Product.storeId = Store.id\n" +
+                "                                  and Product.id = ?)";
+
+        return this.jdbcTemplate.query(Query, (rs,rn)->
+            new GetProductStoreReviewRes(
+                    rs.getInt("purchaserStoreId"),
+                    rs.getString("profileImgUrl"),
+                    rs.getString("storeName"),
+                    rs.getInt("star"),
+                    rs.getString("content"),
+                    rs.getInt("productId"),
+                    rs.getString("title"),
+                    rs.getString("createdAt")
+            ) ,productId);
+    }
+
+    /**
      * 상품 이미지 리스트 ImageUrls 조회
      */
     public List<String> getImageUrls (int productId){

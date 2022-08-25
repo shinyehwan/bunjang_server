@@ -117,6 +117,42 @@ public class ProductProvider {
         }
     }
 
+    /**
+     * 상품 상세정보 조회 - 판매자 정보(프로필 정보)
+     */
+    public List<GetProductStoreRes> getProductStore(int productId) throws BaseException {
+        try {
+            List<GetProductStoreRes> getProductStoreRes = productDao.getProductStore(productId);
+            return getProductStoreRes;
+        } catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    /**
+     * 상품 상세정보 조회 - 판매자 정보(상품 정보)
+     */
+    public List<GetProductStoreProductRes> getProductStoreProduct(int productId) throws BaseException {
+        try {
+            List<GetProductStoreProductRes> getProductStoreProductRes = productDao.getProductStoreProduct(productId);
+            return getProductStoreProductRes;
+        } catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+    /**
+     * 상품 상세정보 조회 - 판매자 정보(최근 리뷰 정보)
+     */
+    public List<GetProductStoreReviewRes> getProductStoreReview(int productId) throws BaseException {
+        try {
+            List<GetProductStoreReviewRes> getProductStoreReviewRes = productDao.getProductStoreReview(productId);
+            return getProductStoreReviewRes;
+        } catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+
 
     /**
      * 카테고리 항목 조회

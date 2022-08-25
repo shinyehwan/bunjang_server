@@ -41,9 +41,37 @@ public class Verifier {
 //        }
 //    }
 
-    public boolean isPresentStoreId(int uid){
-        try{
+    /**
+     * 상점,유저 Store.id 검증
+     */
+    public boolean isPresentStoreId(int uid) {
+        try {
             verifierDao.isPresentStoreId(uid);
+            return true;
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * 존재하는 상품인지 검증
+     */
+    public boolean isPresentProductId (int productId) {
+        try {
+            verifierDao.isPresentProductId(productId);
+            return true;
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            return false;
+        }
+    }
+    /**
+     * 상품이 해당 스토어의 상품인지 검증
+     */
+    public boolean isUsersProductId(int uid, int productId){
+        try{
+            verifierDao.isUsersProductId(uid, productId);
             return true;
         } catch (Exception e) {
             logger.error(e.getMessage());

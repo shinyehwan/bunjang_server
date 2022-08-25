@@ -2,7 +2,12 @@ package com.example.demo.src.feed;
 
 
 import com.example.demo.src.feed.model.GetFeedRes;
+import com.example.demo.src.product.model.GetCategoryDepth01Res;
+import com.example.demo.src.product.model.GetCategoryDepth02Res;
+import com.example.demo.src.product.model.GetCategoryDepth03Res;
+import com.example.demo.src.store.model.GetStoreFollowingProductRes;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -55,9 +60,9 @@ public class FeedDao {
      */
 
     /**
-     * 상품 검색
+     * 상품 검색 (간단)
      */
-    public List<GetFeedRes> FeedByKeyword(String k, int p) {
+    public List<GetFeedRes> FeedByKeywordOrderByDate(String k, int p) {
         String Query = "SELECT id, title, imageUrl01,price,location,createdAt,\n" +
                 "-- 업로드날짜 표시 형식\n" +
                 "        CASE\n" +
@@ -94,6 +99,68 @@ public class FeedDao {
                         false
                 ), 20*(p-1), 20);
     }
+    /**
+     * 상품 검색 (복잡)
+     */
+    public List<GetFeedRes> getFeed(String whereQuery, String orderQuery, int p) {
+        String selectQuery = "SELECT id, title, imageUrl01,price,location,createdAt,\n" +
+                "-- 업로드날짜 표시 형식\n" +
+                "        CASE\n" +
+                "            WHEN TIMESTAMPDIFF (MINUTE,createdAt, CURRENT_TIMESTAMP) < 60\n" +
+                "            THEN CONCAT(TIMESTAMPDIFF (MINUTE,createdAt, CURRENT_TIMESTAMP), '분 전')\n" +
+                "            WHEN TIMESTAMPDIFF(HOUR,createdAt, CURRENT_TIMESTAMP) < 24\n" +
+                "            THEN CONCAT(TIMESTAMPDIFF(HOUR,createdAt, CURRENT_TIMESTAMP), '시간 전')\n" +
+                "            WHEN TIMESTAMPDIFF(DAY,createdAt, CURRENT_TIMESTAMP)< 30\n" +
+                "            THEN CONCAT(TIMESTAMPDIFF(DAY,createdAt, CURRENT_TIMESTAMP), '일 전')\n" +
+                "            WHEN TIMESTAMPDIFF(MONTH,createdAt, CURRENT_TIMESTAMP)< 12\n" +
+                "            THEN CONCAT(TIMESTAMPDIFF(MONTH,createdAt, CURRENT_TIMESTAMP), '개월 전')\n" +
+                "            ELSE CONCAT(TIMESTAMPDIFF(YEAR,createdAt, CURRENT_TIMESTAMP ), '년 전')\n" +
+                "        END AS 'uploadedEasyText',\n" +
+                "    dealStatus FROM Product\n" +
+                "WHERE\n" +
+                "    status='active' \n";
+
+        String limitQuery = "\n LIMIT ?,?";
+
+        String Query = selectQuery + whereQuery+ orderQuery + limitQuery;
+
+        // System.out.println(Query);
+
+        return this.jdbcTemplate.query(Query,
+                (rs,rn) -> new GetFeedRes(
+                        rs.getInt("id"),
+                        rs.getString("title"),
+                        rs.getString("imageUrl01"),
+                        rs.getInt("price"),
+                        rs.getString("location"),
+                        rs.getString("createdAt"),
+                        rs.getString("uploadedEasyText"),
+                        0,
+                        rs.getString("dealStatus"),
+                        false
+                ), 20*(p-1), 20);
+    }
+
+    /**
+     * 팔로잉 상품 조회
+     */
+    public List<Integer> productIdsByFollowingStore (int uid) {
+        String getUserQuery = "select Follow.followerStoreId as followingId, Store.storeName, Product.id as productId, Product.imageUrl01, Product.price\n" +
+                "    from Follow, Store, Product\n" +
+                "where Follow.followerStoreId = Store.id\n" +
+                "    and Store.id = Product.storeId\n" +
+                "    and Follow.followingStoreId = ?";
+        int getUserParams = uid;
+        return this.jdbcTemplate.query(getUserQuery,
+                (rs, rowNum) -> rs.getInt("productId") ,
+                getUserParams);
+    }
+//
+//    public List<Integer> productIdsByView (int uid) {}
+//    public List<Integer> productIdsByBasket (int uid) {}
+//    public List<Integer> productIdsByPurchase (int uid) {}
+
+
 
     /**
      *  사용자 찜 여부 조회
@@ -105,5 +172,84 @@ public class FeedDao {
         this.jdbcTemplate.query(Query,
                 (rs,rn)-> rs.getInt("id"),
                 uid,productId);
+    }
+
+    /**
+     * 카테고리01 정보 확인
+     */
+    public GetCategoryDepth01Res getCategoryInfoDepth01(int depth1Id) {
+        try {
+            String Query = "SELECT Category.id, Category.name, COUNT(C2.name) AS 'count' FROM Category\n" +
+                    "    LEFT JOIN CategoryDepth2 C2 on Category.id = C2.categoryId\n" +
+                    "WHERE Category.status='active' AND Category.id=? \n" +
+                    "GROUP BY Category.id";
+
+            return this.jdbcTemplate.queryForObject(Query,
+                    (rs, rn) -> new GetCategoryDepth01Res(
+                            rs.getInt("id"),
+                            rs.getString("name"),
+                            (rs.getInt("count") > 0)
+                    ),
+                    depth1Id);
+        } catch (IncorrectResultSizeDataAccessException error) {
+            return new GetCategoryDepth01Res(0, "", false);
+        }
+    }
+    /**
+     * 카테고리02 정보 확인
+     */
+    public GetCategoryDepth02Res getCategoryInfoDepth02(int depth2Id) {
+        try {
+            String Query = "SELECT CategoryDepth2.id, CategoryDepth2.name, COUNT(C3.name) AS 'count' FROM CategoryDepth2\n" +
+                    "    LEFT JOIN CategoryDepth3 C3 on CategoryDepth2.id = C3.category2Id\n" +
+                    "WHERE CategoryDepth2.status='active' AND CategoryDepth2.id= ? \n" +
+                    "GROUP BY CategoryDepth2.id";
+
+            return this.jdbcTemplate.queryForObject(Query,
+                    (rs, rn) -> new GetCategoryDepth02Res(
+                            rs.getInt("id"),
+                            rs.getString("name"),
+                            (rs.getInt("count") > 0)
+                    ),
+                    depth2Id);
+        } catch (IncorrectResultSizeDataAccessException error) {
+            return new GetCategoryDepth02Res(0, "", false);
+        }
+    }
+    /**
+     * 카테고리03 정보 확인
+     */
+    public GetCategoryDepth03Res getCategoryInfoDepth03(int depth3Id) {
+        try {
+            String Query = "SELECT id,name FROM CategoryDepth3 WHERE status='active' AND id=?";
+
+            return this.jdbcTemplate.queryForObject(Query,
+                    (rs, rn) -> new GetCategoryDepth03Res(
+                            rs.getInt("id"),
+                            rs.getString("name"),
+                            false
+                    ),
+                    depth3Id);
+        } catch (IncorrectResultSizeDataAccessException error) {
+            return new GetCategoryDepth03Res(0, "", false);
+        }
+    }
+    /**
+     * (validation) 카테고리 아이디 d1 d2 가 일치하는지 확인
+     */
+    public void getMatchCategory1and2(int depth1Id, int depth2Id) {
+        String Query = "SELECT id,categoryId, name FROM CategoryDepth2 WHERE status='active' AND categoryId = ? And id=?";
+        this.jdbcTemplate.queryForObject(Query,
+                (rs, rn) -> rs.getInt("id"),
+                depth1Id, depth2Id);
+    }
+    /**
+     * (validation) 카테고리 아이디 d2 d3 가 일치하는지 확인
+     */
+    public void getMatchCategory2and3(int depth2Id, int depth3Id) {
+        String Query = "SELECT id,category2Id, name FROM CategoryDepth3 WHERE status='active' AND category2Id = ? And id=?";
+        this.jdbcTemplate.queryForObject(Query,
+                (rs, rn) -> rs.getInt("id"),
+                depth2Id, depth3Id);
     }
 }

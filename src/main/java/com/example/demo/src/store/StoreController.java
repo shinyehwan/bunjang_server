@@ -223,7 +223,6 @@ public class StoreController {
             if(storeId != userIdxByJwt){
                 return new BaseResponse<>(INVALID_USER_JWT);
             }
-//            PatchStoreDetailReq patchStoreDetailReq = new PatchStoreDetailReq(storeId, );
             storeService.modifyStore(storeId, patchStoreDetailReq);
 
             String result = "상점 정보가 수정되었습니다.";

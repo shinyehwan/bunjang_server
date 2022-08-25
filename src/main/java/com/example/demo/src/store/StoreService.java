@@ -68,6 +68,18 @@ public class StoreService {
 
     // 상점 정보 수정(Patch)
     public void modifyStore(int storeId, PatchStoreDetailReq patchStoreDetailReq) throws BaseException {
+        if (patchStoreDetailReq.getStoreName() == null) {
+            throw new BaseException(EMPTY_STORENAME);
+        }
+        if (patchStoreDetailReq.getStoreName().length() > 10) {
+            throw new BaseException(TOO_LONG_STORENAME);
+        }if (patchStoreDetailReq.getIntroduce().length() > 1000) {
+            throw new BaseException(TOO_LONG_INTRODUCE);
+        }if (patchStoreDetailReq.getPolicy().length() > 1000) {
+            throw new BaseException(TOO_LONG_POLICY);
+        }if (patchStoreDetailReq.getPrecautions().length() > 1000) {
+            throw new BaseException(TOO_LONG_PRECAUTIONS);
+        }
         try {
             int result = storeDao.modifyStore(storeId, patchStoreDetailReq); // 해당 과정이 무사히 수행되면 True(1), 그렇지 않으면 False(0)입니다.
             if (result == 0) { // result값이 0이면 과정이 실패한 것이므로 에러 메서지를 보냅니다.

@@ -25,7 +25,7 @@ public enum BaseResponseStatus {
     // users
     USERS_EMPTY_USER_ID(false, 2010, "유저 아이디 값을 확인해주세요."),
 
-    // [POST] /users
+    // [POST] 상점관련
     POST_USERS_EMPTY_NAME(false, 2014, "이름을 입력해주세요."),
     POST_USERS_EMPTY_PHONE(false, 2015, "핸드폰 번호를 입력해주세요."),
     POST_USERS_INVALID_PHONE(false, 2016, "핸드폰 번호 형식을 확인해주세요."),
@@ -33,6 +33,11 @@ public enum BaseResponseStatus {
     POST_USERS_EMPTY_BIRTH(false,2018,"생년월일을 입력해 주세요"),
     POST_USERS_INVALID_BIRTH(false,2019,"생년월일 형식을 확인해 주세요."),
 
+    EMPTY_STORENAME(false,2020 ,"상점 이름을 입력해주세요"),
+    TOO_LONG_STORENAME(false,2021 ,"상점 이름의 길이가 10자를 초과하였습니다."),
+    TOO_LONG_INTRODUCE(false,2022 ,"상점 소개의 길이가 1000자를 초과하였습니다."),
+    TOO_LONG_POLICY(false,2023 ,"교환/환불/반품 정책의 길이가 1000자를 초과하였습니다."),
+    TOO_LONG_PRECAUTIONS(false,2024 ,"구매전 유의 사항의 길이가 1000자를 초과하였습니다."),
 
     // 2300 : 상품 관련
     // 2300 : [GET] /bungae/product/:productId : 상품 상세 정보 조회 API(조회수, 찜하기 수, 채팅 수, 상품 관련 내용)

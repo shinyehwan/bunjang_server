@@ -69,14 +69,14 @@ public class ProductProvider {
         result.setUploadedEasyText(productInfoModel.getUploadedEasyText());
         result.setCondition(productInfoModel.getCondition());
         result.setQuantity(productInfoModel.getQuantity());
-        if (productInfoModel.getDeliveryFee().equals("true"))
-            result.setDeliveryFee(true);
+        if (productInfoModel.getDeliveryFee() != null)
+            result.setDeliveryFee(productInfoModel.getDeliveryFee().equals("true"));
         else
             result.setDeliveryFee(false);
-        if (productInfoModel.getChange().equals("true"))
-            result.setChange(true);
-        else
-            result.setChange(false);
+        if (productInfoModel.getChange() != null)
+            result.setChange(productInfoModel.getChange().equals("true"));
+
+
         result.setContent(productInfoModel.getContent());
         result.setCategoryDepth1Id(productInfoModel.getCategoryDepth1Id());
         result.setCategoryDepth2Id(productInfoModel.getCategoryDepth2Id());

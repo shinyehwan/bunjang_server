@@ -204,12 +204,30 @@ public class ProductController {
     }
 
 
-//    /**
-//     * 상품 정보 수정
-//     * [PATCH] /bungae/product/registration
-//     */
-//    @ResponseBody
-//    @PatchMapping("/registration")
+    /**
+     * 상품 정보 수정
+     * [PATCH] /bungae/product/registration
+     */
+    @ResponseBody
+    @PatchMapping("/registration")
+    public BaseResponse<PostNewProductRes> patchNewProduct(
+            @RequestBody PostNewProductReq newProduct,
+            @RequestParam Integer productId) {
+        try {
+            // jwt 에서 uid 추출
+            int uid;
+            uid = jwtService.getUserIdx();
+            // 존재하는 상점 아이디인지 검증
+            if (!verifier.isPresentStoreId(uid))
+                throw new BaseException(INVALID_STORE_ID); // /3001/존재하지 않는 상점 id 입니다.
+
+            return new BaseResponse<>(productService.patchNewProduct(uid, newProduct));
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+
 
     /**
      * 카테고리 항목 조회

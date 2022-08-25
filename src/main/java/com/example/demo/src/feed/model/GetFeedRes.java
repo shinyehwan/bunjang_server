@@ -19,3 +19,4 @@ public class GetFeedRes {
     private String dealStatus;
     private boolean userDibed; // 사용자가 좋아요 눌렀는지?
 }
+

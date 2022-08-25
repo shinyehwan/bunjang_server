@@ -55,13 +55,44 @@ public class FeedController {
     // ******************************************************************************
 
     /**
+     * 홈화면 피드
+     * [GET] /bungae/feed/
+     */
+    public BaseResponse<List<GetFeedRes>> recommendFeedByUser(@RequestParam(required = false) Integer p) {
+        try {
+            int uid = jwtService.getUserIdx();
+            // uid 검증
+            if (!verifier.isPresentStoreId(uid))
+                throw new BaseException(INVALID_STORE_ID); // /3001/존재하지 않는 상점 id 입니다.
+
+            if (p == null) p=1;
+
+            // 나의 조회, 좋아요, 구매, 팔로우 와 관련된 모든 상품 조회 -> pid 모아오기
+            // 중복제거
+            // 정보 가져오기
+
+            return new BaseResponse<>();
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
      * 상품 검색
-     * [GET] /bungae/feed/keyword ? k= & p=
+     * [GET] /bungae/feed/keyword ? q=&order=&brand=&c1=&c2=&c3=&onlySale=&min=&max=&p=
      */
     @ResponseBody
     @GetMapping("/keyword")
     public BaseResponse<List<GetFeedRes>> FeedByKeyword(
-            @RequestParam String k,
+            @RequestParam(required = true) String q,
+            @RequestParam(required = false) String order,
+            @RequestParam(required = false) String brand,
+            @RequestParam(required = false) Integer c1,
+            @RequestParam(required = false) Integer c2,
+            @RequestParam(required = false) Integer c3,
+            @RequestParam(required = false) String onlySale,
+            @RequestParam(required = false) Integer min,
+            @RequestParam(required = false) Integer max,
             @RequestParam(required = false) Integer p){
         try {
             int uid = jwtService.getUserIdx();
@@ -71,7 +102,94 @@ public class FeedController {
 
             if (p == null) p=1;
 
-            return new BaseResponse<>(feedProvider.FeedByKeyword(uid,k,p));
+            return new BaseResponse<>(feedProvider.getFeedRes(uid,q,order,brand,c1,c2,c3,onlySale,min,max,p));
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+    /**
+     * 카테고리 검색
+     * [GET] /bungae/feed/category/:depth1Id/:depth2Id/:depth3Id? q=&order=&brand=&c1=&c2=&c3=&onlySale=&min=&max=&p=
+     */
+    @ResponseBody
+    @GetMapping("/category/{depth1Id}")
+    public BaseResponse<List<GetFeedRes>> FeedByCategory(
+            @PathVariable("depth1Id") Integer depth1Id,
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) String order,
+            @RequestParam(required = false) String brand,
+            @RequestParam(required = false) String onlySale,
+            @RequestParam(required = false) Integer min,
+            @RequestParam(required = false) Integer max,
+            @RequestParam(required = false) Integer p){
+        try {
+            int uid = jwtService.getUserIdx();
+            // uid 검증
+            if (!verifier.isPresentStoreId(uid))
+                throw new BaseException(INVALID_STORE_ID); // /3001/존재하지 않는 상점 id 입니다.
+
+            if (p == null) p=1;
+
+            return new BaseResponse<>(feedProvider.getFeedRes(uid,q,order,brand,depth1Id,null,null,onlySale,min,max,p));
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+    /**
+     * 카테고리 검색 - depth2
+     * [GET] /bungae/feed/category/:depth1Id/:depth2Id? q=&order=&brand=&c1=&c2=&c3=&onlySale=&min=&max=&p=
+     */
+    @ResponseBody
+    @GetMapping("/category/{depth1Id}/{depth2Id}")
+    public BaseResponse<List<GetFeedRes>> FeedByCategory(
+            @PathVariable("depth1Id") Integer depth1Id,
+            @PathVariable("depth2Id") Integer depth2Id,
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) String order,
+            @RequestParam(required = false) String brand,
+            @RequestParam(required = false) String onlySale,
+            @RequestParam(required = false) Integer min,
+            @RequestParam(required = false) Integer max,
+            @RequestParam(required = false) Integer p){
+        try {
+            int uid = jwtService.getUserIdx();
+            // uid 검증
+            if (!verifier.isPresentStoreId(uid))
+                throw new BaseException(INVALID_STORE_ID); // /3001/존재하지 않는 상점 id 입니다.
+
+            if (p == null) p=1;
+
+            return new BaseResponse<>(feedProvider.getFeedRes(uid,q,order,brand,depth1Id,depth2Id,null,onlySale,min,max,p));
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+    /**
+     * 카테고리 검색 - depth3
+     * [GET] /bungae/feed/category/:depth1Id/:depth2Id/:depth3Id? q=&order=&brand=&c1=&c2=&c3=&onlySale=&min=&max=&p=
+     */
+    @ResponseBody
+    @GetMapping("/category/{depth1Id}/{depth2Id}/{depth3Id}")
+    public BaseResponse<List<GetFeedRes>> FeedByCategory(
+            @PathVariable("depth1Id") Integer depth1Id,
+            @PathVariable("depth2Id") Integer depth2Id,
+            @PathVariable("depth3Id") Integer depth3Id,
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) String order,
+            @RequestParam(required = false) String brand,
+            @RequestParam(required = false) String onlySale,
+            @RequestParam(required = false) Integer min,
+            @RequestParam(required = false) Integer max,
+            @RequestParam(required = false) Integer p){
+        try {
+            int uid = jwtService.getUserIdx();
+            // uid 검증
+            if (!verifier.isPresentStoreId(uid))
+                throw new BaseException(INVALID_STORE_ID); // /3001/존재하지 않는 상점 id 입니다.
+
+            if (p == null) p=1;
+
+            return new BaseResponse<>(feedProvider.getFeedRes(uid,q,order,brand,depth1Id,depth2Id,depth3Id,onlySale,min,max,p));
         } catch (BaseException exception) {
             return new BaseResponse<>((exception.getStatus()));
         }

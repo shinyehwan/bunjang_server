@@ -33,6 +33,10 @@ public enum BaseResponseStatus {
     POST_USERS_EMPTY_BIRTH(false,2018,"생년월일을 입력해 주세요"),
     POST_USERS_INVALID_BIRTH(false,2019,"생년월일 형식을 확인해 주세요."),
 
+    // 2200 : 피드,검색 관련
+    INVALID_FEED_ORDER(false,2200,"올바르지 않은 order 입력입니다."),
+    INVALID_PRICE_RANGE(false,2201,"가격범위가 올바르지 않습니다. max와 min을 확인해주세요."),
+    INVALID_ONLYSALE(false,2202,"onlySale에 true 혹은 false를 입력해주세요."),
 
     // 2300 : 상품 관련
     // 2300 : [GET] /bungae/product/:productId : 상품 상세 정보 조회 API(조회수, 찜하기 수, 채팅 수, 상품 관련 내용)

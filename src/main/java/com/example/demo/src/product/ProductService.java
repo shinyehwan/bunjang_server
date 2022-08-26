@@ -7,6 +7,7 @@ import com.example.demo.utils.JwtService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -300,37 +301,37 @@ public class ProductService {
         }
 
         // 9. category
-        if (newProduct.getCategoryDepth1Id() == null);
-
-        GetCategoryDepth01Res category01Info = productProvider.getCategoryInfoDepth01(newProduct.getCategoryDepth1Id());
-        if (category01Info.getDepth1Id() == 0)
-            throw new BaseException(INVALID_CATEGORYD1ID); // |3XXX|잘못된 categoryDepth1Id 입니다.
-        else if (!category01Info.isHasMoreDepth()) { // 더 이상 세부항목이 없다면
-            updateQuery += "  categoryDepth1Id = "+newProduct.getCategoryDepth1Id()+", ";
-            updateQuery += "  categoryDepth2Id = NULL, ";
-            updateQuery += "  categoryDepth3Id = NULL, ";
-        } else if (newProduct.getCategoryDepth2Id() == null) // d1.hasD 있음 && d2 있는지 체크
-            throw new BaseException(EMPTY_CATEGORYD2ID); // |2XXX|categoryDepth2Id을 입력해주세요.
-
-        else { // d1.hasD 있음 && d2 있음
-            if (!productProvider.isMatchCategory1and2(newProduct.getCategoryDepth1Id(), newProduct.getCategoryDepth2Id()))
-                throw new BaseException(NOT_MATCH_CATEGORY_12_ID); // NOT_MATCH_CATEGORY_ID|3330|연관되지 않은 depth1Id와 depth2Id입니다.
-            GetCategoryDepth02Res category02Info = productProvider.getCategoryInfoDepth02(newProduct.getCategoryDepth2Id());
-            if (category02Info.getDepth2Id() == 0)
-                throw new BaseException(INVALID_CATEGORYD2ID); // |3XXX|잘못된 categoryDept2Id 입니다.
-            else if (!category02Info.isHasMoreDepth()) {// 더 이상 세부항목이 없다면
-                updateQuery += "  categoryDepth1Id = "+newProduct.getCategoryDepth1Id()+", ";
-                updateQuery += "  categoryDepth2Id = "+newProduct.getCategoryDepth2Id()+", ";
+        if (newProduct.getCategoryDepth1Id() != null) {
+            GetCategoryDepth01Res category01Info = productProvider.getCategoryInfoDepth01(newProduct.getCategoryDepth1Id());
+            if (category01Info.getDepth1Id() == 0)
+                throw new BaseException(INVALID_CATEGORYD1ID); // |3XXX|잘못된 categoryDepth1Id 입니다.
+            else if (!category01Info.isHasMoreDepth()) { // 더 이상 세부항목이 없다면
+                updateQuery += "  categoryDepth1Id = " + newProduct.getCategoryDepth1Id() + ", ";
+                updateQuery += "  categoryDepth2Id = NULL, ";
                 updateQuery += "  categoryDepth3Id = NULL, ";
-            } else if (newProduct.getCategoryDepth3Id() == null)
-                throw new BaseException(EMPTY_CATEGORYD3ID); // |2XXX|categoryDepth3Id을 입력해주세요.
-            else { // d2.hasD 있음 && d3 있음
-                if (!productProvider.isMatchCategory2and3(newProduct.getCategoryDepth2Id(), newProduct.getCategoryDepth3Id()))
-                    throw new BaseException(NOT_MATCH_CATEGORY_23_ID); // NOT_MATCH_CATEGORY_ID|3330|연관되지 않은 depth2Id와 depth3Id입니다.
-                else {
-                    updateQuery += "  categoryDepth1Id = "+newProduct.getCategoryDepth1Id()+", ";
-                    updateQuery += "  categoryDepth2Id = "+newProduct.getCategoryDepth2Id()+", ";
-                    updateQuery += "  categoryDepth3Id = "+newProduct.getCategoryDepth3Id()+", ";
+            } else if (newProduct.getCategoryDepth2Id() == null) // d1.hasD 있음 && d2 있는지 체크
+                throw new BaseException(EMPTY_CATEGORYD2ID); // |2XXX|categoryDepth2Id을 입력해주세요.
+
+            else { // d1.hasD 있음 && d2 있음
+                if (!productProvider.isMatchCategory1and2(newProduct.getCategoryDepth1Id(), newProduct.getCategoryDepth2Id()))
+                    throw new BaseException(NOT_MATCH_CATEGORY_12_ID); // NOT_MATCH_CATEGORY_ID|3330|연관되지 않은 depth1Id와 depth2Id입니다.
+                GetCategoryDepth02Res category02Info = productProvider.getCategoryInfoDepth02(newProduct.getCategoryDepth2Id());
+                if (category02Info.getDepth2Id() == 0)
+                    throw new BaseException(INVALID_CATEGORYD2ID); // |3XXX|잘못된 categoryDept2Id 입니다.
+                else if (!category02Info.isHasMoreDepth()) {// 더 이상 세부항목이 없다면
+                    updateQuery += "  categoryDepth1Id = " + newProduct.getCategoryDepth1Id() + ", ";
+                    updateQuery += "  categoryDepth2Id = " + newProduct.getCategoryDepth2Id() + ", ";
+                    updateQuery += "  categoryDepth3Id = NULL, ";
+                } else if (newProduct.getCategoryDepth3Id() == null)
+                    throw new BaseException(EMPTY_CATEGORYD3ID); // |2XXX|categoryDepth3Id을 입력해주세요.
+                else { // d2.hasD 있음 && d3 있음
+                    if (!productProvider.isMatchCategory2and3(newProduct.getCategoryDepth2Id(), newProduct.getCategoryDepth3Id()))
+                        throw new BaseException(NOT_MATCH_CATEGORY_23_ID); // NOT_MATCH_CATEGORY_ID|3330|연관되지 않은 depth2Id와 depth3Id입니다.
+                    else {
+                        updateQuery += "  categoryDepth1Id = " + newProduct.getCategoryDepth1Id() + ", ";
+                        updateQuery += "  categoryDepth2Id = " + newProduct.getCategoryDepth2Id() + ", ";
+                        updateQuery += "  categoryDepth3Id = " + newProduct.getCategoryDepth3Id() + ", ";
+                    }
                 }
             }
         }
@@ -429,4 +430,50 @@ public class ProductService {
         return new PostNewProductRes(productId, newProduct.getName()); // TODO: getName db조회후 반환하기
     }
 
+    /**
+     * 상품 삭제
+     */
+    public PatchDeleteRes patchDeleteProduct(int uid, int productId, int kill) throws BaseException {
+        if (kill == 9) {
+            try {
+                if (!isDeletableProductId(productId)){
+                    return new PatchDeleteRes(0, "삭제 가능한 상품이 없습니다. 삭제할 상품을 먼저 deleted 해주세요!");
+                }
+                // 상품 지우기
+                productDao.deleteProduct(productId, kill);
+                return new PatchDeleteRes(productId, "(admin) 데이터가 삭제되었습니다 (admin)");
+            } catch (Exception e) {
+                logger.error(e.getMessage());
+                throw new BaseException(DATABASE_ERROR);
+            }
+        } else {
+            // 관련 태그 찾아 지우기
+            List<String> oldTags = productDao.getTags(productId);
+            if (oldTags.size() > 0)
+                productDao.delHashTags(productId, oldTags);
+            try {
+                // 상품 지우기
+                productDao.deleteProduct(productId);
+                return new PatchDeleteRes(productId, "성공적으로 비활성화 되었습니다.");
+            } catch (Exception e) {
+                logger.error(e.getMessage());
+                throw new BaseException(DATABASE_ERROR);
+            }
+        }
+    }
+
+
+    /**
+     * 어드민 삭제 가능한 상품인지 검증
+     */
+    public boolean isDeletableProductId (int productId) {
+        try {
+            productDao.isDeletableProductId(productId);
+            return true;
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            logger.error("삭제 가능한 상품이 없습니다. 삭제할 상품을 먼저 deleted 해주세요!");
+            return false;
+        }
+    }
 }

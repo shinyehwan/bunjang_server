@@ -247,7 +247,45 @@ public class ProductController {
             if (!verifier.isPresentStoreId(uid))
                 throw new BaseException(INVALID_STORE_ID); // /3001/존재하지 않는 상점 id 입니다.
 
+            // 내 상품인지 확인
+            if (!verifier.isPresentProductId(productId))
+                throw new BaseException(INVALID_PRODUCT_ID); // INVALID_PRODUCT_ID|3301|존재하지 않는 상품입니다.
+            if (!verifier.isUsersProductId(uid, productId))
+                throw new BaseException(USER_NOT_PERMITTED); // USER_NOT_PERMITTED|3302|해당 사용자가 접근할 수 없는 상품입니다.
+
             return new BaseResponse<>(productService.patchNewProduct(uid, productId, newProduct));
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     * 상품 삭제
+     * [PATCH] /bungae/product/registration/d
+     */
+    @ResponseBody
+    @PatchMapping("/registration/d")
+    public BaseResponse<PatchDeleteRes> patchDeleteProduct(
+            @RequestParam Integer productId,
+            @RequestParam(required = false) Integer kill) {
+        try {
+            // jwt 에서 uid 추출
+            int uid;
+            uid = jwtService.getUserIdx();
+            // 존재하는 상점 아이디인지 검증
+            if (!verifier.isPresentStoreId(uid))
+                throw new BaseException(INVALID_STORE_ID); // /3001/존재하지 않는 상점 id 입니다.
+
+            if (kill == null || kill != 9 ) {
+                kill = 0;
+                // 내 상품인지 확인
+                if (!verifier.isPresentProductId(productId))
+                    throw new BaseException(INVALID_PRODUCT_ID); // INVALID_PRODUCT_ID|3301|존재하지 않는 상품입니다.
+                if (!verifier.isUsersProductId(uid, productId))
+                    throw new BaseException(USER_NOT_PERMITTED); // USER_NOT_PERMITTED|3302|해당 사용자가 접근할 수 없는 상품입니다.
+            }
+
+            return new BaseResponse<>(productService.patchDeleteProduct(uid, productId, kill));
         } catch (BaseException exception) {
             return new BaseResponse<>((exception.getStatus()));
         }

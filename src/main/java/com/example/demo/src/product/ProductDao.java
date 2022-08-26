@@ -363,6 +363,35 @@ public class ProductDao {
         this.jdbcTemplate.update(Query,productId);
     }
 
+    /**
+     * 상품 상태 -> deleted
+     */
+    public void deleteProduct(int productId){
+        String Query = "UPDATE Product SET status = 'deleted' WHERE status = 'active' AND id = ?";
+        this.jdbcTemplate.update(Query,productId);
+    }
+    /**
+     * 상품 데이터 삭제!!
+     */
+    public void deleteProduct(int productId, int kill){
+        String Query1 = "DELETE TPM FROM Product AS P\n" +
+                "LEFT JOIN TagProductMap TPM on P.id = TPM.productId\n" +
+                "WHERE P.status='deleted' AND P.id=?";
+        String Query2 = "DELETE P FROM Product AS P\n" +
+                "LEFT JOIN TagProductMap TPM on P.id = TPM.productId\n" +
+                "WHERE P.status='deleted' AND P.id=?";
+        this.jdbcTemplate.update(Query1,productId);
+        this.jdbcTemplate.update(Query2,productId);
+    }
+
+    /**
+     * (admin) 삭제 가능여부 조회
+     */
+    public void isDeletableProductId(int productId){
+        String Query = "SELECT * FROM Product AS P\n" +
+                "WHERE P.status='deleted' AND P.id=?";
+        this.jdbcTemplate.queryForObject(Query,(rs,rn)->rs.getInt("id"),productId);
+    }
 
     /**
      * 카테고리 항목 조회

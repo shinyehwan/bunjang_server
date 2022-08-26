@@ -168,7 +168,7 @@ public class FeedProvider {
 
             if (min != null && max != null){
                 if (min>max)
-                    throw new BaseException(INVALID_PRICE_RANGE); // |2xxxx| max보다 큰 min 값입니다.
+                    throw new BaseException(INVALID_PRICE_RANGE); // |2xxxx|가격 범위가 올바르지 않습니다. max와 min을 확인해주세요.
                 else
                     whereQuery += " AND price BETWEEN "+min+" AND "+max;
             } else if (min != null){

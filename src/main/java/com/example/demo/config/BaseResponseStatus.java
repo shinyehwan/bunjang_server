@@ -38,6 +38,10 @@ public enum BaseResponseStatus {
     TOO_LONG_POLICY(false,2023,"교환/환불/반품 정책의 길이가 1000자를 초과하였습니다."),
     TOO_LONG_PRECAUTIONS(false,2024,"구매전 유의 사항의 길이가 1000자를 초과하였습니다."),
 
+    // 2200 : 피드 관련
+    INVALID_FEED_ORDER(false,2200,"올바르지 않은 order 입력입니다."),
+    INVALID_ONLYSALE(false,2201,"onlySale에 true 혹은 false를 입력해주세요"),
+    INVALID_PRICE_RANGE(false,2201,"가격 범위가 올바르지 않습니다. max와 min을 확인해주세요."),
 
 
     // 2300 : 상품 관련
@@ -73,7 +77,6 @@ public enum BaseResponseStatus {
     EMPTY_IMAGEURL_LIST(false,2335,"imageUrls 리스트를 입력해주세요."),
     INVALID_CONDITION(false,2336,"condition은 '새상품' 혹은 '중고상품' 으로 기록해주세요."),
 
-
     /**
      * 3000 : Response 오류
      */
@@ -88,6 +91,7 @@ public enum BaseResponseStatus {
     // 3300 : 상품 관련
     // 3300 : [GET] /bungae/product/:productId : 상품 상세 정보 조회 API(조회수, 찜하기 수, 채팅 수, 상품 관련 내용)
     INVALID_PRODUCT_ID(false, 3301, "존재하지 않는 상품입니다."),
+    USER_NOT_PERMITTED(false, 3302, "해당 사용자가 접근할 수 없는 상품입니다."),
     // 3310 : [POST] /bungae/product/ : 상품 등록하기 API
     // 3330 : [GET] /bungae/product/category : 카테고리 항목 조회
     NOT_MATCH_CATEGORY_12_ID(false, 3330, "연관되지 않은 depth1Id와 depth2Id입니다."),

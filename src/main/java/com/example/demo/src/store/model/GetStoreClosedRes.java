@@ -8,6 +8,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class GetStoreClosedRes {
+    private String dealStatus;
     private String imageUrl01;
     private String title;
     private int price;

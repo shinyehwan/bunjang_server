@@ -166,10 +166,11 @@ public class StoreDao {
 
     // 상점에 따른 판매중인 상품 조회
     public List<GetStoreSaleRes> getStoreSale (int storeId) {
-        String getUserQuery = "select Product.imageUrl01, Product.title, Product.price from Product where dealStatus = \"sale\" and Product.storeId = ?";
+        String getUserQuery = "select Product.dealStatus, Product.imageUrl01, Product.title, Product.price from Product where dealStatus = \"sale\" and Product.storeId = ?";
         int getUserParams = storeId;
         return this.jdbcTemplate.query(getUserQuery,
                 (rs, rowNum) -> new GetStoreSaleRes(
+                        rs.getString("dealStatus"),
                         rs.getString("imageUrl01"),
                         rs.getString("title"),
                         rs.getInt("price")
@@ -178,10 +179,11 @@ public class StoreDao {
     }
     // 상점에 따른 예약중인 상품 조회
     public List<GetStoreReservedRes> getStoreReserved (int storeId) {
-        String getUserQuery = "select Product.imageUrl01, Product.title, Product.price from Product where dealStatus = \"reserved\" and Product.storeId = ?";
+        String getUserQuery = "select Product.dealStatus, Product.imageUrl01, Product.title, Product.price from Product where dealStatus = \"reserved\" and Product.storeId = ?";
         int getUserParams = storeId;
         return this.jdbcTemplate.query(getUserQuery,
                 (rs, rowNum) -> new GetStoreReservedRes(
+                        rs.getString("dealStatus"),
                         rs.getString("imageUrl01"),
                         rs.getString("title"),
                         rs.getInt("price")
@@ -190,10 +192,11 @@ public class StoreDao {
     }
     // 상점에 따른 예약중인 상품 조회
     public List<GetStoreClosedRes> getStoreClosed (int storeId) {
-        String getUserQuery = "select Product.imageUrl01, Product.title, Product.price from Product where dealStatus = \"closed\" and Product.storeId = ?";
+        String getUserQuery = "select Product.dealStatus, Product.imageUrl01, Product.title, Product.price from Product where dealStatus = \"closed\" and Product.storeId = ?";
         int getUserParams = storeId;
         return this.jdbcTemplate.query(getUserQuery,
                 (rs, rowNum) -> new GetStoreClosedRes(
+                        rs.getString("dealStatus"),
                         rs.getString("imageUrl01"),
                         rs.getString("title"),
                         rs.getInt("price")
@@ -230,17 +233,31 @@ public class StoreDao {
 
     // 상점 찜한 목록 조회
     public List<GetStoreBasketRes> getStoreBasket (int storeId) {
-        String getUserQuery = "select Product.imageUrl01, Product.title\n" +
-                "from Store, Basket, Product\n" +
-                "where Basket.storeId = Store.id and Basket.productId = Product.id and basket = \"true\" and\n" +
-                "      Store.id = ?";
+        String getUserQuery = "select Product.imageUrl01, Product.title, Store.profileImgUrl, Store.storeName,\n" +
+                "       CASE\n" +
+                "                            WHEN TIMESTAMPDIFF (MINUTE,Product.updatedAt, CURRENT_TIMESTAMP) < 60\n" +
+                "                            THEN CONCAT(TIMESTAMPDIFF (MINUTE,Product.updatedAt, CURRENT_TIMESTAMP), '분 전')\n" +
+                "                            WHEN TIMESTAMPDIFF(HOUR,Product.updatedAt, CURRENT_TIMESTAMP) < 24\n" +
+                "                            THEN CONCAT(TIMESTAMPDIFF(HOUR,Product.updatedAt, CURRENT_TIMESTAMP), '시간 전')\n" +
+                "                            WHEN TIMESTAMPDIFF(DAY,Product.updatedAt, CURRENT_TIMESTAMP)< 30\n" +
+                "                            THEN CONCAT(TIMESTAMPDIFF(DAY,Product.updatedAt, CURRENT_TIMESTAMP), '일 전')\n" +
+                "                            WHEN TIMESTAMPDIFF(MONTH,Product.updatedAt, CURRENT_TIMESTAMP)< 12\n" +
+                "                            THEN CONCAT(TIMESTAMPDIFF(MONTH,Product.updatedAt, CURRENT_TIMESTAMP), '개월 전')\n" +
+                "                            ELSE CONCAT(TIMESTAMPDIFF(YEAR,Product.updatedAt, CURRENT_TIMESTAMP ), '년 전')\n" +
+                "                        END AS 'updatedAt'\n" +
+                "from Product, Store, Basket\n" +
+                "where Product.storeId = Store.id\n" +
+                "and Basket.productId = Product.id\n" +
+                "and Basket.basket = \"true\"\n" +
+                "and Basket.storeId = ?";
         int getUserParams = storeId;
         return this.jdbcTemplate.query(getUserQuery,
                 (rs, rowNum) -> new GetStoreBasketRes(
                         rs.getString("imageUrl01"),
-                        rs.getString("title")
-//                        rs.getString("profileImgUrl"),
-//                        rs.getString("storeName")
+                        rs.getString("title"),
+                        rs.getString("profileImgUrl"),
+                        rs.getString("storeName"),
+                        rs.getString("updatedAt")
                 ), // RowMapper(위의 링크 참조): 원하는 결과값 형태로 받기
                 getUserParams); // 한 개의 회원정보를 얻기 위한 jdbcTemplate 함수(Query, 객체 매핑 정보, Params)의 결과 반환
     }

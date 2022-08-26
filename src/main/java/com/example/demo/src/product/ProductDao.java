@@ -194,6 +194,56 @@ public class ProductDao {
     }
 
     /**
+     * 해당 상품 찜하기
+     */
+    public int postProductBasket(int uid, int productId) {
+        String createBasketQuery = "insert into Basket (storeId, productId) value (?, ?)"; // 실행될 동적 쿼리문
+        Object[] createBasketParams = new Object[]{uid, productId}; // 동적 쿼리의 ?부분에 주입될 값
+        this.jdbcTemplate.update(createBasketQuery, createBasketParams);
+        String lastInserIdQuery = "select last_insert_id()"; // 가장 마지막에 삽입된(생성된) id값은 가져온다.
+        return this.jdbcTemplate.queryForObject(lastInserIdQuery, int.class); // 해당 쿼리문의 결과 마지막으로 삽입된 찜하기의 Id번호를 반환한다.
+
+    }
+
+    /**
+     * 해당 상품 찜하기 확인
+     */
+    public int checkBasket(int uid, int productId) {
+        String checkNameQuery = "select exists (select id from Basket where storeId = ? and productId = ? and basket = \"true\")";
+        int param1 = uid;
+        int param2 = productId;
+        return this.jdbcTemplate.queryForObject(checkNameQuery,
+                int.class,
+                param1, param2); // checkNameQuery, checkNameParams 통해 가져온 값(int형)을 반환한다. -> 쿼리문의 결과(존재하지 않음(False,0),존재함(True, 1))를 int형(0,1)으로 반환됩니다.
+    }
+
+    /**
+     * 해당 상품 찜하기 취소
+     */
+    public int patchProductBasket(int uid, int productId) {
+        String createBasketQuery = "update Basket set basket = \"false\"  where storeId = ? and productId = ?"; // 실행될 동적 쿼리문
+        Object[] createBasketParams = new Object[]{uid, productId}; // 동적 쿼리의 ?부분에 주입될 값
+        this.jdbcTemplate.update(createBasketQuery, createBasketParams);
+        String lastInserIdQuery = "select last_insert_id()"; // 가장 마지막에 삽입된(생성된) id값은 가져온다.
+        return this.jdbcTemplate.queryForObject(lastInserIdQuery, int.class); // 해당 쿼리문의 결과 마지막으로 삽입된 찜하기의 Id번호를 반환한다.
+
+    }
+
+    /**
+     * 해당 상품 찜하기 취소 확인
+     */
+    public int checkBasketFalse(int uid, int productId) {
+        String checkNameQuery = "select exists (select id from Basket where storeId = ? and productId = ? and basket = \"false\")";
+        int param1 = uid;
+        int param2 = productId;
+        return this.jdbcTemplate.queryForObject(checkNameQuery,
+                int.class,
+                param1, param2); // checkNameQuery, checkNameParams 통해 가져온 값(int형)을 반환한다. -> 쿼리문의 결과(존재하지 않음(False,0),존재함(True, 1))를 int형(0,1)으로 반환됩니다.
+    }
+
+
+
+    /**
      * 상품 이미지 리스트 ImageUrls 조회
      */
     public List<String> getImageUrls (int productId){

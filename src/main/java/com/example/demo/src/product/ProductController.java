@@ -4,7 +4,6 @@ import com.example.demo.config.BaseException;
 import com.example.demo.config.BaseResponse;
 import com.example.demo.src.product.model.*;
 import com.example.demo.utils.JwtService;
-import com.example.demo.utils.Utils;
 import com.example.demo.utils.Verifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -174,6 +173,53 @@ public class ProductController {
         }
 
     }
+
+    /**
+     * 해당 상품 찜하기
+     */
+    @PostMapping("/{productId}/basket")
+    public BaseResponse<PostProductBasketRes> getProductBasket(
+            @PathVariable("productId") Integer productId) {
+
+        try {
+            // jwt 에서 uid 추출
+            int uid;
+            uid = jwtService.getUserIdx();
+            // 존재하는 상점 아이디인지 검증
+            if (!verifier.isPresentStoreId(uid)){
+                throw new BaseException(INVALID_STORE_ID); // /3001/존재하지 않는 상점 id 입니다.
+            }
+            PostProductBasketRes postProductBasketRes = productService.postProductBasket(uid, productId);
+            return new BaseResponse<>(postProductBasketRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+
+    }
+
+    /**
+     * 해당 상품 찜하기 취소
+     */
+    @PatchMapping("/{productId}/basket")
+    public BaseResponse<PatchProductBasketRes> patchProductBasket(
+            @PathVariable("productId") Integer productId) {
+        try {
+            // jwt 에서 uid 추출
+            int uid;
+            uid = jwtService.getUserIdx();
+            // 존재하는 상점 아이디인지 검증
+            if (!verifier.isPresentStoreId(uid)){
+                throw new BaseException(INVALID_STORE_ID); // /3001/존재하지 않는 상점 id 입니다.
+            }
+            PatchProductBasketRes patchProductBasketRes = productService.patchProductBasket(uid, productId);
+            return new BaseResponse<>(patchProductBasketRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+
+    }
+
+
 
 
     /**

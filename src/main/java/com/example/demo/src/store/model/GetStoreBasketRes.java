@@ -10,7 +10,8 @@ import lombok.Setter;
 public class GetStoreBasketRes {
     private String imageUrl01;
     private String title;
-//    private String profileImgUrl;
-//    private String storeName;
+    private String profileImgUrl;
+    private String storeName;
+    private String updatedAt;
 
 }

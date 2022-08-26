@@ -330,4 +330,28 @@ public class ProductProvider {
             return false;
         }
     }
+
+    /**
+     * 해당 상품이 찜하기 등록 여부 확인
+     *
+     */
+    public int checkBasket(int uid, int productId) throws BaseException {
+        try {
+            return productDao.checkBasket(uid, productId);
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    /**
+     * 해당 상품이 찜하기 취소 여부 확인
+     */
+    public int checkBasketFalse(int uid, int productId) throws BaseException {
+        try {
+            return productDao.checkBasketFalse(uid, productId);
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
 }

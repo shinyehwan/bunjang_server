@@ -7,7 +7,6 @@ import com.example.demo.utils.JwtService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -476,4 +475,38 @@ public class ProductService {
             return false;
         }
     }
+
+    /**
+     * 해당상품 찜하기
+     */
+
+    public PostProductBasketRes postProductBasket(int uid, int productId) throws BaseException {
+        if (productProvider.checkBasket(uid, productId) == 1) {
+            throw new BaseException(BASKET_EXIST);
+        }
+        try {
+            int basketId = productDao.postProductBasket(uid, productId);
+            String message = "찜목록에 추가했어요!";
+            return new PostProductBasketRes(basketId, message);
+        } catch (Exception exception) { // DB에 이상이 있는 경우 에러 메시지를 보냅니다.
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+    /**
+     * 해당상품 찜하기 취소
+     */
+
+    public PatchProductBasketRes patchProductBasket(int uid, int productId) throws BaseException {
+        if (productProvider.checkBasketFalse(uid, productId) == 1) {
+            throw new BaseException(BASKET_DELETE);
+        }
+        try {
+            int basketId = productDao.patchProductBasket(uid, productId);
+            String message = "찜 해제가 완료되었어요!";
+            return new PatchProductBasketRes(basketId, message);
+        } catch (Exception exception) { // DB에 이상이 있는 경우 에러 메시지를 보냅니다.
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
 }

@@ -76,6 +76,8 @@ public enum BaseResponseStatus {
     TOO_LONG_LOCATION(false,2334,"location의 길이가 50자를 초과하였습니다."),
     EMPTY_IMAGEURL_LIST(false,2335,"imageUrls 리스트를 입력해주세요."),
     INVALID_CONDITION(false,2336,"condition은 '새상품' 혹은 '중고상품' 으로 기록해주세요."),
+    BASKET_EXIST(false,2337,"이미 찜하기에 존재하는 상품입니다."),
+    BASKET_DELETE(false,2337,"이미 찜하기 해제가 완료되었습니다."),
 
     /**
      * 3000 : Response 오류

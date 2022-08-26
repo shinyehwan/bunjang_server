@@ -12,6 +12,7 @@ public class GetStoreBasketRes {
     private String title;
     private String profileImgUrl;
     private String storeName;
+    private String dealStatus;
     private String updatedAt;
 
 }

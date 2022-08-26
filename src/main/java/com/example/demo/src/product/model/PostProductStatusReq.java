@@ -7,7 +7,6 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-
-public class PatchProductBasketRes {
-    private String message;
+public class PostProductStatusReq {
+    private String dealStatus;
 }

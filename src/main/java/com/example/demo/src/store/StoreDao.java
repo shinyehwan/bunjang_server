@@ -233,7 +233,7 @@ public class StoreDao {
 
     // 상점 찜한 목록 조회
     public List<GetStoreBasketRes> getStoreBasket (int storeId) {
-        String getUserQuery = "select Product.imageUrl01, Product.title, Store.profileImgUrl, Store.storeName,\n" +
+        String getUserQuery = "select Product.imageUrl01, Product.title, Store.profileImgUrl, Store.storeName, Product.dealStatus, \n" +
                 "       CASE\n" +
                 "                            WHEN TIMESTAMPDIFF (MINUTE,Product.updatedAt, CURRENT_TIMESTAMP) < 60\n" +
                 "                            THEN CONCAT(TIMESTAMPDIFF (MINUTE,Product.updatedAt, CURRENT_TIMESTAMP), '분 전')\n" +
@@ -257,6 +257,7 @@ public class StoreDao {
                         rs.getString("title"),
                         rs.getString("profileImgUrl"),
                         rs.getString("storeName"),
+                        rs.getString("dealStatus"),
                         rs.getString("updatedAt")
                 ), // RowMapper(위의 링크 참조): 원하는 결과값 형태로 받기
                 getUserParams); // 한 개의 회원정보를 얻기 위한 jdbcTemplate 함수(Query, 객체 매핑 정보, Params)의 결과 반환

@@ -175,6 +175,50 @@ public class ProductController {
     }
 
     /**
+     * 해당상품 - 판매자 정보(판매자 팔로우 하기)
+     */
+    @PostMapping("/{productId}/store/follow")
+    public BaseResponse<PostProductFollowRes> postProductFollow(
+            @PathVariable("productId") Integer productId) {
+        try {
+            // jwt 에서 uid 추출
+            int uid;
+            uid = jwtService.getUserIdx();
+            // 존재하는 상점 아이디인지 검증
+            if (!verifier.isPresentStoreId(uid)){
+                throw new BaseException(INVALID_STORE_ID); // /3001/존재하지 않는 상점 id 입니다.
+            }
+            PostProductFollowRes postProductFollowRes = productService.postProductFollow(uid, productId);
+            return new BaseResponse<>(postProductFollowRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+
+    }
+
+    /**
+     * 해당상품 - 판매자 정보(판매자 팔로우 취소하기)
+     */
+    @PatchMapping("/{productId}/store/follow")
+    public BaseResponse<PatchProductFollowRes> patchProductFollow(
+            @PathVariable("productId") Integer productId) {
+        try {
+            // jwt 에서 uid 추출
+            int uid;
+            uid = jwtService.getUserIdx();
+            // 존재하는 상점 아이디인지 검증
+            if (!verifier.isPresentStoreId(uid)){
+                throw new BaseException(INVALID_STORE_ID); // /3001/존재하지 않는 상점 id 입니다.
+            }
+            PatchProductFollowRes patchProductFollowRes = productService.patchProductFollow(uid, productId);
+            return new BaseResponse<>(patchProductFollowRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+
+    }
+
+    /**
      * 해당 상품 찜하기
      */
     @PostMapping("/{productId}/basket")

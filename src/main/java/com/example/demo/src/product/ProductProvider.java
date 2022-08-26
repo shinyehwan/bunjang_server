@@ -332,6 +332,30 @@ public class ProductProvider {
     }
 
     /**
+     * 해당 상품 팔로우 여부 확인
+     *
+     */
+    public int checkFollow(int uid, int productId) throws BaseException {
+        try {
+            return productDao.checkFollow(uid, productId);
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    /**
+     * 해당 상품 팔로우 취소 여부 확인
+     */
+    public int checkFollowFalse(int uid, int productId) throws BaseException {
+        try {
+            return productDao.checkFollowFalse(uid, productId);
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+
+    /**
      * 해당 상품이 찜하기 등록 여부 확인
      *
      */

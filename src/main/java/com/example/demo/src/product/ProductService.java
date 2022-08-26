@@ -477,6 +477,41 @@ public class ProductService {
     }
 
     /**
+     * 해당상품 팔로우 하기
+     */
+
+    public PostProductFollowRes postProductFollow(int uid, int productId) throws BaseException {
+        if (productProvider.checkFollow(uid, productId) == 1) {
+            throw new BaseException(FOLLOW_EXIST);
+        }
+        try {
+            int followId = productDao.postProductFollow(uid, productId);
+            String message = "팔로우 되었습니다!";
+            return new PostProductFollowRes(followId, message);
+        } catch (Exception exception) { // DB에 이상이 있는 경우 에러 메시지를 보냅니다.
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    /**
+     * 해당상품 팔로우 취소
+     */
+
+    public PatchProductFollowRes patchProductFollow(int uid, int productId) throws BaseException {
+        if (productProvider.checkFollowFalse(uid, productId) == 1) {
+            throw new BaseException(FOLLOW_DELETE);
+        }
+        try {
+            int followId = productDao.patchProductFollow(uid, productId);
+            String message = "언팔로우 되었습니다!";
+            return new PatchProductFollowRes(followId, message);
+        } catch (Exception exception) { // DB에 이상이 있는 경우 에러 메시지를 보냅니다.
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+
+    /**
      * 해당상품 찜하기
      */
 
@@ -492,6 +527,7 @@ public class ProductService {
             throw new BaseException(DATABASE_ERROR);
         }
     }
+
     /**
      * 해당상품 찜하기 취소
      */

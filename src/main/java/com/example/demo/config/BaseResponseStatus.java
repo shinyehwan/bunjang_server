@@ -77,7 +77,9 @@ public enum BaseResponseStatus {
     EMPTY_IMAGEURL_LIST(false,2335,"imageUrls 리스트를 입력해주세요."),
     INVALID_CONDITION(false,2336,"condition은 '새상품' 혹은 '중고상품' 으로 기록해주세요."),
     BASKET_EXIST(false,2337,"이미 찜하기에 존재하는 상품입니다."),
-    BASKET_DELETE(false,2337,"이미 찜하기 해제가 완료되었습니다."),
+    BASKET_DELETE(false,2338,"이미 찜하기 해제가 완료되었습니다."),
+    FOLLOW_EXIST(false,2339,"이미 팔로우한 계정입니다."),
+    FOLLOW_DELETE(false,2340,"이미 언팔로우한 계정입니다."),
 
     /**
      * 3000 : Response 오류

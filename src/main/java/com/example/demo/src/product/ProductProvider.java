@@ -2,7 +2,6 @@ package com.example.demo.src.product;
 
 import com.example.demo.config.BaseException;
 import com.example.demo.src.product.model.*;
-import com.example.demo.src.store.model.GetStoreCountRes;
 import com.example.demo.utils.JwtService;
 import com.example.demo.utils.Utils;
 import org.slf4j.Logger;
@@ -377,5 +376,6 @@ public class ProductProvider {
             throw new BaseException(DATABASE_ERROR);
         }
     }
+
 
 }

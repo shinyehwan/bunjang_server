@@ -80,6 +80,7 @@ public enum BaseResponseStatus {
     BASKET_DELETE(false,2338,"이미 찜하기 해제가 완료되었습니다."),
     FOLLOW_EXIST(false,2339,"이미 팔로우한 계정입니다."),
     FOLLOW_DELETE(false,2340,"이미 언팔로우한 계정입니다."),
+    STATUS_UNAVAILABE(false,2341,"sale, reserved, closed 형태로만 가능합니다."),
 
     /**
      * 3000 : Response 오류

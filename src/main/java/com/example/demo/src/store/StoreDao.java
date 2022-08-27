@@ -299,6 +299,7 @@ public class StoreDao {
                 "from Follow, Store, Product\n" +
                 "where Follow.followerStoreId = Store.id\n" +
                 "  and Store.id = Product.storeId\n" +
+                "  and Follow.status = \"active\"" +
                 "  and Follow.followingStoreId = ?\n" +
                 "group by Store.storeName";
         int getUserParams = storeId;
@@ -316,6 +317,7 @@ public class StoreDao {
                 "from Follow, Store, Product\n" +
                 "where Follow.followingStoreId = Store.id\n" +
                 "  and Store.id = Product.storeId\n" +
+                "  and Follow.status = \"active\"" +
                 "  and Follow.followerStoreId = ?\n" +
                 "group by Store.storeName";
         int getUserParams = storeId;
@@ -334,6 +336,7 @@ public class StoreDao {
                 "    from Follow, Store, Product\n" +
                 "where Follow.followerStoreId = Store.id\n" +
                 "    and Store.id = Product.storeId\n" +
+                "    and Follow.status = \"active\"" +
                 "    and Follow.followingStoreId = ?";
         int getUserParams = storeId;
         return this.jdbcTemplate.query(getUserQuery,
@@ -353,6 +356,7 @@ public class StoreDao {
                 "    from Follow, Store, Product\n" +
                 "where Follow.followingStoreId = Store.id\n" +
                 "    and Store.id = Product.storeId\n" +
+                "    and Follow.status = \"active\"" +
                 "    and Follow.followerStoreId = ?\n";
         int getUserParams = storeId;
         return this.jdbcTemplate.query(getUserQuery,

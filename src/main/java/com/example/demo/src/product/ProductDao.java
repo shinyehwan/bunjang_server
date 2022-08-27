@@ -301,19 +301,13 @@ public class ProductDao {
     }
 
     /**
-     * 해당 상품 상태변경 하기
+     * 내 상품 상태변경 하기
      */
-    public int postProductStatus(int productId, PostProductStatusReq postProductStatusReq) {
-        String Query = "update Product set dealStatus = ?  where Product.id= ?"; // 실행될 동적 쿼리문
-        Object[] Params = new Object[]{postProductStatusReq.getDealStatus(), productId}; // 동적 쿼리의 ?부분에 주입될 값
+    public int postProductStatus(int uid, int productId, PostProductStatusReq postProductStatusReq) {
+        String Query = "update Product set dealStatus = ?  where Product.storeId = ? and Product.id= ?"; // 실행될 동적 쿼리문
+        Object[] Params = new Object[]{postProductStatusReq.getDealStatus(), uid, productId}; // 동적 쿼리의 ?부분에 주입될 값
         return this.jdbcTemplate.update(Query, Params);
     }
-
-
-
-
-
-
 
     /**
      * 상품 이미지 리스트 ImageUrls 조회

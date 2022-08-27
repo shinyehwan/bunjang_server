@@ -264,29 +264,39 @@ public class ProductController {
     }
 
     /**
-     * 해당 상품 상태변경
+     * 상품 상세 정보 - 관련 상품 정보 (관련상품 리스트)
+     *
+     */
+
+
+
+
+    /**
+     * 상품 상태변경
      */
     @PostMapping("/{productId}/update")
     public BaseResponse<PostProductStatusRes> postProductStatus(
             @PathVariable("productId") Integer productId,
-            @RequestBody PostProductStatusReq postProductStatusReq) {
-
-        try {
-            // jwt 에서 uid 추출
-            int uid;
-            uid = jwtService.getUserIdx();
-            // 존재하는 상점 아이디인지 검증
-            if (!verifier.isPresentStoreId(uid)){
-                throw new BaseException(INVALID_STORE_ID); // /3001/존재하지 않는 상점 id 입니다.
-            }
-            PostProductStatusRes postProductStatusRes = productService.postProductStatus(productId, postProductStatusReq);
-            return new BaseResponse<>(postProductStatusRes);
-        } catch (BaseException exception) {
-            return new BaseResponse<>((exception.getStatus()));
+            @RequestBody PostProductStatusReq postProductStatusReq){
+        if (!postProductStatusReq.getDealStatus().equals("sale") &&
+            !postProductStatusReq.getDealStatus().equals("reserved") &&
+            !postProductStatusReq.getDealStatus().equals("closed") ) {
+            return new BaseResponse<>(STATUS_UNAVAILABE);
         }
-
+        try {
+                // jwt 에서 uid 추출
+                int uid;
+                uid = jwtService.getUserIdx();
+                // 존재하는 상점 아이디인지 검증
+                if (!verifier.isPresentStoreId(uid)){
+                    throw new BaseException(INVALID_STORE_ID); // /3001/존재하지 않는 상점 id 입니다.
+                }
+                PostProductStatusRes postProductStatusRes = productService.postProductStatus(uid, productId, postProductStatusReq);
+                return new BaseResponse<>(postProductStatusRes);
+            } catch (BaseException exception) {
+                return new BaseResponse<>((exception.getStatus()));
+            }
     }
-
 
 
     /**

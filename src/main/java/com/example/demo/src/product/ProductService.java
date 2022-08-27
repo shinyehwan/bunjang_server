@@ -549,15 +549,12 @@ public class ProductService {
         }
     }
     /**
-     * 해당상품 상태변경
+     * 내 상품 상태변경
      */
 
-    public PostProductStatusRes postProductStatus(int productId, PostProductStatusReq postProductStatusReq) throws BaseException {
-//        if (productProvider.checkBasketFalse(uid, productId) == 1) {
-//            throw new BaseException(BASKET_DELETE);
-//        }
+    public PostProductStatusRes postProductStatus(int uid, int productId, PostProductStatusReq postProductStatusReq) throws BaseException {
         try {
-            productDao.postProductStatus(productId, postProductStatusReq);
+            productDao.postProductStatus(uid, productId, postProductStatusReq);
             String message = "상태변경이 완료되었어요!";
             return new PostProductStatusRes(message);
         } catch (Exception exception) { // DB에 이상이 있는 경우 에러 메시지를 보냅니다.

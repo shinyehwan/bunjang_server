@@ -138,7 +138,7 @@ public class ProductDao {
                 "                    and Store.id = (select Product.storeId\n" +
                 "                                  from Product, Store\n" +
                 "                                  where Product.storeId = Store.id\n" +
-                "                                  and Product.id = ?)";
+                "                                  and Product.id = ?) order by Product.updatedAt DESC";
 
         return this.jdbcTemplate.query(Query, (rs,rn)->
             new GetProductStoreProductRes(
@@ -192,6 +192,128 @@ public class ProductDao {
                     rs.getString("createdAt")
             ) ,productId);
     }
+
+
+    /**
+     * 해당 상품 팔로우하기
+     */
+    public int postProductFollow(int uid, int productId) {
+        String createBasketQuery = "insert into Follow(followingStoreId, followerStoreId) values(?, (select Store.id\n" +
+                "    from Store, Product\n" +
+                "where Product.storeId = Store.id\n" +
+                "and Product.id = ?))"; // 실행될 동적 쿼리문
+        Object[] createBasketParams = new Object[]{uid, productId}; // 동적 쿼리의 ?부분에 주입될 값
+        this.jdbcTemplate.update(createBasketQuery, createBasketParams);
+        String lastInserIdQuery = "select last_insert_id()"; // 가장 마지막에 삽입된(생성된) id값은 가져온다.
+        return this.jdbcTemplate.queryForObject(lastInserIdQuery, int.class); // 해당 쿼리문의 결과 마지막으로 삽입된 찜하기의 Id번호를 반환한다.
+
+    }
+
+    /**
+     * 해당 상품 팔로우 확인
+     */
+    public int checkFollow(int uid, int productId) {
+        String checkNameQuery = "select exists (select id from Follow where followingStoreId = ? and followerStoreId = (select Store.id\n" +
+                "    from Store, Product\n" +
+                "where Product.storeId = Store.id\n" +
+                "and Product.id = ?) and Follow.status = \"active\")";
+        int param1 = uid;
+        int param2 = productId;
+        return this.jdbcTemplate.queryForObject(checkNameQuery,
+                int.class,
+                param1, param2); // checkNameQuery, checkNameParams 통해 가져온 값(int형)을 반환한다. -> 쿼리문의 결과(존재하지 않음(False,0),존재함(True, 1))를 int형(0,1)으로 반환됩니다.
+    }
+
+    /**
+     * 해당 상품 팔로우 취소
+     */
+    public int patchProductFollow(int uid, int productId) {
+        String Query = "update Follow set status = \"delete\"  where followingStoreId = ? and followerStoreId = (select Store.id\n" +
+                "    from Store, Product\n" +
+                "where Product.storeId = Store.id\n" +
+                "and Product.id = ?)"; // 실행될 동적 쿼리문
+        Object[] Params = new Object[]{uid, productId}; // 동적 쿼리의 ?부분에 주입될 값
+        return this.jdbcTemplate.update(Query, Params);
+
+    }
+
+    /**
+     * 해당 상품 찜하기 취소 확인
+     */
+    public int checkFollowFalse(int uid, int productId) {
+        String checkNameQuery = "select exists (select id from Follow where followingStoreId = ? and followerStoreId = (select Store.id\n" +
+                "    from Store, Product\n" +
+                "where Product.storeId = Store.id\n" +
+                "and Product.id = ?) and status = \"delete\")";
+        int param1 = uid;
+        int param2 = productId;
+        return this.jdbcTemplate.queryForObject(checkNameQuery,
+                int.class,
+                param1, param2); // checkNameQuery, checkNameParams 통해 가져온 값(int형)을 반환한다. -> 쿼리문의 결과(존재하지 않음(False,0),존재함(True, 1))를 int형(0,1)으로 반환됩니다.
+    }
+
+
+
+    /**
+     * 해당 상품 찜하기
+     */
+    public int postProductBasket(int uid, int productId) {
+        String createBasketQuery = "insert into Basket (storeId, productId) value (?, ?)"; // 실행될 동적 쿼리문
+        Object[] createBasketParams = new Object[]{uid, productId}; // 동적 쿼리의 ?부분에 주입될 값
+        this.jdbcTemplate.update(createBasketQuery, createBasketParams);
+        String lastInserIdQuery = "select last_insert_id()"; // 가장 마지막에 삽입된(생성된) id값은 가져온다.
+        return this.jdbcTemplate.queryForObject(lastInserIdQuery, int.class); // 해당 쿼리문의 결과 마지막으로 삽입된 찜하기의 Id번호를 반환한다.
+
+    }
+
+    /**
+     * 해당 상품 찜하기 확인
+     */
+    public int checkBasket(int uid, int productId) {
+        String checkNameQuery = "select exists (select id from Basket where storeId = ? and productId = ? and basket = \"true\")";
+        int param1 = uid;
+        int param2 = productId;
+        return this.jdbcTemplate.queryForObject(checkNameQuery,
+                int.class,
+                param1, param2); // checkNameQuery, checkNameParams 통해 가져온 값(int형)을 반환한다. -> 쿼리문의 결과(존재하지 않음(False,0),존재함(True, 1))를 int형(0,1)으로 반환됩니다.
+    }
+
+    /**
+     * 해당 상품 찜하기 취소
+     */
+    public int patchProductBasket(int uid, int productId) {
+        String createBasketQuery = "update Basket set basket = \"false\"  where storeId = ? and productId = ?"; // 실행될 동적 쿼리문
+        Object[] createBasketParams = new Object[]{uid, productId}; // 동적 쿼리의 ?부분에 주입될 값
+        return this.jdbcTemplate.update(createBasketQuery, createBasketParams);
+
+    }
+
+    /**
+     * 해당 상품 찜하기 취소 확인
+     */
+    public int checkBasketFalse(int uid, int productId) {
+        String checkNameQuery = "select exists (select id from Basket where storeId = ? and productId = ? and basket = \"false\")";
+        int param1 = uid;
+        int param2 = productId;
+        return this.jdbcTemplate.queryForObject(checkNameQuery,
+                int.class,
+                param1, param2); // checkNameQuery, checkNameParams 통해 가져온 값(int형)을 반환한다. -> 쿼리문의 결과(존재하지 않음(False,0),존재함(True, 1))를 int형(0,1)으로 반환됩니다.
+    }
+
+    /**
+     * 해당 상품 상태변경 하기
+     */
+    public int postProductStatus(int productId, PostProductStatusReq postProductStatusReq) {
+        String Query = "update Product set dealStatus = ?  where Product.id= ?"; // 실행될 동적 쿼리문
+        Object[] Params = new Object[]{postProductStatusReq.getDealStatus(), productId}; // 동적 쿼리의 ?부분에 주입될 값
+        return this.jdbcTemplate.update(Query, Params);
+    }
+
+
+
+
+
+
 
     /**
      * 상품 이미지 리스트 ImageUrls 조회

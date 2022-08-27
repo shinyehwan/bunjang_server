@@ -7,7 +7,6 @@ import com.example.demo.utils.JwtService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -476,4 +475,94 @@ public class ProductService {
             return false;
         }
     }
+
+    /**
+     * 해당상품 판매자 팔로우 하기
+     */
+
+    public PostProductFollowRes postProductFollow(int uid, int productId) throws BaseException {
+        if (productProvider.checkFollow(uid, productId) == 1) {
+            throw new BaseException(FOLLOW_EXIST);
+        }
+        try {
+            int followId = productDao.postProductFollow(uid, productId);
+            String message = "팔로우 되었습니다!";
+            return new PostProductFollowRes(followId, message);
+        } catch (Exception exception) { // DB에 이상이 있는 경우 에러 메시지를 보냅니다.
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    /**
+     * 해당상품 판매자 팔로우 취소
+     */
+
+    public PatchProductFollowRes patchProductFollow(int uid, int productId) throws BaseException {
+        // 팔로우->언팔로우->팔로우 끝난후 다시 언팔로우 하는 과정에서 문제 발생.
+        // 사실 언팔로우는 계속 하여도 상관이없다.
+//        if (productProvider.checkFollowFalse(uid, productId) == 1) {
+//            throw new BaseException(FOLLOW_DELETE);
+//        }
+        try {
+            productDao.patchProductFollow(uid, productId);
+            String message = "언팔로우 되었습니다!";
+            return new PatchProductFollowRes(message);
+        } catch (Exception exception) { // DB에 이상이 있는 경우 에러 메시지를 보냅니다.
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+
+    /**
+     * 해당상품 찜하기
+     */
+
+    public PostProductBasketRes postProductBasket(int uid, int productId) throws BaseException {
+        if (productProvider.checkBasket(uid, productId) == 1) {
+            throw new BaseException(BASKET_EXIST);
+        }
+        try {
+            int basketId = productDao.postProductBasket(uid, productId);
+            String message = "찜목록에 추가했어요!";
+            return new PostProductBasketRes(basketId, message);
+        } catch (Exception exception) { // DB에 이상이 있는 경우 에러 메시지를 보냅니다.
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    /**
+     * 해당상품 찜하기 취소
+     */
+
+    public PatchProductBasketRes patchProductBasket(int uid, int productId) throws BaseException {
+        // 찜하기->취소->찜하기 끝난후 다시 찜하는 과정에서 문제 발생.
+        // 사실 찜하기 취소는 계속 하여도 상관이없다.
+//        if (productProvider.checkBasketFalse(uid, productId) == 1) {
+//            throw new BaseException(BASKET_DELETE);
+//        }
+        try {
+            productDao.patchProductBasket(uid, productId);
+            String message = "찜 해제가 완료되었어요!";
+            return new PatchProductBasketRes(message);
+        } catch (Exception exception) { // DB에 이상이 있는 경우 에러 메시지를 보냅니다.
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+    /**
+     * 해당상품 상태변경
+     */
+
+    public PostProductStatusRes postProductStatus(int productId, PostProductStatusReq postProductStatusReq) throws BaseException {
+//        if (productProvider.checkBasketFalse(uid, productId) == 1) {
+//            throw new BaseException(BASKET_DELETE);
+//        }
+        try {
+            productDao.postProductStatus(productId, postProductStatusReq);
+            String message = "상태변경이 완료되었어요!";
+            return new PostProductStatusRes(message);
+        } catch (Exception exception) { // DB에 이상이 있는 경우 에러 메시지를 보냅니다.
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
 }

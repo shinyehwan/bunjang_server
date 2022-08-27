@@ -193,6 +193,30 @@ public class ProductDao {
             ) ,productId);
     }
 
+    public List<GetProductRelatedRes> getProductRelated(int productId) {
+        String Query = "select distinct Product.id as productId, Product.storeId, Product.imageUrl01, Product.title, Product.price\n" +
+                "from Tag, TagProductMap, Product,\n" +
+                "     (\n" +
+                "     select Tag.id, Tag.tag\n" +
+                "        from Product, Tag, TagProductMap\n" +
+                "        where TagProductMap.tagId = Tag.id\n" +
+                "        and TagProductMap.productId = Product.id\n" +
+                "        and Product.id = ?\n" +
+                "     ) A\n" +
+                "where TagProductMap.tagId = Tag.id\n" +
+                "and TagProductMap.productId = Product.id\n" +
+                "and Product.dealStatus = \"sale\"\n" +
+                "and TagProductMap.tagId = A.id and NOT Product.id = ?";
+
+        return this.jdbcTemplate.query(Query, (rs,rn)->
+                new GetProductRelatedRes(
+                        rs.getInt("productId"),
+                        rs.getString("imageUrl01"),
+                        rs.getString("title"),
+                        rs.getInt("price")
+                ) ,productId, productId);
+    }
+
 
     /**
      * 해당 상품 팔로우하기

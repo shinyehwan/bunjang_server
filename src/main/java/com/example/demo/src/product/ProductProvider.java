@@ -171,6 +171,19 @@ public class ProductProvider {
         }
     }
 
+    /**
+     * 해당 상품 - 관련상품 정보 조회
+     */
+
+    public List<GetProductRelatedRes> getProductRelated(int productId) throws BaseException {
+        try {
+            List<GetProductRelatedRes> getProductRelatedRes = productDao.getProductRelated(productId);
+            return getProductRelatedRes;
+        } catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
 
     /**
      * 상품 세부정보 조회
@@ -376,6 +389,8 @@ public class ProductProvider {
             throw new BaseException(DATABASE_ERROR);
         }
     }
+
+
 
 
 }

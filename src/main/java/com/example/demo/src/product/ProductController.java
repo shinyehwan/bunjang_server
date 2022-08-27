@@ -219,6 +219,31 @@ public class ProductController {
     }
 
     /**
+     * 해당 상품 - 관련상품정보 조회
+     */
+    @GetMapping("/{productId}/related")
+    public BaseResponse<List<GetProductRelatedRes>> getProductRelated(
+            @PathVariable("productId") Integer productId) {
+
+        try {
+            // jwt 에서 uid 추출
+            int uid;
+            uid = jwtService.getUserIdx();
+            // 존재하는 상점 아이디인지 검증
+            if (!verifier.isPresentStoreId(uid)){
+                throw new BaseException(INVALID_STORE_ID); // /3001/존재하지 않는 상점 id 입니다.
+            }
+            List<GetProductRelatedRes> getProductRelatedRes = productProvider.getProductRelated(productId);
+            return new BaseResponse<>(getProductRelatedRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+
+    }
+
+
+
+    /**
      * 해당 상품 찜하기
      */
     @PostMapping("/{productId}/basket")

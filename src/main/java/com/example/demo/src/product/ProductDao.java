@@ -282,7 +282,6 @@ public class ProductDao {
      */
     public void addImgUrls(int productId, List<String> imageUrls) {
         String Query;
-        System.out.println(imageUrls.size());
         for (int i=0; i < imageUrls.size(); i++){
             if (i == 9)
                 Query = "UPDATE Product SET imageUrl10 = '"+ imageUrls.get(i) +"' WHERE id=?";

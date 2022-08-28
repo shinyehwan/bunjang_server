@@ -2,7 +2,6 @@ package com.example.demo.src.product;
 
 import com.example.demo.config.BaseException;
 import com.example.demo.src.product.model.*;
-import com.example.demo.src.store.model.GetStoreCountRes;
 import com.example.demo.utils.JwtService;
 import com.example.demo.utils.Utils;
 import org.slf4j.Logger;
@@ -167,6 +166,19 @@ public class ProductProvider {
         try {
             List<GetProductStoreReviewRes> getProductStoreReviewRes = productDao.getProductStoreReview(productId);
             return getProductStoreReviewRes;
+        } catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    /**
+     * 해당 상품 - 관련상품 정보 조회
+     */
+
+    public List<GetProductRelatedRes> getProductRelated(int productId) throws BaseException {
+        try {
+            List<GetProductRelatedRes> getProductRelatedRes = productDao.getProductRelated(productId);
+            return getProductRelatedRes;
         } catch (Exception e) {
             throw new BaseException(DATABASE_ERROR);
         }
@@ -377,5 +389,8 @@ public class ProductProvider {
             throw new BaseException(DATABASE_ERROR);
         }
     }
+
+
+
 
 }

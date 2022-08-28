@@ -69,46 +69,78 @@ public class FeedProvider {
             }
             // 팔로우 상점 -> 상품 pid 모아오기
             resultIdSet.addAll(feedDao.productIdsByFollowingStore(uid));
-
             // 이미 본 물품 제거
             resultIdSet.removeAll(productIdSet);
 
+            // Set List로 변환 후 정렬(최신순)
             List<Integer> resultIdList = new ArrayList<>(resultIdSet);
             Collections.sort(resultIdList,Collections.reverseOrder());
 
             int addRows=0, addStart=0;
             if (p*20 < resultIdList.size()){
                 resultIdList = resultIdList.subList(20*(p-1), 20*p);
-            } else if ((p-1)*20 < resultIdList.size()){
+            } else if ((p-1)*20 < resultIdList.size()){ // page에 필요한 상품 수가 resultIdList의 수보다 적을 때
                 resultIdList = resultIdList.subList(20*(p-1), resultIdList.size());
                 addRows = 20*(p-1) - resultIdList.size();
-            } else {
+            } else { // page에 필요한 상품 수가 resultIdList의 수보다 적을 때
                 addStart = 20*(p-1) - resultIdList.size() - 1;
                 addRows = 20;
             }
 
             List<GetFeedRes> result = new ArrayList<>();
-            if (addRows != 20) {
+            if (addRows != 20) { // resultIdList의 상품들 정보 조회
                 String whereQuery = " AND id IN (" +
                         resultIdList.toString().substring(1, resultIdList.toString().length() - 1) + ")";
                 String orderQuery = "ORDER BY createdAt DESC";
                 result.addAll(feedDao.getFeed(whereQuery, orderQuery, 1));
             }
-            if (addRows > 0) {
+            if (addRows > 0) { // page에 필요한 상품 수가 resultIdList의 수보다 적을 때 -> 최신상품들 최신순으로 조회
                 result.addAll(feedDao.getRecentFeed(addStart,addRows));
             }
 
+            // 상품별 추가작업
             for (GetFeedRes elem : result) {
-                // dibs
+                // dibs 조회
                 elem.setDibs(
                         utils.getBasketCountByProductId(
                                 elem.getProductId()
                         )
                 );
-                // 사용자 찜 여부
+                // 사용자 찜 여부 조회
                 elem.setUserDibed(this.isBasketByUid(uid, elem.getProductId()));
             }
 
+            return result;
+        } catch (Exception e){
+            logger.error(e.getMessage());
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    /**
+     * 내피드 화면 (팔로우 상점 피드들)
+     */
+    public List<GetFeedRes> followFeedByUser (int uid, int p) throws BaseException {
+        try {
+            // 팔로우 상점 -> 상품 pid 모아오기
+            List<Integer> resultIdList = new ArrayList<>(feedDao.productIdsByFollowingStore(uid));
+
+            String whereQuery = " AND id IN (" +
+                    resultIdList.toString().substring(1, resultIdList.toString().length() - 1) + ")";
+            String orderQuery = "ORDER BY createdAt DESC";
+            List<GetFeedRes> result = new ArrayList<>(feedDao.getFeed(whereQuery, orderQuery, 1));
+
+            // 상품별 추가작업
+            for (GetFeedRes elem : result) {
+                // dibs 조회
+                elem.setDibs(
+                        utils.getBasketCountByProductId(
+                                elem.getProductId()
+                        )
+                );
+                // 사용자 찜 여부 조회
+                elem.setUserDibed(this.isBasketByUid(uid, elem.getProductId()));
+            }
             return result;
         } catch (Exception e){
             logger.error(e.getMessage());

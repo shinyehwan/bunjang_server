@@ -77,6 +77,28 @@ public class FeedController {
     }
 
     /**
+     * 내피드 화면 (팔로우 상점 피드들)
+     * [GET] /bungae/feed/follow
+     */
+    @ResponseBody
+    @GetMapping("/follow")
+    public BaseResponse<List<GetFeedRes>> followFeedByUser(
+            @RequestParam(required = false) Integer p) {
+        try {
+            int uid = jwtService.getUserIdx();
+            // uid 검증
+            if (!verifier.isPresentStoreId(uid))
+                throw new BaseException(INVALID_STORE_ID); // /3001/존재하지 않는 상점 id 입니다.
+
+            if (p == null) p=1;
+
+            return new BaseResponse<>(feedProvider.followFeedByUser(uid,p));
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
      * 상품 검색
      * [GET] /bungae/feed/keyword ? q=&order=&brand=&c1=&c2=&c3=&onlySale=&min=&max=&p=
      */

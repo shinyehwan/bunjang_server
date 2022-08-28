@@ -140,6 +140,61 @@ public class FeedDao {
                         false
                 ), 20*(p-1), 20);
     }
+    /**
+     * 최신 상품 조회 (조건x)
+     */
+    public List<GetFeedRes> getRecentFeed(int start, int rowNum) {
+        String Query = "SELECT id, title, imageUrl01,price,location,createdAt,\n" +
+                "-- 업로드날짜 표시 형식\n" +
+                "        CASE\n" +
+                "            WHEN TIMESTAMPDIFF (MINUTE,createdAt, CURRENT_TIMESTAMP) < 60\n" +
+                "            THEN CONCAT(TIMESTAMPDIFF (MINUTE,createdAt, CURRENT_TIMESTAMP), '분 전')\n" +
+                "            WHEN TIMESTAMPDIFF(HOUR,createdAt, CURRENT_TIMESTAMP) < 24\n" +
+                "            THEN CONCAT(TIMESTAMPDIFF(HOUR,createdAt, CURRENT_TIMESTAMP), '시간 전')\n" +
+                "            WHEN TIMESTAMPDIFF(DAY,createdAt, CURRENT_TIMESTAMP)< 30\n" +
+                "            THEN CONCAT(TIMESTAMPDIFF(DAY,createdAt, CURRENT_TIMESTAMP), '일 전')\n" +
+                "            WHEN TIMESTAMPDIFF(MONTH,createdAt, CURRENT_TIMESTAMP)< 12\n" +
+                "            THEN CONCAT(TIMESTAMPDIFF(MONTH,createdAt, CURRENT_TIMESTAMP), '개월 전')\n" +
+                "            ELSE CONCAT(TIMESTAMPDIFF(YEAR,createdAt, CURRENT_TIMESTAMP ), '년 전')\n" +
+                "        END AS 'uploadedEasyText',\n" +
+                "    dealStatus FROM Product\n" +
+                "WHERE\n" +
+                "    status='active' \n" +
+                "ORDER BY createdAt DESC\n " +
+                "LIMIT ?,?";
+
+        // System.out.println(Query);
+
+        return this.jdbcTemplate.query(Query,
+                (rs,rn) -> new GetFeedRes(
+                        rs.getInt("id"),
+                        rs.getString("title"),
+                        rs.getString("imageUrl01"),
+                        rs.getInt("price"),
+                        rs.getString("location"),
+                        rs.getString("createdAt"),
+                        rs.getString("uploadedEasyText"),
+                        0,
+                        rs.getString("dealStatus"),
+                        false
+                ), start, rowNum);
+    }
+
+    // 최근 조회,찜 한 물품들 id 20개 불러오기
+    public List<Integer> getPidListByViewAndBasket(int uid, int p){
+        String Query = "SELECT P.id,P.storeId,P.title,P.status,V.storeId,V.status,B.storeId,V.status FROM Product P\n" +
+                "LEFT JOIN View V on P.id = V.productId\n" +
+                "LEFT JOIN Basket B on P.id = B.productId\n" +
+                "WHERE P.status='active'\n" +
+                "AND ((V.status='active' AND V.storeId=?) OR (B.status='active' AND B.storeId=?))\n" +
+                "GROUP BY P.id\n" +
+                "LIMIT ?,?";
+
+        return this.jdbcTemplate.query(Query,
+                (rs,rn)-> rs.getInt("id"),
+                uid,uid, 20*(p-1), 20);
+    }
+
 
     /**
      * 팔로잉 상품 조회
@@ -155,12 +210,33 @@ public class FeedDao {
                 (rs, rowNum) -> rs.getInt("productId") ,
                 getUserParams);
     }
+
+    public List<Integer> getProductsByTag(String tag){
+        String Query = "SELECT Product.id, Product.title, T.tag FROM Product\n" +
+                "LEFT JOIN TagProductMap TPM on Product.id = TPM.productId\n" +
+                "LEFT JOIN Tag T on TPM.tagId = T.id\n" +
+                "WHERE tag LIKE '%"+tag+"%'\n" +
+                "GROUP BY Product.id";
+        return this.jdbcTemplate.query(Query,
+                (rs, rowNum) -> rs.getInt("id"));
+    }
 //
 //    public List<Integer> productIdsByView (int uid) {}
 //    public List<Integer> productIdsByBasket (int uid) {}
 //    public List<Integer> productIdsByPurchase (int uid) {}
 
 
+    /**
+     * 상품 태그 리스트 조회
+     */
+    public List<String> getTags(int productId) {
+        String Query = "SELECT TPM.productId, Tag.tag  FROM Tag\n" +
+                "LEFT JOIN TagProductMap TPM on Tag.id = TPM.tagId\n" +
+                "WHERE TPM.status='active' AND TPM.productId = ?";
+        return this.jdbcTemplate.query(Query,
+                (rs,rn)-> rs.getString("tag"),
+                productId);
+    }
 
     /**
      *  사용자 찜 여부 조회

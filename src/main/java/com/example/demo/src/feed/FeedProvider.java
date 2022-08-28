@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.List;
+import java.util.*;
 
 import static com.example.demo.config.BaseResponseStatus.*;
 
@@ -49,6 +49,73 @@ public class FeedProvider {
         this.utils = utils;
     }
     // ******************************************************************************
+    /**
+     * 홈화면 피드
+     */
+    public List<GetFeedRes> recommendFeedByUser (int uid, int p) throws BaseException {
+        try {
+            Set<Integer> productIdSet = new HashSet<>();
+            Set<Integer> resultIdSet = new HashSet<>();
+            Set<String> tagSet = new HashSet<>();
+            // 최근 조회,찜 한 물품들 id 20개 불러오기
+            productIdSet.addAll(feedDao.getPidListByViewAndBasket(uid,1));
+            // pid -> 태그 모아오기
+            for(int pid : productIdSet){
+                tagSet.addAll(feedDao.getTags(pid));
+            }
+            // 태그 -> 관련상품 pid 모아오기
+            for (String tag : tagSet) {
+                resultIdSet.addAll(feedDao.getProductsByTag(tag));
+            }
+            // 팔로우 상점 -> 상품 pid 모아오기
+            resultIdSet.addAll(feedDao.productIdsByFollowingStore(uid));
+
+            // 이미 본 물품 제거
+            resultIdSet.removeAll(productIdSet);
+
+            List<Integer> resultIdList = new ArrayList<>(resultIdSet);
+            Collections.sort(resultIdList,Collections.reverseOrder());
+
+            int addRows=0, addStart=0;
+            if (p*20 < resultIdList.size()){
+                resultIdList = resultIdList.subList(20*(p-1), 20*p);
+            } else if ((p-1)*20 < resultIdList.size()){
+                resultIdList = resultIdList.subList(20*(p-1), resultIdList.size());
+                addRows = 20*(p-1) - resultIdList.size();
+            } else {
+                addStart = 20*(p-1) - resultIdList.size() - 1;
+                addRows = 20;
+            }
+
+            List<GetFeedRes> result = new ArrayList<>();
+            if (addRows != 20) {
+                String whereQuery = " AND id IN (" +
+                        resultIdList.toString().substring(1, resultIdList.toString().length() - 1) + ")";
+                String orderQuery = "ORDER BY createdAt DESC";
+                result.addAll(feedDao.getFeed(whereQuery, orderQuery, 1));
+            }
+            if (addRows > 0) {
+                result.addAll(feedDao.getRecentFeed(addStart,addRows));
+            }
+
+            for (GetFeedRes elem : result) {
+                // dibs
+                elem.setDibs(
+                        utils.getBasketCountByProductId(
+                                elem.getProductId()
+                        )
+                );
+                // 사용자 찜 여부
+                elem.setUserDibed(this.isBasketByUid(uid, elem.getProductId()));
+            }
+
+            return result;
+        } catch (Exception e){
+            logger.error(e.getMessage());
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
 
     /**
      * 상품 검색
@@ -58,17 +125,14 @@ public class FeedProvider {
             List<GetFeedRes> result = feedDao.FeedByKeywordOrderByDate(k, p);
 
             for (GetFeedRes elem : result) {
-
                 // dibs
                 elem.setDibs(
                         utils.getBasketCountByProductId(
                                 elem.getProductId()
                         )
                 );
-
                 // 사용자 찜 여부
                 elem.setUserDibed(this.isBasketByUid(uid, elem.getProductId()));
-
             }
 
             return result;

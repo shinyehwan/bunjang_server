@@ -1,6 +1,10 @@
 package com.example.demo.src.product;
 
 
+import com.example.demo.config.BaseException;
+import com.example.demo.config.BaseResponse;
+import com.example.demo.config.BaseResponseStatus;
+import com.example.demo.src.feed.model.GetFeedRes;
 import com.example.demo.src.product.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
@@ -12,6 +16,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import static com.example.demo.config.BaseResponseStatus.DATABASE_ERROR;
 
 @Repository //  [Persistence Layer에서 DAO를 명시하기 위해 사용]
 
@@ -422,7 +428,6 @@ public class ProductDao {
      */
     public void addImgUrls(int productId, List<String> imageUrls) {
         String Query;
-        System.out.println(imageUrls.size());
         for (int i=0; i < imageUrls.size(); i++){
             if (i == 9)
                 Query = "UPDATE Product SET imageUrl10 = '"+ imageUrls.get(i) +"' WHERE id=?";

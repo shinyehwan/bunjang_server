@@ -145,6 +145,9 @@ public class ProductService {
                 else if (newProduct.getTags().size() > 0)
                     checkExistOptions.add("tags");
                 for (String tag : newProduct.getTags()) {
+                    if (tag == null) {
+                        continue;
+                    }
                     if (tag.length() > 15)
                         throw new BaseException(TOO_LONG_TAGS); // TOO_LONG_TAGS|2XXX|tag의 글자수가 15자를 초과하였습니다.
                 }

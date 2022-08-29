@@ -69,7 +69,7 @@ public enum BaseResponseStatus {
     TOO_MANY_TAGS(false,2329,"tag의 수가 5개를 초과하였습니다."),
     TOO_LONG_TAGS(false,2330,"tag의 글자수가 15자를 초과하였습니다."),
     EMPTY_PRICE(false,2331,"price를 입력해주세요"),
-    EMPTY_DELIVERYFREE(false,2332,"deliveryFree를 입력해주세요"),
+    EMPTY_DELIVERYFREE(false,2332,"deliveryFee를 입력해주세요"),
     EMPTY_QUANTITY(false,2333,"quantity를 입력해주세요"),
     EMPTY_CONDITION(false,2334,"condition를 입력해주세요"),
     EMPTY_CHANGE(false,2334,"change를 입력해주세요"),
@@ -92,6 +92,8 @@ public enum BaseResponseStatus {
     // [POST] /users
     DUPLICATED_EMAIL(false, 3013, "중복된 이메일입니다."),
     FAILED_TO_LOGIN(false,3014,"없는 번호이거나 비밀번호가 틀렸습니다."),
+    // 3200 : 피드 관련
+    BRAND_NOT_EXIST(false, 3200, "존재하지 않는 브랜드명입니다."),
 
     // 3300 : 상품 관련
     // 3300 : [GET] /bungae/product/:productId : 상품 상세 정보 조회 API(조회수, 찜하기 수, 채팅 수, 상품 관련 내용)

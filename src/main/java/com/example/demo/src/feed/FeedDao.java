@@ -5,13 +5,14 @@ import com.example.demo.src.feed.model.GetFeedRes;
 import com.example.demo.src.product.model.GetCategoryDepth01Res;
 import com.example.demo.src.product.model.GetCategoryDepth02Res;
 import com.example.demo.src.product.model.GetCategoryDepth03Res;
-import com.example.demo.src.store.model.GetStoreFollowingProductRes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Repository //  [Persistence Layer에서 DAO를 명시하기 위해 사용]
@@ -236,6 +237,20 @@ public class FeedDao {
         return this.jdbcTemplate.query(Query,
                 (rs,rn)-> rs.getString("tag"),
                 productId);
+    }
+
+    /**
+     * 브랜드 검색키워드 조회
+     */
+    public List<String> getKeywordByBrand(String brandName){
+        String Query = "SELECT keyword01, keyword02, keyword03  FROM Brand\n" +
+                "WHERE status='active' AND brandName = '"+brandName + "' ";
+        return this.jdbcTemplate.queryForObject(Query,
+                (rs,rn)-> new ArrayList<>(Arrays.asList(
+                        rs.getString("keyword01"),
+                        rs.getString("keyword02"),
+                        rs.getString("keyword03")
+                )));
     }
 
     /**

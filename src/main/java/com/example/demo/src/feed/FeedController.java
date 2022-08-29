@@ -216,4 +216,35 @@ public class FeedController {
         }
     }
 
+    /**
+     * 브랜드 별 피드
+     * [GET] /bungae/feed/brand/:brandName ? q=&order=&c1=&c2=&c3=&onlySale=&min=&max=&p=
+     */
+    @ResponseBody
+    @GetMapping("/brand/{brandName}")
+    public BaseResponse<List<GetFeedRes>> FeedByBrand(
+            @PathVariable("brandName") String brandName,
+            @RequestParam(required = false) String order,
+            @RequestParam(required = false) Integer c1,
+            @RequestParam(required = false) Integer c2,
+            @RequestParam(required = false) Integer c3,
+            @RequestParam(required = false) String onlySale,
+            @RequestParam(required = false) Integer min,
+            @RequestParam(required = false) Integer max,
+            @RequestParam(required = false) Integer p){
+        try {
+            int uid = jwtService.getUserIdx();
+            // uid 검증
+            if (!verifier.isPresentStoreId(uid))
+                throw new BaseException(INVALID_STORE_ID); // /3001/존재하지 않는 상점 id 입니다.
+
+            if (p == null) p=1;
+
+            return new BaseResponse<>(feedProvider.getFeedRes(uid,null,order,brandName,c1,c2,c3,onlySale,min,max,p));
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+
 }

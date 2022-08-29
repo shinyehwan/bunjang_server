@@ -1,9 +1,8 @@
 package com.example.demo.src.chat;
 
 import com.example.demo.config.BaseException;
-import com.example.demo.src.chat.model.GetChatRes;
-import com.example.demo.src.chat.model.GetChatRoomsRes;
-import com.example.demo.src.chat.model.MessageRawInfoModel;
+import com.example.demo.src.chat.model.*;
+import com.example.demo.src.product.model.GetProductRelatedRes;
 import com.example.demo.utils.JwtService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -140,6 +139,25 @@ import static com.example.demo.config.BaseResponseStatus.*;
             return false;
         }
     }
+
+    public GetChatRoomInfoRes getChatRoomInfo(int uid, int roomId) throws BaseException {
+        try {
+            GetChatRoomInfoRes getChatRoomInfoRes = chatDao.getChatRoomInfo(uid, roomId);
+            return getChatRoomInfoRes;
+        } catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+    public List<GetChatRoomMessageRes> getChatRoomMessage(int roomId) throws BaseException {
+        try {
+            List<GetChatRoomMessageRes> getChatRoomMessageRes = chatDao.getChatRoomMessage(roomId);
+            return getChatRoomMessageRes;
+        } catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+
 
 //
 //    // 로그인(password 검사)

@@ -3,6 +3,8 @@ package com.example.demo.src.chat;
 import com.example.demo.config.BaseException;
 import com.example.demo.config.BaseResponse;
 import com.example.demo.src.chat.model.GetChatRes;
+import com.example.demo.src.chat.model.GetChatRoomInfoRes;
+import com.example.demo.src.chat.model.GetChatRoomMessageRes;
 import com.example.demo.src.chat.model.GetChatRoomsRes;
 import com.example.demo.utils.JwtService;
 import com.example.demo.utils.Verifier;
@@ -84,26 +86,52 @@ public class ChatController {
 
     }
 
-//    @ResponseBody
-//    @GetMapping("/{roomId}")
-//    public BaseResponse<GetRecentProductRes> getChatRoomInfo(
-//            @PathVariable("roomId") Integer roomId) {
-//        try {
-//            // jwt 에서 uid 추출
-//            int uid;
-//            uid = jwtService.getUserIdx();
-//            // 존재하는 상점 아이디인지 검증
-//            if (!verifier.isPresentStoreId(uid))
-//                throw new BaseException(INVALID_STORE_ID);
-//            // 접속 가능한 채팅방인지 검증
-//            if (!chatProvider.isAccessableRoom(uid, roomId))
-//                throw new BaseException(INVALID_ROOM_ID);
-//
-//
-//        } catch (BaseException exception) {
-//            return new BaseResponse<>((exception.getStatus()));
-//        }
-//    }
+    /**
+     * 채팅방 상품 정보 조회
+     */
+    @ResponseBody
+    @GetMapping("/{roomId}")
+    public BaseResponse<GetChatRoomInfoRes> getChatRoomInfo(
+            @PathVariable("roomId") Integer roomId) {
+        try {
+            // jwt 에서 uid 추출
+            int uid;
+            uid = jwtService.getUserIdx();
+            // 존재하는 상점 아이디인지 검증
+            if (!verifier.isPresentStoreId(uid))
+                throw new BaseException(INVALID_STORE_ID);
+            // 접속 가능한 채팅방인지 검증
+            if (!chatProvider.isAccessableRoom(uid, roomId))
+                throw new BaseException(INVALID_ROOM_ID);
+            GetChatRoomInfoRes getChatRoomInfoRes = chatProvider.getChatRoomInfo(uid, roomId);
+            return new BaseResponse<>(getChatRoomInfoRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+    /**
+     * 해당 채팅방 모든 메시지 조회
+     */
+    @ResponseBody
+    @GetMapping("/{roomId}/content")
+    public BaseResponse<List<GetChatRoomMessageRes>> getChatRoomMessage(
+            @PathVariable("roomId") Integer roomId) {
+        try {
+            // jwt 에서 uid 추출
+            int uid;
+            uid = jwtService.getUserIdx();
+            // 존재하는 상점 아이디인지 검증
+            if (!verifier.isPresentStoreId(uid))
+                throw new BaseException(INVALID_STORE_ID);
+            // 접속 가능한 채팅방인지 검증
+            if (!chatProvider.isAccessableRoom(uid, roomId))
+                throw new BaseException(INVALID_ROOM_ID);
+            List<GetChatRoomMessageRes> getChatRoomMessageRes = chatProvider.getChatRoomMessage(roomId);
+            return new BaseResponse<>(getChatRoomMessageRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
 
     /**
      * 최근 채팅 메시지 조회
@@ -134,6 +162,35 @@ public class ChatController {
         }
 
     }
+//    /**
+//     * 최근 채팅 메시지 조회
+//     * [GET] /bungae/chat/:roomId/message ? p=
+//     */
+//    @ResponseBody
+//    @GetMapping("/{roomId}/message")
+//    public BaseResponse<List<GetChatRes>> getChatHistory (
+//            @PathVariable("roomId") Integer roomId,
+//            @RequestParam(required = false) Integer p) {
+//        try {
+//            // jwt 에서 uid 추출
+//            int uid;
+//            uid = jwtService.getUserIdx();
+//            // 존재하는 상점 아이디인지 검증
+//            if (!verifier.isPresentStoreId(uid))
+//                throw new BaseException(INVALID_STORE_ID); // /3001/존재하지 않는 상점 id 입니다.
+//            // 접속 가능한 채팅방인지 검증
+//            if (!chatProvider.isAccessableRoom(uid, roomId))
+//                throw new BaseException(INVALID_ROOM_ID);
+//
+//            if (p == null)
+//                p = 1;
+//
+//            return new BaseResponse<>(chatProvider.getChatHistory(roomId,uid,p));
+//        } catch (BaseException exception) {
+//            return new BaseResponse<>((exception.getStatus()));
+//        }
+//
+//    }
 
 //
 //    /**

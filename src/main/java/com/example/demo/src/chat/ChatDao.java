@@ -1,6 +1,8 @@
 package com.example.demo.src.chat;
 
 
+import com.example.demo.src.chat.model.GetChatRoomInfoRes;
+import com.example.demo.src.chat.model.GetChatRoomMessageRes;
 import com.example.demo.src.chat.model.GetChatRoomsRes;
 import com.example.demo.src.chat.model.MessageRawInfoModel;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -153,6 +155,67 @@ public class ChatDao {
         this.jdbcTemplate.queryForObject(Query,
                 (rs, rowNum) -> rs.getInt("id"),
                 uid,roomId);
+    }
+
+    /**
+     * 채팅방 정보 조회
+     */
+    public GetChatRoomInfoRes getChatRoomInfo(int uid, int roomId){
+        String Query = "select distinct Store.id as storeId, Store.storeName, Chat.chatRoomId, Product.id as productId, Product.imageUrl01, Product.title, Product.price\n" +
+                "from Chat,\n" +
+                "     ChatRoom,\n" +
+                "     ChatRoomStoreMap,\n" +
+                "     Product,\n" +
+                "     Store\n" +
+                "where Chat.chatRoomId = ChatRoom.id\n" +
+                "  and ChatRoom.productId = Product.id\n" +
+                "  and ChatRoomStoreMap.chatRoomId = ChatRoom.id\n" +
+                "  and ChatRoomStoreMap.storeId = Store.id\n" +
+                "  and ChatRoomStoreMap.storeId not in(?)\n" +
+                "  and ChatRoomStoreMap.chatRoomId = ?;";
+        int param1 = uid;
+        int param2 = roomId;
+        return this.jdbcTemplate.queryForObject(Query,
+                (rs, rn) -> new GetChatRoomInfoRes(
+                        rs.getInt("storeId"),
+                        rs.getString("storeName"),
+                        rs.getInt("chatRoomId"),
+                        rs.getInt("productId"),
+                        rs.getString("imageUrl01"),
+                        rs.getString("title"),
+                        rs.getInt("price")
+                ),
+              param1, param2);
+    }
+    /**
+     * 채팅방 정보 조회
+     */
+    public List<GetChatRoomMessageRes> getChatRoomMessage(int roomId){
+        String Query = "select Chat.chatRoomId, Chat.sendStoreId, Chat.description, Chat.mediaType, Chat.mediaDescriptionUrl,\n" +
+                "       CASE\n" +
+                "            WHEN TIMESTAMPDIFF (MINUTE,Chat.createdAt, CURRENT_TIMESTAMP) < 60\n" +
+                "            THEN CONCAT(TIMESTAMPDIFF (MINUTE,Chat.createdAt, CURRENT_TIMESTAMP), '분 전')\n" +
+                "            WHEN TIMESTAMPDIFF(HOUR,Chat.createdAt, CURRENT_TIMESTAMP) < 24\n" +
+                "            THEN CONCAT(TIMESTAMPDIFF(HOUR,Chat.createdAt, CURRENT_TIMESTAMP), '시간 전')\n" +
+                "            WHEN TIMESTAMPDIFF(DAY,Chat.createdAt, CURRENT_TIMESTAMP)< 30\n" +
+                "            THEN CONCAT(TIMESTAMPDIFF(DAY,Chat.createdAt, CURRENT_TIMESTAMP), '일 전')\n" +
+                "            WHEN TIMESTAMPDIFF(MONTH,Chat.createdAt, CURRENT_TIMESTAMP)< 12\n" +
+                "            THEN CONCAT(TIMESTAMPDIFF(MONTH,Chat.createdAt, CURRENT_TIMESTAMP), '개월 전')\n" +
+                "            ELSE CONCAT(TIMESTAMPDIFF(YEAR,Chat.createdAt, CURRENT_TIMESTAMP ), '년 전')\n" +
+                "        END AS 'createdAt'\n" +
+                "from Chat\n" +
+                "where Chat.chatRoomId = ?";
+        int param2 = roomId;
+        return this.jdbcTemplate.query(Query,
+                (rs, rn) -> new GetChatRoomMessageRes(
+                        rs.getInt("chatRoomId"),
+                        rs.getInt("sendStoreId"),
+                        rs.getString("description"),
+                        rs.getString("mediaType"),
+                        rs.getString("mediaDescriptionUrl"),
+                        rs.getString("createdAt")
+                ),
+              param2);
     }
 
 

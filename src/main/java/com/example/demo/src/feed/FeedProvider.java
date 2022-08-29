@@ -1,6 +1,7 @@
 package com.example.demo.src.feed;
 
 import com.example.demo.config.BaseException;
+import com.example.demo.src.feed.model.GetBrandRes;
 import com.example.demo.src.feed.model.GetFeedRes;
 import com.example.demo.src.product.model.GetCategoryDepth01Res;
 import com.example.demo.src.product.model.GetCategoryDepth02Res;
@@ -150,6 +151,28 @@ public class FeedProvider {
     }
 
     /**
+     * 브랜드 리스트 조회
+     */
+    public List<GetBrandRes> getBrandList() throws BaseException {
+        try {
+            // 브랜드 정보 리스트 조회
+            List<GetBrandRes> result = feedDao.getBrandList();
+            for (GetBrandRes b : result) {
+                // 각 정보 쿼리문 만들고
+                String whereQuery = this.queryByBrand(b.getName());
+                // 조회
+                b.setProductCount(feedDao.getProductCount(whereQuery));
+            }
+            // count 순으로 정렬
+            Collections.sort(result, Collections.reverseOrder());
+            return result;
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    /**
      * 브랜드 검색 스트링 반환
      */
     public String queryByBrand(String brandName) throws BaseException {
@@ -175,7 +198,7 @@ public class FeedProvider {
 
             // 하나씩 검색어에 넣어서 or문 완성하기
             String whereQuery = "";
-            if (brandQue.size() >0 ) {
+            if (brandQue.size() > 0) {
                 for (int i = 0; i < brandQue.size(); i++) {
                     String keyword = brandQue.poll();
                     if (i == 0)

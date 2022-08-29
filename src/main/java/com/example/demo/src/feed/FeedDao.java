@@ -1,6 +1,7 @@
 package com.example.demo.src.feed;
 
 
+import com.example.demo.src.feed.model.GetBrandRes;
 import com.example.demo.src.feed.model.GetFeedRes;
 import com.example.demo.src.product.model.GetCategoryDepth01Res;
 import com.example.demo.src.product.model.GetCategoryDepth02Res;
@@ -142,6 +143,18 @@ public class FeedDao {
                 ), 20*(p-1), 20);
     }
     /**
+     * 상품 수 조회
+     */
+    public int getProductCount(String whereQuery) {
+        String selectQuery = "SELECT count(*) AS 'count' FROM Product\n" +
+                "WHERE status='active'";
+
+        String Query = selectQuery + whereQuery;
+
+        return this.jdbcTemplate.queryForObject(Query,
+                (rs,rn) -> rs.getInt("count") );
+    }
+    /**
      * 최신 상품 조회 (조건x)
      */
     public List<GetFeedRes> getRecentFeed(int start, int rowNum) {
@@ -237,6 +250,19 @@ public class FeedDao {
         return this.jdbcTemplate.query(Query,
                 (rs,rn)-> rs.getString("tag"),
                 productId);
+    }
+
+    /**
+     * 브랜드 리스트 조회
+     */
+    public List<GetBrandRes> getBrandList () {
+        String Query = "SELECT brandName,imageUrl  FROM Brand";
+        return this.jdbcTemplate.query(Query,
+                (rs,rn)-> new GetBrandRes(
+                        rs.getString("brandName"),
+                        rs.getString("imageUrl"),
+                        0
+                ));
     }
 
     /**

@@ -4,6 +4,7 @@ import com.example.demo.config.BaseException;
 import com.example.demo.config.BaseResponse;
 import com.example.demo.src.chat.ChatProvider;
 import com.example.demo.src.chat.ChatService;
+import com.example.demo.src.feed.model.GetBrandRes;
 import com.example.demo.src.feed.model.GetFeedRes;
 import com.example.demo.utils.JwtService;
 import com.example.demo.utils.Verifier;
@@ -247,4 +248,23 @@ public class FeedController {
     }
 
 
+
+    /**
+     * 브랜드 리스트
+     * [GET] /bungae/feed/brand
+     */
+    @ResponseBody
+    @GetMapping("/brand")
+    public BaseResponse<List<GetBrandRes>> getBrandList(){
+        try {
+            int uid = jwtService.getUserIdx();
+            // uid 검증
+            if (!verifier.isPresentStoreId(uid))
+                throw new BaseException(INVALID_STORE_ID); // /3001/존재하지 않는 상점 id 입니다.
+
+            return new BaseResponse<>(feedProvider.getBrandList());
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
 }

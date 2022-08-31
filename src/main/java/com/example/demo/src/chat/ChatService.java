@@ -63,7 +63,7 @@ public class ChatService {
     public PostProductInfoRes sendProcutInfoMessage(int uid, int roomId, int productId) throws BaseException {
         try {
             // 보낼 수 있는 상품인지 확인 : 내 상품 혹은 상대방의 상품인지?
-            if (!isOurProduct(roomId, productId))
+            if (!chatProvider.isOurProduct(roomId, productId))
                 throw new BaseException(SEND_NOT_PERMITTED); // 3401|이용자가 전송할 수 없는 상품입니다.
             // todo: 대표상품 바꾸기!!
             // todo: 존재하는 상품인지 확인
@@ -98,7 +98,7 @@ public class ChatService {
     public PostAccountInfoRes sendAccountInfoMessage(int uid, int roomId, PostAccountInfoReq pInfo) throws BaseException {
         try {
             // 보낼 수 있는 상품인지 확인 : 내 상품 혹은 상대방의 상품인지?
-            if (!isMyProduct(uid, pInfo.getProductId()))
+            if (!chatProvider.isMyProduct(uid, pInfo.getProductId()))
                 throw new BaseException(SEND_NOT_PERMITTED); // 3401|이용자가 전송할 수 없는 상품입니다.
             // todo: 존재하는 상품인지 확인
             // todo: 입력값 리젝스
@@ -137,7 +137,7 @@ public class ChatService {
     public PostAddressInfoRes sendAddressInfoMessage(int uid, int roomId, PostAddressInfoReq pInfo) throws BaseException {
         try {
             // 보낼 수 있는 상품인지 확인 : 내 상품 혹은 상대방의 상품인지?
-            if (!isYourProduct(uid, roomId, pInfo.getProductId()))
+            if (!chatProvider.isYourProduct(uid, roomId, pInfo.getProductId()))
                 throw new BaseException(SEND_NOT_PERMITTED); // 3401|이용자가 전송할 수 없는 상품입니다.
             // todo: 존재하는 상품인지 확인
             // todo: 입력값 리젝스
@@ -179,7 +179,7 @@ public class ChatService {
     public PostDealInfoRes sendDealInfoMessage(int uid, int roomId, PostDealInfoReq pInfo) throws BaseException {
         try {
             // 보낼 수 있는 상품인지 확인 : 내 상품 혹은 상대방의 상품인지?
-            if (!isOurProduct(roomId, pInfo.getProductId()))
+            if (!chatProvider.isOurProduct(roomId, pInfo.getProductId()))
                 throw new BaseException(SEND_NOT_PERMITTED); // 3401|이용자가 전송할 수 없는 상품입니다.
             // todo: 존재하는 상품인지 확인
             // todo: 입력값 리젝스
@@ -462,41 +462,6 @@ public class ChatService {
     }
 
 
-    /**
-     * (Validation) 내 상품인지 확인
-     */
-    public boolean isMyProduct(int uid, int productId) {
-        try {
-            chatDao.isMyProduct(uid, productId);
-            return true;
-        } catch (IncorrectResultSizeDataAccessException error) {
-            return false;
-        }
-    }
-
-    /**
-     * (Validation) 대화상대의 상품인지 확인
-     */
-    public boolean isYourProduct(int uid, int roomId, int productId) {
-        try {
-            chatDao.isYourProduct(uid, roomId, productId);
-            return true;
-        } catch (IncorrectResultSizeDataAccessException error) {
-            return false;
-        }
-    }
-
-    /**
-     * (Validation) 나 또는 대화상대의 상품인지 확인
-     */
-    public boolean isOurProduct(int roomId, int productId) {
-        try {
-            chatDao.isOurProduct(roomId, productId);
-            return true;
-        } catch (IncorrectResultSizeDataAccessException error) {
-            return false;
-        }
-    }
 //
 //    // 회원정보 수정(Patch)
 //    public void modifyUserName(PatchUserReq patchUserReq) throws BaseException {

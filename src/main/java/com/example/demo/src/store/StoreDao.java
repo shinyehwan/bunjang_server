@@ -166,10 +166,11 @@ public class StoreDao {
 
     // 상점에 따른 판매중인 상품 조회
     public List<GetStoreSaleRes> getStoreSale (int storeId) {
-        String getUserQuery = "select Product.dealStatus, Product.imageUrl01, Product.title, Product.price from Product where dealStatus = \"sale\" and Product.storeId = ?";
+        String getUserQuery = "select Product.id, Product.dealStatus, Product.imageUrl01, Product.title, Product.price from Product where dealStatus = \"sale\" and Product.storeId = ?";
         int getUserParams = storeId;
         return this.jdbcTemplate.query(getUserQuery,
                 (rs, rowNum) -> new GetStoreSaleRes(
+                        rs.getInt("id"),
                         rs.getString("dealStatus"),
                         rs.getString("imageUrl01"),
                         rs.getString("title"),
@@ -179,10 +180,11 @@ public class StoreDao {
     }
     // 상점에 따른 예약중인 상품 조회
     public List<GetStoreReservedRes> getStoreReserved (int storeId) {
-        String getUserQuery = "select Product.dealStatus, Product.imageUrl01, Product.title, Product.price from Product where dealStatus = \"reserved\" and Product.storeId = ?";
+        String getUserQuery = "select Product.id,  Product.dealStatus, Product.imageUrl01, Product.title, Product.price from Product where dealStatus = \"reserved\" and Product.storeId = ?";
         int getUserParams = storeId;
         return this.jdbcTemplate.query(getUserQuery,
                 (rs, rowNum) -> new GetStoreReservedRes(
+                        rs.getInt("id"),
                         rs.getString("dealStatus"),
                         rs.getString("imageUrl01"),
                         rs.getString("title"),
@@ -192,10 +194,11 @@ public class StoreDao {
     }
     // 상점에 따른 예약중인 상품 조회
     public List<GetStoreClosedRes> getStoreClosed (int storeId) {
-        String getUserQuery = "select Product.dealStatus, Product.imageUrl01, Product.title, Product.price from Product where dealStatus = \"closed\" and Product.storeId = ?";
+        String getUserQuery = "select Product.id,  Product.dealStatus, Product.imageUrl01, Product.title, Product.price from Product where dealStatus = \"closed\" and Product.storeId = ?";
         int getUserParams = storeId;
         return this.jdbcTemplate.query(getUserQuery,
                 (rs, rowNum) -> new GetStoreClosedRes(
+                        rs.getInt("id"),
                         rs.getString("dealStatus"),
                         rs.getString("imageUrl01"),
                         rs.getString("title"),

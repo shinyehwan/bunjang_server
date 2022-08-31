@@ -1,11 +1,9 @@
 package com.example.demo.src.chat;
 
 
-import com.example.demo.src.chat.model.GetChatRoomInfoRes;
-import com.example.demo.src.chat.model.GetChatRoomMessageRes;
-import com.example.demo.src.chat.model.GetChatRoomsRes;
-import com.example.demo.src.chat.model.MessageRawInfoModel;
+import com.example.demo.src.chat.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -142,6 +140,297 @@ public class ChatDao {
     }
 
 
+    /**
+     * 상품 정보 가져오기
+     */
+    public PostProductInfoRes getProductInfoMessage(int productId) {
+        String Query = "SELECT id,title,imageUrl01,price,deliveryFee FROM Product\n" +
+                "WHERE  status='active' AND id=?";
+
+        return this.jdbcTemplate.queryForObject(Query,
+                (rs,rn)-> new PostProductInfoRes(
+                        rs.getInt("id"),
+                        rs.getString("title"),
+                        rs.getString("imageUrl01"),
+                        rs.getInt("price"),
+                        rs.getString("deliveryFee").equals("true")
+                ), productId);
+    }
+    /**
+     * 계좌 메시지 정보 가져오기
+     */
+    public PostAccountInfoRes getAccountInfoMessage(int productId) {
+        String Query = "SELECT storeName, Product.id, Product.title, Product.price, Product.deliveryFee FROM Product\n" +
+                "LEFT JOIN Store S on Product.storeId = S.id\n" +
+                "WHERE  Product.status='active' AND Product.id=?";
+
+        return this.jdbcTemplate.queryForObject(Query,
+                (rs,rn)-> new PostAccountInfoRes(
+                        rs.getString("storeName"),
+                        rs.getInt("id"),
+                        rs.getString("title"),
+                        rs.getInt("price"),
+                        rs.getString("deliveryFee").equals("true"),
+                        0
+                ), productId);
+    }
+    /**
+     * 계좌 메시지 세부정보 생성하기
+     */
+    public int newAccountInfoMessage(int uid, PostAccountInfoReq p) {
+        String Query = "INSERT INTO Account (storeId,productId,owner,bankName,accountNum) VALUES (?,?,'"+
+                p.getOwner() +"','"+
+                p.getBankName() +"','"+
+                p.getAccountNum() +"' ) ";
+        this.jdbcTemplate.update(Query, uid, p.getProductId());
+
+        return this.jdbcTemplate.queryForObject("SELECT last_insert_id()",
+                Integer.class);
+    }
+    /**
+     * 사용자 정보 가져오기
+     */
+    public String getStoreNameById(int uid){
+        return this.jdbcTemplate.queryForObject(
+                "SELECT storeName FROM Store\n" +
+                        "WHERE  status='active' AND id=?",
+                (rs,rn) -> rs.getString("storeName"),
+                uid
+        );
+    }
+    /**
+     * 주소 메시지 정보 가져오기
+     */
+    public PostAddressInfoRes getAddressInfoMessage(int productId) {
+        String Query = "SELECT Product.id, Product.title, Product.price, Product.deliveryFee FROM Product\n" +
+                "WHERE  Product.status='active' AND Product.id=?";
+
+        return this.jdbcTemplate.queryForObject(Query,
+                (rs,rn)-> new PostAddressInfoRes(
+                        "",
+                        rs.getInt("id"),
+                        rs.getString("title"),
+                        rs.getInt("price"),
+                        rs.getString("deliveryFee").equals("true"),
+                        0
+                ), productId);
+    }
+    /**
+     * 주소 메시지 세부정보 생성하기
+     */
+    public int newAddressInfoMessage(int uid, PostAddressInfoReq p) {
+        String Query = "INSERT INTO Address (storeId,productId,name,phoneNum,address,addressDetail) VALUES (?,?,'"+
+                p.getName() +"','"+
+                p.getPhoneNum() +"','"+
+                p.getAddress() +"','"+
+                p.getAddressDetail() +"')";
+        this.jdbcTemplate.update(Query, uid, p.getProductId());
+
+        return this.jdbcTemplate.queryForObject("SELECT last_insert_id()",
+                Integer.class);
+    }
+    /**
+     * 주소 메시지 정보 가져오기
+     */
+    public PostDealInfoRes getDealInfoMessage(int productId) {
+        String Query = "SELECT Product.id, Product.title, Product.price, Product.deliveryFee FROM Product\n" +
+                "WHERE  Product.status='active' AND Product.id=?";
+
+        return this.jdbcTemplate.queryForObject(Query,
+                (rs,rn)-> new PostDealInfoRes(
+                        rs.getInt("id"),
+                        rs.getString("title"),
+                        rs.getInt("price"),
+                        0
+                ), productId);
+    }
+    /**
+     * 주소 메시지 세부정보 생성하기
+     */
+    public int newDealInfoMessage(int uid, PostDealInfoReq p) {
+        String Query = "INSERT INTO DirectDeal (storeId,productId,date,location,phone) VALUES (?,?,'"+
+                p.getDate() +"','"+
+                p.getLocation() +"','"+
+                p.getPhoneNum() +"')";
+        this.jdbcTemplate.update(Query, uid, p.getProductId());
+
+        return this.jdbcTemplate.queryForObject("SELECT last_insert_id()",
+                Integer.class);
+    }
+    /**
+     * 메시지 Object 등록하기
+     */
+    public void sendObjectMessage (int sendStoreId, int chatRoomId, String mediaType, String mediaDescriptionUrl) throws Exception {
+        String Query = "INSERT INTO Chat (sendStoreId,chatRoomId,mediaType, mediaDescriptionUrl) VALUES (?,?,?,?)";
+        if (this.jdbcTemplate.update(Query, sendStoreId,chatRoomId,mediaType,mediaDescriptionUrl)
+             > 0)
+            ;
+        else
+            throw new Exception();
+    }
+
+    /**
+     * 계좌 세부정보 불러오기
+     */
+    public GetAccountInfoRes getAccountDetail(int messageId) {
+        String Query = "SELECT status, productId, owner, bankName, accountNum FROM Account\n" +
+                "WHERE id=?";
+        return this.jdbcTemplate.queryForObject(Query,
+                (rs,rn)-> new GetAccountInfoRes(
+                        rs.getString("status").equals("active"),
+                        rs.getInt("productId"),
+                        "","",false, 0,
+                        rs.getString("owner"),
+                        rs.getString("bankName"),
+                        rs.getString("accountNum")
+                ),
+                messageId);
+    }
+    /**
+     * 주소 세부정보 불러오기
+     */
+    public GetAddressInfoRes getAddressDetail(int messageId) {
+        String Query = "SELECT status, productId, address, addressDetail, name, phoneNum FROM Address\n" +
+                "WHERE id=?";
+        return this.jdbcTemplate.queryForObject(Query,
+                (rs,rn)-> new GetAddressInfoRes(
+                        rs.getString("status").equals("active"),
+                        rs.getInt("productId"),
+                        "","",false, 0,
+                        rs.getString("address"),
+                        rs.getString("addressDetail"),
+                        rs.getString("name"),
+                        rs.getString("phoneNum")
+                ),
+                messageId);
+    }
+    /**
+     * 직거래 세부정보 불러오기
+     */
+    public GetDealInfoRes getDealDetail(int messageId) {
+        String Query = "SELECT status, productId, date, location, phone FROM DirectDeal\n" +
+                "WHERE id=?";
+        return this.jdbcTemplate.queryForObject(Query,
+                (rs,rn)-> new GetDealInfoRes(
+                        rs.getString("status").equals("active"),
+                        rs.getInt("productId"),
+                        "","",0,
+                        rs.getString("date"),
+                        rs.getString("location"),
+                        rs.getString("phone")
+                ),
+                messageId);
+    }
+    /**
+     * 계좌정보 삭제
+     */
+    public void delAccountInfo (int messageId) {
+        String Query = "UPDATE Account SET status='deleted' WHERE  status='active' AND id=?";
+        this.jdbcTemplate.update(Query, messageId);
+    }
+    /**
+     * 배송정보 삭제
+     */
+    public void delAddressInfo (int messageId) {
+        String Query = "UPDATE Address SET status='deleted' WHERE  status='active' AND id=?";
+        this.jdbcTemplate.update(Query, messageId);
+    }
+    /**
+     * 직거래정보 삭제
+     */
+    public void delDealtInfo (int messageId) {
+        String Query = "UPDATE DirectDeal SET status='deleted' WHERE  status='active' AND id=?";
+        this.jdbcTemplate.update(Query, messageId);
+    }
+
+    /**
+     * (Validation) 내 상품인지 확인
+     */
+    public void isMyProduct (int uid, int productId) {
+        String Query = "SELECT * FROM Product\n" +
+                "WHERE status='active'\n" +
+                "AND storeId = ?\n" +
+                "AND id= ?";
+        this.jdbcTemplate.queryForObject(Query,
+                (rs,rn)-> rs.getInt("id"),
+                uid, productId
+                );
+    }
+    /**
+     * (Validation) 대화상대의 상품인지 확인
+     */
+    public void isYourProduct (int uid, int roomId, int productId) {
+        String Query = "SELECT * FROM Product\n" +
+                "WHERE status='active' AND\n" +
+                "      storeId IN (SELECT storeId FROM ChatRoomStoreMap WHERE status='active' AND chatRoomId = ?)\n" +
+                "AND storeId <> ?\n" +
+                "AND id= ?";
+        this.jdbcTemplate.queryForObject(Query,
+                (rs,rn)-> rs.getInt("id"),
+                roomId,uid,productId
+                );
+    }
+    /**
+     * (Validation) 나 또는 대화상대의 상품인지 확인
+     */
+    public void isOurProduct (int roomId, int productId) {
+        String Query = "SELECT * FROM Product\n" +
+                "WHERE status='active' AND\n" +
+                "      storeId IN (SELECT storeId FROM ChatRoomStoreMap WHERE status='active' AND chatRoomId = ?)\n" +
+                "AND id= ?";
+        this.jdbcTemplate.queryForObject(Query,
+                (rs,rn)-> rs.getInt("id"),
+                roomId, productId
+                );
+    }
+    /**
+     * (validation) 내가 수정 가능한 데이터인지 확인 - uid, mid 일치하는지 조회
+     */
+    public int isModifiableAccountData(int uid, int messageId){
+        try {
+            String Query = "SELECT productId FROM Account\n" +
+                    "WHERE status='active' AND storeId=? AND id= ?";
+
+            return this.jdbcTemplate.queryForObject(Query,
+                    (rs,rn)-> rs.getInt("productId"),
+                    uid, messageId
+            );
+        } catch (IncorrectResultSizeDataAccessException error) {
+            return 0;
+        }
+    }
+    /**
+     * (validation) 내가 수정 가능한 데이터인지 확인 - uid, mid 일치하는지 조회
+     */
+    public int isModifiableAddressData(int uid, int messageId){
+        try {
+            String Query = "SELECT productId FROM Address\n" +
+                    "WHERE status='active' AND storeId=? AND id= ?";
+
+            return this.jdbcTemplate.queryForObject(Query,
+                    (rs,rn)-> rs.getInt("productId"),
+                    uid, messageId
+            );
+        } catch (IncorrectResultSizeDataAccessException error) {
+            return 0;
+        }
+    }
+    /**
+     * (validation) 내가 수정 가능한 데이터인지 확인 - uid, mid 일치하는지 조회
+     */
+    public int isModifiableDealData(int uid, int messageId){
+        try {
+            String Query = "SELECT productId FROM DirectDeal\n" +
+                    "WHERE status='active' AND storeId=? AND id= ?";
+
+            return this.jdbcTemplate.queryForObject(Query,
+                    (rs,rn)-> rs.getInt("productId"),
+                    uid, messageId
+            );
+        } catch (IncorrectResultSizeDataAccessException error) {
+            return 0;
+        }
+    }
 
 
 

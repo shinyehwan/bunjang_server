@@ -109,6 +109,10 @@ public enum BaseResponseStatus {
 
     // 3400 : 번개톡 관련
     INVALID_ROOM_ID(false, 3400, "이용자가 접속 불가능한 대화방입니다."),
+    SEND_NOT_PERMITTED(false, 3401, "이용자가 전송할 수 없는 상품입니다."),
+    VIEW_NOT_PERMITTED(false, 3402, "이용자가 조회할 수 없는 상품입니다."),
+    MODIFY_NOT_PERMITTED(false, 3403, "이용자가 수정할 수 없는 메시지입니다."),
+    INVALID_MESSAGE_ID(false, 3403, "존재하지 않는 메시지 아이디입니다."),
 
 
     /**

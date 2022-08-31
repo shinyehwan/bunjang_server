@@ -2,6 +2,7 @@ package com.example.demo.src.chat;
 
 
 import com.example.demo.src.chat.model.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -11,7 +12,7 @@ import javax.sql.DataSource;
 import java.util.List;
 
 @Repository //  [Persistence Layer에서 DAO를 명시하기 위해 사용]
-
+@Slf4j
 /**
  * DAO란?
  * 데이터베이스 관련 작업을 전담하는 클래스
@@ -503,13 +504,86 @@ public class ChatDao {
               param2);
     }
 
-    public int postChatMessage(int uid, int roomId, PostChatMessageReq postChatMessageReq) {
+    // 텍스트 메시지 전송
+    public PostChatMessageRes postChatMessage(int uid, int roomId, PostChatMessageReq postChatMessageReq) {
         String query = "insert into Chat (sendStoreId, chatRoomId, description) VALUES (?, ?, ?)"; // 실행될 동적 쿼리문
         Object[] params = new Object[]{uid, roomId, postChatMessageReq.getMessage()}; // 동적 쿼리의 ?부분에 주입될 값
         this.jdbcTemplate.update(query, params);
-        String lastInserIdQuery = "select last_insert_id()"; // 가장 마지막에 삽입된(생성된) id값은 가져온다.
-        return this.jdbcTemplate.queryForObject(lastInserIdQuery, int.class);
+        String lastInserIdQuery = "select description as message, DATE_FORMAT(Chat.createdAt, '%p %h:%i') as createdAt\n" +
+                "from Chat\n" +
+                "where Chat.id = (select last_insert_id())"; // 가장 마지막에 삽입된(생성된) id값은 가져온다.
+        return this.jdbcTemplate.queryForObject(lastInserIdQuery,
+                (rs, rn) -> new PostChatMessageRes(
+                        rs.getString("message"),
+                        rs.getString("createdAt")
+                )
+        );
     }
+
+    // 이미지 파일 전송
+    public PostImageRes postImageUrl(int uid, int roomId, PostImageReq postImageReq) {
+        String query = "insert into Chat(sendStoreId, chatRoomId, mediaType, mediaDescriptionUrl) values(?, ?, ?, ?)"; // 실행될 동적 쿼리문
+        Object[] params = new Object[]{uid, roomId, postImageReq.getType(), postImageReq.getImageUrl()}; // 동적 쿼리의 ?부분에 주입될 값
+        this.jdbcTemplate.update(query, params);
+        String lastInserIdQuery = "select mediaDescriptionUrl, DATE_FORMAT(Chat.createdAt, '%p %h:%i') as createdAt\n" +
+                "from Chat\n" +
+                "where Chat.id = (select last_insert_id())"; // 가장 마지막에 삽입된(생성된) id값은 가져온다.
+        return this.jdbcTemplate.queryForObject(lastInserIdQuery,
+                (rs, rn) -> new PostImageRes(
+                        rs.getString("mediaDescriptionUrl"),
+                        rs.getString("createdAt")
+                ));
+    }
+
+    // 이모티콘 조회
+    public List<GetEmoticonListRes> getEmoticonList(int roomId) {
+        String query = "select * from Emoticon";
+        int param = roomId;
+        return this.jdbcTemplate.query(query,
+                (rs, rn) -> new GetEmoticonListRes(
+                        rs.getInt("id"),
+                        rs.getString("emoticon")
+                ));
+    }
+
+    // 이모티콘 전송
+    public PostEmoticonRes postEmoticonUrl(int uid, int roomId, PostEmoticonReq postEmoticonReq) {
+        String query1 = "select Emoticon.emoticon as emoticonUrl, Emoticon.createdAt\n" +
+                "from Emoticon\n" +
+                "where Emoticon.id = ?";// 실행될 동적 쿼리문
+        int param1 = postEmoticonReq.getEmoticonId();
+        PostEmoticonRes postEmoticonUrl = this.jdbcTemplate.queryForObject(query1,
+                (rs, rn) -> new PostEmoticonRes(
+                        rs.getString("emoticonUrl"),
+                        rs.getString("createdAt")),
+                param1);
+
+
+        String query2 = "insert into Chat(sendStoreId, chatRoomId, emoticonId, mediaType, mediaDescriptionUrl) values(?, ?, ?, ?, ?)";
+        Object[] param2 = new Object[]{uid, roomId, postEmoticonReq.getEmoticonId(), postEmoticonReq.getType(), postEmoticonUrl.getEmoticonUrl()}; // 동적 쿼리의 ?부분에 주입될 값
+        this.jdbcTemplate.update(query2, param2);
+
+        String query3 = "select Chat.mediaDescriptionUrl, DATE_FORMAT(Chat.createdAt, '%p %h:%i') as createdAt\n" +
+                "from Chat\n" +
+                "where Chat.id = (last_insert_id())";
+        return this.jdbcTemplate.queryForObject(query3,
+                (rs, rn) -> new PostEmoticonRes(
+                        rs.getString("mediaDescriptionUrl"),
+                        rs.getString("createdAt")
+                       )
+                );
+
+//
+//
+//        String query3 = "update Chat set mediaDescriptionUrl = ? where Chat.id = (select last_insert_id())";
+//        Object[] param3 = new Object[]{selectPostEmoticonUrl.getEmoticonUrl()};
+//        this.jdbcTemplate.update(query3, param3);
+
+
+    }
+
+
+
 
 //    // 회원가입
 //    public int createUser(PostUserReq postUserReq) {

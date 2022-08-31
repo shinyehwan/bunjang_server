@@ -160,13 +160,13 @@ public class ChatController {
 
     }
     /**
-     * 채팅 메시지 조회
+     * 텍스트 메시지 전송
      */
     @ResponseBody
     @PostMapping("/{roomId}/message")
     public BaseResponse<PostChatMessageRes> postChatRoomMessage(
             @PathVariable("roomId") Integer roomId,
-            PostChatMessageReq postChatMessageReq) {
+            @RequestBody PostChatMessageReq postChatMessageReq) {
         try {
             // jwt 에서 uid 추출
             int uid;
@@ -183,6 +183,85 @@ public class ChatController {
             return new BaseResponse<>((exception.getStatus()));
         }
     }
+
+    /**
+     * 이미지 전송
+     */
+    @ResponseBody
+    @PostMapping("/{roomId}/image")
+    public BaseResponse<PostImageRes> postImageRes(
+            @PathVariable("roomId") Integer roomId,
+            @RequestBody PostImageReq postImageReq) {
+        try {
+            // jwt 에서 uid 추출
+            int uid;
+            uid = jwtService.getUserIdx();
+            // 존재하는 상점 아이디인지 검증
+            if (!verifier.isPresentStoreId(uid))
+                throw new BaseException(INVALID_STORE_ID);
+            // 접속 가능한 채팅방인지 검증
+            if (!chatProvider.isAccessableRoom(uid, roomId))
+                throw new BaseException(INVALID_ROOM_ID);
+
+            PostImageRes postImageRes = chatService.postImageUrl(uid, roomId, postImageReq);
+            return new BaseResponse<>(postImageRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     * 이모티콘 전송
+     */
+    @ResponseBody
+    @PostMapping("/{roomId}/emoticon")
+    public BaseResponse<PostEmoticonRes> postImageRes(
+            @PathVariable("roomId") Integer roomId,
+            @RequestBody PostEmoticonReq postEmoticonReq) {
+        try {
+            // jwt 에서 uid 추출
+            int uid;
+            uid = jwtService.getUserIdx();
+            // 존재하는 상점 아이디인지 검증
+            if (!verifier.isPresentStoreId(uid))
+                throw new BaseException(INVALID_STORE_ID);
+            // 접속 가능한 채팅방인지 검증
+            if (!chatProvider.isAccessableRoom(uid, roomId))
+                throw new BaseException(INVALID_ROOM_ID);
+
+            PostEmoticonRes postEmoticonRes = chatService.postEmoticonUrl(uid, roomId, postEmoticonReq);
+            return new BaseResponse<>(postEmoticonRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+
+    /**
+     * 이모티콘 리스트 조회
+     */
+    @ResponseBody
+    @GetMapping("/{roomId}/emoticon")
+    public BaseResponse<List<GetEmoticonListRes>> getEmoticonList(
+            @PathVariable("roomId") Integer roomId) {
+        try {
+            // jwt 에서 uid 추출
+            int uid;
+            uid = jwtService.getUserIdx();
+            // 존재하는 상점 아이디인지 검증
+            if (!verifier.isPresentStoreId(uid))
+                throw new BaseException(INVALID_STORE_ID);
+            // 접속 가능한 채팅방인지 검증
+            if (!chatProvider.isAccessableRoom(uid, roomId))
+                throw new BaseException(INVALID_ROOM_ID);
+
+            List<GetEmoticonListRes> getEmoticonListRes = chatProvider.getEmoticonList(roomId);
+            return new BaseResponse<>(getEmoticonListRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
 
     /**
      * 물품정보 전송

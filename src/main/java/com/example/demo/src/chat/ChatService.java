@@ -42,14 +42,52 @@ public class ChatService {
         this.jwtService = jwtService; // JWT부분은 7주차에 다루므로 모르셔도 됩니다!
 
     }
+
+    /**
+     * 텍스트 메시지 전송
+     */
     public PostChatMessageRes postChatMessage(int uid, int roomId, PostChatMessageReq postChatMessageReq) throws BaseException {
 
-//        if (chatProvider.checkPhone(postUserReq.getPhone()) == 1) {
-//            throw new BaseException(POST_USERS_EXISTS_USER);
-//        }
+        if (postChatMessageReq.getMessage().isEmpty()) {
+            throw new BaseException(EMPTY_TEXT);
+        }
+
+        if (postChatMessageReq.getMessage().length() > 1000) {
+            throw new BaseException(TOO_LONG_TEXT);
+        }
         try {
-            int chatId = chatDao.postChatMessage(uid, roomId, postChatMessageReq);
-            return new PostChatMessageRes(chatId);
+            PostChatMessageRes postChatMessageRes = chatDao.postChatMessage(uid, roomId, postChatMessageReq);
+            return new PostChatMessageRes(postChatMessageRes.getMessage(), postChatMessageRes.getCreatedAt());
+        } catch (Exception exception) { // DB에 이상이 있는 경우 에러 메시지를 보냅니다.
+            throw new BaseException(DATABASE_ERROR);
+        }
+
+    }
+
+    /**
+     * 이미지 전송
+     */
+    public PostImageRes postImageUrl(int uid, int roomId, PostImageReq postImageReq) throws BaseException {
+
+        if (postImageReq.getImageUrl().isEmpty()) {
+            throw new BaseException(EMPTY_IMAGE);
+        }
+        try {
+            PostImageRes postImageRes = chatDao.postImageUrl(uid, roomId, postImageReq);
+            return new PostImageRes(postImageRes.getImageUrl(), postImageRes.getCreatedAt());
+        } catch (Exception exception) { // DB에 이상이 있는 경우 에러 메시지를 보냅니다.
+            throw new BaseException(DATABASE_ERROR);
+        }
+
+    }
+    /**
+     * 이모티콘 전송
+     */
+    public PostEmoticonRes postEmoticonUrl(int uid, int roomId, PostEmoticonReq postEmoticonReq) throws BaseException {
+
+        try {
+            PostEmoticonRes postEmoticonRes = chatDao.postEmoticonUrl(uid, roomId, postEmoticonReq);
+            return new PostEmoticonRes(postEmoticonRes.getEmoticonUrl(), postEmoticonRes.getCreatedAt());
         } catch (Exception exception) { // DB에 이상이 있는 경우 에러 메시지를 보냅니다.
             throw new BaseException(DATABASE_ERROR);
         }

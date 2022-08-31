@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class PostChatMessageRes {
-    private String message;
+public class PostImageRes {
+    private String imageUrl;
     private String createdAt;
 }

@@ -38,6 +38,12 @@ public enum BaseResponseStatus {
     TOO_LONG_POLICY(false,2023,"교환/환불/반품 정책의 길이가 1000자를 초과하였습니다."),
     TOO_LONG_PRECAUTIONS(false,2024,"구매전 유의 사항의 길이가 1000자를 초과하였습니다."),
 
+    // 2100 : 채팅 관련
+    TOO_LONG_TEXT(false,2100,"텍스트의 길이가 천자를 초과하였습니다."),
+    EMPTY_TEXT(false, 2101, "텍스트를 입력해주세요."),
+    EMPTY_IMAGE(false, 2102, "이미지를 입력해주세요."),
+    EMPTY_EMOTICON(false, 2103, "이모티콘을 입력해주세요."),
+
     // 2200 : 피드 관련
     INVALID_FEED_ORDER(false,2200,"올바르지 않은 order 입력입니다."),
     INVALID_ONLYSALE(false,2201,"onlySale에 true 혹은 false를 입력해주세요"),

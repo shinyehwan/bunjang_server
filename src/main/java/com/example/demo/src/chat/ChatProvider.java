@@ -2,7 +2,6 @@ package com.example.demo.src.chat;
 
 import com.example.demo.config.BaseException;
 import com.example.demo.src.chat.model.*;
-import com.example.demo.src.product.model.GetProductRelatedRes;
 import com.example.demo.utils.JwtService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -152,6 +151,16 @@ import static com.example.demo.config.BaseResponseStatus.*;
         try {
             List<GetChatRoomMessageRes> getChatRoomMessageRes = chatDao.getChatRoomMessage(roomId);
             return getChatRoomMessageRes;
+        } catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    // 이모티콘 리스트 조회
+    public List<GetEmoticonListRes> getEmoticonList(int roomId) throws BaseException {
+        try {
+            List<GetEmoticonListRes> getEmoticonListRes = chatDao.getEmoticonList(roomId);
+            return getEmoticonListRes;
         } catch (Exception e) {
             throw new BaseException(DATABASE_ERROR);
         }

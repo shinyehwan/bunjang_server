@@ -96,6 +96,7 @@ public class StoreDao {
         String getUserQuery = "select COUNT(Product.storeId) as productCount\n" +
                 "    from Store, Product\n" +
                 "    where Store.id = Product.storeId\n" +
+                "        and Product.status = \"active\"" +
                 "        and Store.id = ?";
         int getUserParams = storeId;
         return this.jdbcTemplate.queryForObject(getUserQuery,
@@ -109,6 +110,8 @@ public class StoreDao {
         String getUserQuery = "select COUNT(Basket.storeId) as basketCount\n" +
                 "from Basket, Store, Product\n" +
                 "where Basket.storeId = Store.id\n" +
+                "  and Product.status = \"active\"" +
+                "  and Basket.basket = \"true\"" +
                 "  and Basket.productId = Product.id\n" +
                 "  and Store.id = ?";
         int getUserParams = storeId;
@@ -123,6 +126,7 @@ public class StoreDao {
         String getUserQuery = "select COUNT(Review.sellerStoreId) as reviewCount\n" +
                 "from Review, Store\n" +
                 "where Review.sellerStoreId = Store.id\n" +
+                "  and Review.status = \"active\"" +
                 "  and Store.id = ?";
 
         int getUserParams = storeId;
@@ -138,6 +142,7 @@ public class StoreDao {
         String getUserQuery = "select COUNT(Follow.followingStoreId) as followerCount\n" +
                 "from Follow, Store\n" +
                 "where Follow.followerStoreId = Store.id\n" +
+                "  and Follow.status = \"active\"" +
                 "  and Store.id = ?";
 
         int getUserParams = storeId;
@@ -153,6 +158,7 @@ public class StoreDao {
         String getUserQuery = "select COUNT(Follow.followerStoreId) as followingCount\n" +
                 "from Follow, Store\n" +
                 "where Follow.followingStoreId = Store.id\n" +
+                "  and Follow.status = \"active\"" +
                 "  and Store.id = ?";
 
         int getUserParams = storeId;
@@ -166,7 +172,10 @@ public class StoreDao {
 
     // 상점에 따른 판매중인 상품 조회
     public List<GetStoreSaleRes> getStoreSale (int storeId) {
-        String getUserQuery = "select Product.id, Product.dealStatus, Product.imageUrl01, Product.title, Product.price from Product where dealStatus = \"sale\" and Product.storeId = ?";
+        String getUserQuery = "select Product.id, Product.dealStatus, Product.imageUrl01, Product.title, Product.price\n" +
+                "                from Product\n" +
+                "                where dealStatus = \"sale\"\n" +
+                "                and status = \"active\" and Product.storeId = ?";
         int getUserParams = storeId;
         return this.jdbcTemplate.query(getUserQuery,
                 (rs, rowNum) -> new GetStoreSaleRes(
@@ -180,7 +189,9 @@ public class StoreDao {
     }
     // 상점에 따른 예약중인 상품 조회
     public List<GetStoreReservedRes> getStoreReserved (int storeId) {
-        String getUserQuery = "select Product.id,  Product.dealStatus, Product.imageUrl01, Product.title, Product.price from Product where dealStatus = \"reserved\" and Product.storeId = ?";
+        String getUserQuery = "select Product.id,  Product.dealStatus, Product.imageUrl01, Product.title, Product.price " +
+                "from Product " +
+                "where dealStatus = \"reserved\" and status = \"active\" and Product.storeId = ?";
         int getUserParams = storeId;
         return this.jdbcTemplate.query(getUserQuery,
                 (rs, rowNum) -> new GetStoreReservedRes(
@@ -194,7 +205,9 @@ public class StoreDao {
     }
     // 상점에 따른 예약중인 상품 조회
     public List<GetStoreClosedRes> getStoreClosed (int storeId) {
-        String getUserQuery = "select Product.id,  Product.dealStatus, Product.imageUrl01, Product.title, Product.price from Product where dealStatus = \"closed\" and Product.storeId = ?";
+        String getUserQuery = "select Product.id,  Product.dealStatus, Product.imageUrl01, Product.title, Product.price " +
+                "from Product " +
+                "where dealStatus = \"closed\" and status = \"active\" and Product.storeId = ?";
         int getUserParams = storeId;
         return this.jdbcTemplate.query(getUserQuery,
                 (rs, rowNum) -> new GetStoreClosedRes(

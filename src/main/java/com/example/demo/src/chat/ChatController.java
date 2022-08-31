@@ -159,6 +159,30 @@ public class ChatController {
         }
 
     }
+    /**
+     * 채팅 메시지 조회
+     */
+    @ResponseBody
+    @PostMapping("/{roomId}/message")
+    public BaseResponse<PostChatMessageRes> postChatRoomMessage(
+            @PathVariable("roomId") Integer roomId,
+            PostChatMessageReq postChatMessageReq) {
+        try {
+            // jwt 에서 uid 추출
+            int uid;
+            uid = jwtService.getUserIdx();
+            // 존재하는 상점 아이디인지 검증
+            if (!verifier.isPresentStoreId(uid))
+                throw new BaseException(INVALID_STORE_ID);
+            // 접속 가능한 채팅방인지 검증
+            if (!chatProvider.isAccessableRoom(uid, roomId))
+                throw new BaseException(INVALID_ROOM_ID);
+            PostChatMessageRes postChatMessageRes = chatService.postChatMessage(uid, roomId, postChatMessageReq);
+            return new BaseResponse<>(postChatMessageRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
 
     /**
      * 물품정보 전송

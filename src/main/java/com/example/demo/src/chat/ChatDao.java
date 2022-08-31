@@ -507,6 +507,13 @@ public class ChatDao {
               param2);
     }
 
+    public int postChatMessage(int uid, int roomId, PostChatMessageReq postChatMessageReq) {
+        String query = "insert into Chat (sendStoreId, chatRoomId, description) VALUES (?, ?, ?)"; // 실행될 동적 쿼리문
+        Object[] params = new Object[]{uid, roomId, postChatMessageReq.getMessage()}; // 동적 쿼리의 ?부분에 주입될 값
+        this.jdbcTemplate.update(query, params);
+        String lastInserIdQuery = "select last_insert_id()"; // 가장 마지막에 삽입된(생성된) id값은 가져온다.
+        return this.jdbcTemplate.queryForObject(lastInserIdQuery, int.class);
+    }
 
 //    // 회원가입
 //    public int createUser(PostUserReq postUserReq) {

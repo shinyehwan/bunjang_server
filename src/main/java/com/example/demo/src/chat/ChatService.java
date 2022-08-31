@@ -7,12 +7,19 @@ import com.example.demo.config.BaseException;
 import com.example.demo.src.chat.model.PostChatMessageReq;
 import com.example.demo.src.chat.model.PostChatMessageRes;
 import com.example.demo.utils.JwtService;
+import com.example.demo.utils.Verifier;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static com.example.demo.config.BaseResponseStatus.*;
 
@@ -33,6 +40,13 @@ public class ChatService {
     private final ChatDao chatDao;
     private final ChatProvider chatProvider;
     private final JwtService jwtService; // JWT부분은 7주차에 다루므로 모르셔도 됩니다!
+    // *********************** 동작에 있어 필요한 요소들을 불러옵니다. *************************
+    private Verifier verifier;
+    @Autowired
+    public void setVerifier(Verifier verifier){
+        this.verifier = verifier;
+    }
+    // *********************** 동작에 있어 필요한 요소들을 불러옵니다. *************************
 
 
     @Autowired //readme 참고
@@ -73,6 +87,7 @@ public class ChatService {
             try {
                 result = chatDao.getProductInfoMessage(productId);
             } catch (Exception exception) {
+                logger.error(exception.getMessage());
                 throw new BaseException(INVALID_PRODUCT_ID); // 3301|존재하지 않는 상품입니다.
             }
 
@@ -460,7 +475,187 @@ public class ChatService {
             throw new BaseException(DATABASE_ERROR);
         }
     }
+//    /**
+//     * 계좌정보 전송
+//     */
+//    @Transactional(rollbackFor = BaseException.class)
+//    public PostAccountInfoRes sendAccountInfoMessage(int uid, int messageId, PostAccountInfoReq pInfo) throws BaseException {
+//        try {
+//            // (validation) 내가 수정 가능한 데이터인지 확인 - uid, mid 일치하는지 조회
+//            int productId = chatDao.isModifiableDealData(uid,messageId);
+//            if (productId == 0 )
+//                throw new BaseException(MODIFY_NOT_PERMITTED); // 3403|이용자가 수정할 수 없는 메시지입니다.
+//
+//            // productId 변경되었을 경우
+//            if (pInfo.getProductId() != null){
+//                // (validation) 존재하는 상품인지 확인
+//                if (!verifier.isPresentProductId(pInfo.getProductId()))
+//                    throw new BaseException(INVALID_PRODUCT_ID); // 3301|존재하지 않는 상품입니다.
+//                // 보낼 수 있는 상품인지 확인 : 내 상품 혹은 상대방의 상품인지?
+//                if (!chatProvider.isMyProduct(uid, pInfo.getProductId()))
+//                    throw new BaseException(SEND_NOT_PERMITTED); // 3401|이용자가 전송할 수 없는 상품입니다.
+//
+//                // todo: productId 수정하기
+//
+//            } else {
+//                // 계좌정보 불러오기
+//
+//                // 빈칸 채우기 if null ||  ""
+//
+//
+//                // 수정하기
+//            }
+//
+//
+//            // todo: 입력값 리젝스
+//
+//
+//            // 상품 정보 가져오기
+//            PostAccountInfoRes result;
+//            try {
+//                result = chatDao.getAccountInfoMessage(pInfo.getProductId());
+//            } catch (Exception exception) {
+//                throw new BaseException(INVALID_PRODUCT_ID); // 3301|존재하지 않는 상품입니다.
+//            }
+//
+//            // 계좌 데이터 생성하기 -> id 반환
+//            int lastInsertId = chatDao.newAccountInfoMessage(uid, pInfo);
+//            result.setAccountInfoId(lastInsertId);
+//
+//            // 계좌 정보 json으로 바꿔서 DB에 저장하기
+//            ObjectMapper mapper = new ObjectMapper();
+//            String productInfoJson = mapper.writeValueAsString(result);
+//            chatDao.sendObjectMessage(uid, roomId, "Object_account", productInfoJson);
+//
+//            // 정보 반환하기 -> getProductInfoMessage(int productId);
+//            return result;
+//        } catch (BaseException exception) {
+//            throw exception;
+//        } catch (Exception e) {
+//            logger.error(e.getMessage());
+//            throw new BaseException(DATABASE_ERROR);
+//        }
+//    }
 
+//    /**
+//     * 주소정보 전송
+//     */
+//    public PostAddressInfoRes sendAddressInfoMessage(int uid, int roomId, PostAddressInfoReq pInfo) throws BaseException {
+//        try {
+//            // 보낼 수 있는 상품인지 확인 : 내 상품 혹은 상대방의 상품인지?
+//            if (!chatProvider.isYourProduct(uid, roomId, pInfo.getProductId()))
+//                throw new BaseException(SEND_NOT_PERMITTED); // 3401|이용자가 전송할 수 없는 상품입니다.
+//            // todo: 존재하는 상품인지 확인
+//            // todo: 입력값 리젝스
+//
+//
+//            // 상품 정보 가져오기
+//            PostAddressInfoRes result;
+//            try {
+//                result = chatDao.getAddressInfoMessage(pInfo.getProductId());
+//            } catch (Exception exception) {
+//                throw new BaseException(INVALID_PRODUCT_ID); // 3301|존재하지 않는 상품입니다.
+//            }
+//
+//            // 사용자 이름 가져오기
+//            result.setStoreName(chatDao.getStoreNameById(uid));
+//
+//            // 계좌 데이터 생성하기 -> id 반환
+//            int lastInsertId = chatDao.newAddressInfoMessage(uid, pInfo);
+//            result.setAddressInfoId(lastInsertId);
+//
+//            // 계좌 정보 json으로 바꿔서 DB에 저장하기
+//            ObjectMapper mapper = new ObjectMapper();
+//            String productInfoJson = mapper.writeValueAsString(result);
+//            chatDao.sendObjectMessage(uid, roomId, "Object_address", productInfoJson);
+//
+//            // 정보 반환하기 -> getProductInfoMessage(int productId);
+//            return result;
+//        } catch (BaseException exception) {
+//            throw exception;
+//        } catch (Exception e) {
+//            logger.error(e.getMessage());
+//            throw new BaseException(DATABASE_ERROR);
+//        }
+//    }
+//
+//    /**
+//     * 직거래정보 전송
+//     */
+//    public PostDealInfoRes sendDealInfoMessage(int uid, int roomId, PostDealInfoReq pInfo) throws BaseException {
+//        try {
+//            // 보낼 수 있는 상품인지 확인 : 내 상품 혹은 상대방의 상품인지?
+//            if (!chatProvider.isOurProduct(roomId, pInfo.getProductId()))
+//                throw new BaseException(SEND_NOT_PERMITTED); // 3401|이용자가 전송할 수 없는 상품입니다.
+//            // todo: 존재하는 상품인지 확인
+//            // todo: 입력값 리젝스
+//
+//
+//            // 상품 정보 가져오기
+//            PostDealInfoRes result;
+//            try {
+//                result = chatDao.getDealInfoMessage(pInfo.getProductId());
+//            } catch (Exception exception) {
+//                throw new BaseException(INVALID_PRODUCT_ID); // 3301|존재하지 않는 상품입니다.
+//            }
+//
+//            // 계좌 데이터 생성하기 -> id 반환
+//            int lastInsertId = chatDao.newDealInfoMessage(uid, pInfo);
+//            result.setDealInfoId(lastInsertId);
+//
+//            // 계좌 정보 json으로 바꿔서 DB에 저장하기
+//            ObjectMapper mapper = new ObjectMapper();
+//            String productInfoJson = mapper.writeValueAsString(result);
+//            chatDao.sendObjectMessage(uid, roomId, "Object_address", productInfoJson);
+//
+//            // 정보 반환하기 -> getProductInfoMessage(int productId);
+//            return result;
+//        } catch (BaseException exception) {
+//            throw exception;
+//        } catch (Exception e) {
+//            logger.error(e.getMessage());
+//            throw new BaseException(DATABASE_ERROR);
+//        }
+//    }
+
+
+    /**
+     * 상품 판매자와 번개톡 시작하기
+     */
+    public PostRoomRes openNewChatRoom (int uid, int productId) throws BaseException {
+        // productId -> 상대방 storeId 가져오기
+        int storeId;
+        try {
+            storeId = chatDao.getStoreIdByProduct(productId);
+        } catch (Exception exception) { // (validation) 존재하지 않는 상품
+            logger.error(exception.getMessage());
+            throw new BaseException(INVALID_PRODUCT_ID); // 3301|존재하지 않는 상품입니다.
+        }
+
+        // (validation) 내 상품
+        if (storeId == uid)
+            throw new BaseException(ITS_MY_PRODUCT); // 3404|내 상품과는 채팅이 불가능합니다.
+
+        // 이미 생성된 채팅방인지 확인
+        int roomId = chatDao.checkExistRoom(uid, storeId);
+        if(roomId == 0) { // 채팅방이 없는 경우
+            // 내 uid,productId,storeId -> 새톡방, roomId 가져오기
+            roomId = chatDao.openNewChatRoom(productId);
+            chatDao.connectChatRoom(roomId, uid, storeId);
+
+            // 첫 메시지 보내기
+            this.sendProcutInfoMessage(uid, roomId, productId);
+
+            // roomId 반환
+            return new PostRoomRes("new", roomId);
+        } else { // 이미 존재하는 채팅방인 경우
+            // 상품 메시지 보내기
+            this.sendProcutInfoMessage(uid, roomId, productId);
+
+            // roomId 반환
+            return new PostRoomRes("exist", roomId);
+        }
+    }
 
 //
 //    // 회원정보 수정(Patch)

@@ -344,6 +344,56 @@ public class ChatDao {
         this.jdbcTemplate.update(Query, messageId);
     }
 
+
+
+
+    /**
+     * 판매자 id 가져오기
+     */
+    public int getStoreIdByProduct(int productId) {
+        String Query = "SELECT * FROM Product\n" +
+                "WHERE  status='active' AND id=?";
+
+        return this.jdbcTemplate.queryForObject(Query,
+                (rs,rn)-> rs.getInt("storeId"),
+                productId);
+    }
+    /**
+     * 새 채팅방 생성
+     */
+    public int openNewChatRoom(int productId) {
+        this.jdbcTemplate.update("INSERT INTO ChatRoom (productId) VALUES (?)", productId);
+
+        String lastInserIdQuery = "select last_insert_id()"; // 가장 마지막에 삽입된(생성된) id값은 가져온다.
+        return this.jdbcTemplate.queryForObject(lastInserIdQuery, int.class);
+    }
+    /**
+     * 채팅방 - 이용자 연결
+     */
+    public void connectChatRoom(int roomId, int uid, int storeId){
+        String Query = "INSERT INTO ChatRoomStoreMap (chatRoomId, storeId) VALUES (?,?)";
+        this.jdbcTemplate.update(Query,roomId,uid);
+        this.jdbcTemplate.update(Query,roomId,storeId);
+    }
+    /**
+     * 이미 있는 채팅방인지 확인
+     */
+    public int checkExistRoom(int uid, int storeId){
+        try {
+            String Query = "SELECT * FROM ChatRoomStoreMap\n" +
+                    "WHERE  status='active' AND storeId= ? AND chatRoomId IN (\n" +
+                    "SELECT chatRoomId FROM ChatRoomStoreMap\n" +
+                    "WHERE  status='active' AND storeId= ? )";
+
+            return this.jdbcTemplate.queryForObject(Query,
+                    (rs,rn)-> rs.getInt("chatRoomId"),
+                    uid, storeId
+            );
+        } catch (IncorrectResultSizeDataAccessException error) {
+            return 0;
+        }
+    }
+
     /**
      * (Validation) 내 상품인지 확인
      */

@@ -6,6 +6,7 @@ import com.example.demo.utils.JwtService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -135,6 +136,43 @@ import static com.example.demo.config.BaseResponseStatus.*;
             return true;
         } catch (Exception e) {
             logger.error(e.getMessage());
+            return false;
+        }
+    }
+
+
+    /**
+     * (Validation) 내 상품인지 확인
+     */
+    public boolean isMyProduct(int uid, int productId) {
+        try {
+            chatDao.isMyProduct(uid, productId);
+            return true;
+        } catch (IncorrectResultSizeDataAccessException error) {
+            return false;
+        }
+    }
+
+    /**
+     * (Validation) 대화상대의 상품인지 확인
+     */
+    public boolean isYourProduct(int uid, int roomId, int productId) {
+        try {
+            chatDao.isYourProduct(uid, roomId, productId);
+            return true;
+        } catch (IncorrectResultSizeDataAccessException error) {
+            return false;
+        }
+    }
+
+    /**
+     * (Validation) 나 또는 대화상대의 상품인지 확인
+     */
+    public boolean isOurProduct(int roomId, int productId) {
+        try {
+            chatDao.isOurProduct(roomId, productId);
+            return true;
+        } catch (IncorrectResultSizeDataAccessException error) {
             return false;
         }
     }

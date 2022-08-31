@@ -431,10 +431,6 @@ public class ChatDao {
             return 0;
         }
     }
-
-
-
-
     /**
      * (Validation) 사용자가 접근 가능한 채팅방인지 검증
      */

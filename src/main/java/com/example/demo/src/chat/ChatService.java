@@ -42,6 +42,19 @@ public class ChatService {
         this.jwtService = jwtService; // JWT부분은 7주차에 다루므로 모르셔도 됩니다!
 
     }
+    public PostChatMessageRes postChatMessage(int uid, int roomId, PostChatMessageReq postChatMessageReq) throws BaseException {
+
+//        if (chatProvider.checkPhone(postUserReq.getPhone()) == 1) {
+//            throw new BaseException(POST_USERS_EXISTS_USER);
+//        }
+        try {
+            int chatId = chatDao.postChatMessage(uid, roomId, postChatMessageReq);
+            return new PostChatMessageRes(chatId);
+        } catch (Exception exception) { // DB에 이상이 있는 경우 에러 메시지를 보냅니다.
+            throw new BaseException(DATABASE_ERROR);
+        }
+
+    }
 
 
     /**
@@ -483,19 +496,6 @@ public class ChatService {
         } catch (IncorrectResultSizeDataAccessException error) {
             return false;
         }
-    }
-    public PostChatMessageRes postChatMessage(int uid, int roomId, PostChatMessageReq postChatMessageReq) throws BaseException {
-
-//        if (chatProvider.checkPhone(postUserReq.getPhone()) == 1) {
-//            throw new BaseException(POST_USERS_EXISTS_USER);
-//        }
-        try {
-            int chatId = chatDao.postChatMessage(uid, roomId, postChatMessageReq);
-            return new PostChatMessageRes(chatId);
-        } catch (Exception exception) { // DB에 이상이 있는 경우 에러 메시지를 보냅니다.
-            throw new BaseException(DATABASE_ERROR);
-        }
-
     }
 //
 //    // 회원정보 수정(Patch)

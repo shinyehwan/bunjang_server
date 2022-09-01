@@ -158,9 +158,7 @@ public class ChatService {
             // 보낼 수 있는 상품인지 확인 : 내 상품 혹은 상대방의 상품인지?
             if (!chatProvider.isMyProduct(uid, pInfo.getProductId()))
                 throw new BaseException(SEND_NOT_PERMITTED); // 3401|이용자가 전송할 수 없는 상품입니다.
-            // todo: 존재하는 상품인지 확인
             // todo: 입력값 리젝스
-
 
             // 상품 정보 가져오기
             PostAccountInfoRes result;
@@ -681,7 +679,7 @@ public class ChatService {
 
         // (validation) 내 상품
         if (storeId == uid)
-            throw new BaseException(ITS_MY_PRODUCT); // 3404|내 상품과는 채팅이 불가능합니다.
+            throw new BaseException(ITS_MY_PRODUCT); // 3405|내 상품과는 채팅이 불가능합니다.
 
         // 이미 생성된 채팅방인지 확인
         int roomId = chatDao.checkExistRoom(uid, storeId);

@@ -87,7 +87,7 @@ public class FeedProvider {
                 resultIdList = resultIdList.subList(20 * (p - 1), resultIdList.size());
                 addRows = 20 * (p - 1) - resultIdList.size();
             } else { // page에 필요한 상품 수가 resultIdList의 수보다 적을 때
-                addStart = 20 * (p - 1) - resultIdList.size() - 1;
+                addStart = 20 * (p - 1) - resultIdList.size();
                 addRows = 20;
             }
 

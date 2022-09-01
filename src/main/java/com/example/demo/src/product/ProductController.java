@@ -68,8 +68,6 @@ public class ProductController {
             if (!verifier.isPresentStoreId(uid))
                 throw new BaseException(INVALID_STORE_ID); // /3001/존재하지 않는 상점 id 입니다.
 
-            //TODO : 조회수 추가하기
-
 
             return new BaseResponse<>(productProvider.getProductDetailInfo(productId));
         } catch (BaseException exception) {

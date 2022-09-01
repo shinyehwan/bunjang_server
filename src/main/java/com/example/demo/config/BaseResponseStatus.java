@@ -118,8 +118,8 @@ public enum BaseResponseStatus {
     SEND_NOT_PERMITTED(false, 3401, "이용자가 전송할 수 없는 상품입니다."),
     VIEW_NOT_PERMITTED(false, 3402, "이용자가 조회할 수 없는 상품입니다."),
     MODIFY_NOT_PERMITTED(false, 3403, "이용자가 수정할 수 없는 메시지입니다."),
-    INVALID_MESSAGE_ID(false, 3403, "존재하지 않는 메시지 아이디입니다."),
-    ITS_MY_PRODUCT(false, 3404, "내 상품과는 채팅이 불가능합니다."),
+    INVALID_MESSAGE_ID(false, 3404, "존재하지 않는 메시지 아이디입니다."),
+    ITS_MY_PRODUCT(false, 3405, "내 상품과는 채팅이 불가능합니다."),
 
 
     /**

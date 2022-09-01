@@ -10,6 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 import static com.example.demo.config.BaseResponseStatus.*;
 
@@ -45,6 +47,7 @@ public class StoreProvider {
 
 
     // 로그인(password 검사)
+    @Transactional
     public PostLoginRes logIn(PostLoginReq postLoginReq) throws BaseException {
         Store store = storeDao.getPwd(postLoginReq);
         String password;
@@ -66,6 +69,7 @@ public class StoreProvider {
     }
 
     // 해당 핸드폰번호가 이미 User Table에 존재하는지 확인
+    @Transactional(rollbackFor = BaseException.class)
     public int checkPhone(String phone) throws BaseException {
         try {
             return storeDao.checkPhone(phone);
@@ -75,6 +79,7 @@ public class StoreProvider {
     }
 
     // 상품, 찜, 리뷰, 팔로잉, 팔로워 갯수 조회
+    @Transactional(rollbackFor = BaseException.class)
     public GetStoreCountRes getStoreCount(int storeId) throws BaseException {
         try {
             int productCount = storeDao.getStoreProductCount(storeId);
@@ -90,6 +95,7 @@ public class StoreProvider {
     }
 
     // 마이페이지에서 판매중인 상품 조회
+    @Transactional(rollbackFor = BaseException.class)
     public List<GetStoreSaleRes> getStoreSale(int storeId) throws BaseException {
         try {
             List<GetStoreSaleRes> getStoreSaleRes = storeDao.getStoreSale(storeId);
@@ -99,6 +105,7 @@ public class StoreProvider {
         }
     }
     // 마이페이지에서 예약인 상품 조회
+    @Transactional(rollbackFor = BaseException.class)
     public List<GetStoreReservedRes> getStoreReserved(int storeId) throws BaseException {
         try {
             List<GetStoreReservedRes> getStoreReservedRes = storeDao.getStoreReserved(storeId);
@@ -108,6 +115,7 @@ public class StoreProvider {
         }
     }
     // 마이페이지에서 판매완료된 상품 조회
+    @Transactional(rollbackFor = BaseException.class)
     public List<GetStoreClosedRes> getStoreClosed(int storeId) throws BaseException {
         try {
             List<GetStoreClosedRes> getStoreClosedRes = storeDao.getStoreClosed(storeId);
@@ -118,6 +126,7 @@ public class StoreProvider {
     }
 
     // 마이페이지에서 디테일 조회
+    @Transactional(rollbackFor = BaseException.class)
     public GetStoreDetailRes getStoreDetail(int storeId) throws BaseException {
         try {
             GetStoreDetailRes getStoreDetailRes = storeDao.getStoreDetail(storeId);
@@ -128,6 +137,7 @@ public class StoreProvider {
     }
 
     // 찜한 상품 조회
+    @Transactional(rollbackFor = BaseException.class)
     public List<GetStoreBasketRes> getStoreBasket(int storeId) throws BaseException {
         try {
             List<GetStoreBasketRes> getStoreBasketRes = storeDao.getStoreBasket(storeId);
@@ -138,6 +148,7 @@ public class StoreProvider {
     }
 
     // 리뷰 상품 조회
+    @Transactional(rollbackFor = BaseException.class)
     public List<GetStoreReviewRes> getStoreReview(int storeId) throws BaseException {
         try {
             List<GetStoreReviewRes> getStoreReviewRes = storeDao.getStoreReview(storeId);
@@ -147,6 +158,7 @@ public class StoreProvider {
         }
     }
     // 팔로잉 계정 조회
+    @Transactional(rollbackFor = BaseException.class)
     public List<GetStoreFollowingRes> getStoreFollowing(int storeId) throws BaseException {
         try {
             List<GetStoreFollowingRes> getStoreFollowingRes = storeDao.getStoreFollowing(storeId);
@@ -157,6 +169,7 @@ public class StoreProvider {
     }
 
     // 팔로워 계정 조회
+    @Transactional(rollbackFor = BaseException.class)
     public List<GetStoreFollowerRes> getStoreFollower(int storeId) throws BaseException {
         try {
             List<GetStoreFollowerRes> getStoreFollowerRes = storeDao.getStoreFollower(storeId);
@@ -167,6 +180,7 @@ public class StoreProvider {
     }
 
     // 팔로잉 상품 정보 조회
+    @Transactional(rollbackFor = BaseException.class)
     public List<GetStoreFollowingProductRes> getStoreFollowingProduct(int storeId) throws BaseException {
         try {
             List<GetStoreFollowingProductRes> getStoreFollowingProductRes = storeDao.getStoreFollowingProduct(storeId);
@@ -178,6 +192,7 @@ public class StoreProvider {
     }
 
     // 팔로워 상품 정보 조회
+    @Transactional(rollbackFor = BaseException.class)
     public List<GetStoreFollowerProductRes> getStoreFollowerProduct(int storeId) throws BaseException {
         try {
             List<GetStoreFollowerProductRes> getStoreFollowerProductRes = storeDao.getStoreFollowerProduct(storeId);

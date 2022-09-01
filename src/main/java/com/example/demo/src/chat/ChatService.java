@@ -60,6 +60,7 @@ public class ChatService {
     /**
      * 텍스트 메시지 전송
      */
+    @Transactional(rollbackFor = BaseException.class)
     public PostChatMessageRes postChatMessage(int uid, int roomId, PostChatMessageReq postChatMessageReq) throws BaseException {
 
         if (postChatMessageReq.getMessage().isEmpty()) {
@@ -81,6 +82,7 @@ public class ChatService {
     /**
      * 이미지 전송
      */
+    @Transactional(rollbackFor = BaseException.class)
     public PostImageRes postImageUrl(int uid, int roomId, PostImageReq postImageReq) throws BaseException {
 
         if (postImageReq.getImageUrl().isEmpty()) {
@@ -97,6 +99,7 @@ public class ChatService {
     /**
      * 이모티콘 전송
      */
+    @Transactional(rollbackFor = BaseException.class)
     public PostEmoticonRes postEmoticonUrl(int uid, int roomId, PostEmoticonReq postEmoticonReq) throws BaseException {
 
         try {

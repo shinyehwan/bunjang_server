@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import static com.example.demo.config.BaseResponseStatus.*;
 
@@ -22,6 +23,7 @@ import static com.example.demo.config.BaseResponseStatus.*;
  */
 @Service    // [Business Layer에서 Service를 명시하기 위해서 사용] 비즈니스 로직이나 respository layer 호출하는 함수에 사용된다.
             // [Business Layer]는 컨트롤러와 데이터 베이스를 연결
+
 public class StoreService {
     final Logger logger = LoggerFactory.getLogger(this.getClass()); // Log 처리부분: Log를 기록하기 위해 필요한 함수입니다.
 
@@ -43,6 +45,7 @@ public class StoreService {
 
     }
     // 회원가입 (POST)
+    @Transactional(rollbackFor = BaseException.class)
     public PostStoreRes createUser(PostStoreReq postStoreReq) throws BaseException {
 
         if (storeProvider.checkPhone(postStoreReq.getPhone()) == 1) {
@@ -67,6 +70,7 @@ public class StoreService {
     }
 
     // 상점 정보 수정(Patch)
+    @Transactional(rollbackFor = BaseException.class)
     public void modifyStore(int storeId, PatchStoreDetailReq patchStoreDetailReq) throws BaseException {
         if (patchStoreDetailReq.getStoreName() == null) {
             throw new BaseException(EMPTY_STORENAME);

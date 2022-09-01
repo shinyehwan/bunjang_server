@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -54,6 +55,7 @@ public class FeedProvider {
     /**
      * 홈화면 피드
      */
+    @Transactional(rollbackFor = BaseException.class)
     public List<GetFeedRes> recommendFeedByUser(int uid, int p) throws BaseException {
         try {
             Set<Integer> productIdSet = new HashSet<>();
@@ -122,6 +124,7 @@ public class FeedProvider {
     /**
      * 내피드 화면 (팔로우 상점 피드들)
      */
+    @Transactional(rollbackFor = BaseException.class)
     public List<GetFeedRes> followFeedByUser(int uid, int p) throws BaseException {
         try {
             // 팔로우 상점 -> 상품 pid 모아오기
@@ -153,6 +156,7 @@ public class FeedProvider {
     /**
      * 브랜드 리스트 조회
      */
+    @Transactional(rollbackFor = BaseException.class)
     public List<GetBrandRes> getBrandList() throws BaseException {
         try {
             // 브랜드 정보 리스트 조회
@@ -175,6 +179,7 @@ public class FeedProvider {
     /**
      * 브랜드 검색 스트링 반환
      */
+    @Transactional(rollbackFor = BaseException.class)
     public String queryByBrand(String brandName) throws BaseException {
         Queue<String> brandQue;
 
@@ -221,6 +226,7 @@ public class FeedProvider {
     /**
      * 상품 검색
      */
+    @Transactional(rollbackFor = BaseException.class)
     public List<GetFeedRes> FeedByKeyword(int uid, String k, int p) throws BaseException {
         try {
             List<GetFeedRes> result = feedDao.FeedByKeywordOrderByDate(k, p);
@@ -245,6 +251,7 @@ public class FeedProvider {
     /**
      * 상품 검색 (Detail Ver.)
      */
+    @Transactional(rollbackFor = BaseException.class)
     public List<GetFeedRes> getFeedRes(int uid,
                                        String q,
                                        String order,
@@ -370,6 +377,7 @@ public class FeedProvider {
     /**
      * 사용자 찜 여부 조회
      */
+    @Transactional(rollbackFor = BaseException.class)
     public boolean isBasketByUid(int uid, int productId) {
         try {
             feedDao.isBasketByUid(uid, productId);

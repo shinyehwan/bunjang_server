@@ -115,6 +115,7 @@ public class ChatService {
     /**
      * 상품정보 전송
      */
+    @Transactional(rollbackFor = BaseException.class)
     public PostProductInfoRes sendProcutInfoMessage(int uid, int roomId, int productId) throws BaseException {
         try {
             // 보낼 수 있는 상품인지 확인 : 내 상품 혹은 상대방의 상품인지?
@@ -151,6 +152,7 @@ public class ChatService {
     /**
      * 계좌정보 전송
      */
+    @Transactional(rollbackFor = BaseException.class)
     public PostAccountInfoRes sendAccountInfoMessage(int uid, int roomId, PostAccountInfoReq pInfo) throws BaseException {
         try {
             // 보낼 수 있는 상품인지 확인 : 내 상품 혹은 상대방의 상품인지?
@@ -190,6 +192,7 @@ public class ChatService {
     /**
      * 주소정보 전송
      */
+    @Transactional(rollbackFor = BaseException.class)
     public PostAddressInfoRes sendAddressInfoMessage(int uid, int roomId, PostAddressInfoReq pInfo) throws BaseException {
         try {
             // 보낼 수 있는 상품인지 확인 : 내 상품 혹은 상대방의 상품인지?
@@ -232,6 +235,7 @@ public class ChatService {
     /**
      * 직거래정보 전송
      */
+    @Transactional(rollbackFor = BaseException.class)
     public PostDealInfoRes sendDealInfoMessage(int uid, int roomId, PostDealInfoReq pInfo) throws BaseException {
         try {
             // 보낼 수 있는 상품인지 확인 : 내 상품 혹은 상대방의 상품인지?
@@ -271,6 +275,7 @@ public class ChatService {
     /**
      * 계좌정보 조회하기
      */
+    @Transactional(rollbackFor = BaseException.class)
     public GetAccountInfoRes viewAccountInfoMessage(int uid, int roomId, int messageId) throws BaseException {
         try {
             // todo: validation 내가 조회할 수 있는 정보인지? -> (uid, storeId, roomId) -> 같은 방에 있는지 확인!
@@ -316,6 +321,7 @@ public class ChatService {
     /**
      * 주소정보 조회하기
      */
+    @Transactional(rollbackFor = BaseException.class)
     public GetAddressInfoRes viewAddressInfoMessage(int uid, int roomId, int messageId) throws BaseException {
         try {
             // todo: validation 내가 조회할 수 있는 정보인지? -> (uid, storeId, roomId) -> 같은 방에 있는지 확인!
@@ -362,6 +368,7 @@ public class ChatService {
     /**
      * 직거래정보 조회하기
      */
+    @Transactional(rollbackFor = BaseException.class)
     public GetDealInfoRes viewDealInfoMessage(int uid, int roomId, int messageId) throws BaseException {
         try {
             // todo: validation 내가 조회할 수 있는 정보인지? -> (uid, storeId, roomId) -> 같은 방에 있는지 확인!
@@ -408,6 +415,7 @@ public class ChatService {
     /**
      * 계좌정보 거래 취소하기
      */
+    @Transactional(rollbackFor = BaseException.class)
     public PatchCancelRes delAccountInfoMessage(int uid, int roomId, int messageId) throws BaseException {
         try {
             // (validation) 내가 취소 가능한 데이터인지 확인 - uid, mid 일치하는지 조회
@@ -445,6 +453,7 @@ public class ChatService {
     /**
      * 배송정보 거래 취소하기
      */
+    @Transactional(rollbackFor = BaseException.class)
     public PatchCancelRes delAddressInfoMessage(int uid, int roomId, int messageId) throws BaseException {
         try {
             // (validation) 내가 취소 가능한 데이터인지 확인 - uid, mid 일치하는지 조회
@@ -482,6 +491,7 @@ public class ChatService {
     /**
      * 계좌정보 거래 취소하기
      */
+    @Transactional(rollbackFor = BaseException.class)
     public PatchCancelRes delDealInfoMessage(int uid, int roomId, int messageId) throws BaseException {
         try {
             // (validation) 내가 취소 가능한 데이터인지 확인 - uid, mid 일치하는지 조회
@@ -516,153 +526,149 @@ public class ChatService {
             throw new BaseException(DATABASE_ERROR);
         }
     }
-//    /**
-//     * 계좌정보 전송
-//     */
-//    @Transactional(rollbackFor = BaseException.class)
-//    public PostAccountInfoRes sendAccountInfoMessage(int uid, int messageId, PostAccountInfoReq pInfo) throws BaseException {
-//        try {
-//            // (validation) 내가 수정 가능한 데이터인지 확인 - uid, mid 일치하는지 조회
-//            int productId = chatDao.isModifiableDealData(uid,messageId);
-//            if (productId == 0 )
-//                throw new BaseException(MODIFY_NOT_PERMITTED); // 3403|이용자가 수정할 수 없는 메시지입니다.
-//
-//            // productId 변경되었을 경우
-//            if (pInfo.getProductId() != null){
-//                // (validation) 존재하는 상품인지 확인
-//                if (!verifier.isPresentProductId(pInfo.getProductId()))
-//                    throw new BaseException(INVALID_PRODUCT_ID); // 3301|존재하지 않는 상품입니다.
-//                // 보낼 수 있는 상품인지 확인 : 내 상품 혹은 상대방의 상품인지?
-//                if (!chatProvider.isMyProduct(uid, pInfo.getProductId()))
-//                    throw new BaseException(SEND_NOT_PERMITTED); // 3401|이용자가 전송할 수 없는 상품입니다.
-//
-//                // todo: productId 수정하기
-//
-//            } else {
-//                // 계좌정보 불러오기
-//
-//                // 빈칸 채우기 if null ||  ""
-//
-//
-//                // 수정하기
-//            }
-//
-//
-//            // todo: 입력값 리젝스
-//
-//
-//            // 상품 정보 가져오기
-//            PostAccountInfoRes result;
-//            try {
-//                result = chatDao.getAccountInfoMessage(pInfo.getProductId());
-//            } catch (Exception exception) {
-//                throw new BaseException(INVALID_PRODUCT_ID); // 3301|존재하지 않는 상품입니다.
-//            }
-//
-//            // 계좌 데이터 생성하기 -> id 반환
-//            int lastInsertId = chatDao.newAccountInfoMessage(uid, pInfo);
-//            result.setAccountInfoId(lastInsertId);
-//
-//            // 계좌 정보 json으로 바꿔서 DB에 저장하기
-//            ObjectMapper mapper = new ObjectMapper();
-//            String productInfoJson = mapper.writeValueAsString(result);
-//            chatDao.sendObjectMessage(uid, roomId, "Object_account", productInfoJson);
-//
-//            // 정보 반환하기 -> getProductInfoMessage(int productId);
-//            return result;
-//        } catch (BaseException exception) {
-//            throw exception;
-//        } catch (Exception e) {
-//            logger.error(e.getMessage());
-//            throw new BaseException(DATABASE_ERROR);
-//        }
-//    }
+    /**
+     * 계좌정보 수정
+     */
+    @Transactional(rollbackFor = BaseException.class)
+    public PatchObjectRes patchAccountInfo(int uid, int messageId, PatchAccountInfoReq pInfo) throws BaseException {
+        try {
+            // (validation) 내가 수정 가능한 데이터인지 확인 - uid, mid 일치하는지 조회
+            int productId = chatDao.isModifiableAccountData(uid,messageId);
+            if (productId == 0 )
+                throw new BaseException(MODIFY_NOT_PERMITTED); // 3403|이용자가 수정할 수 없는 메시지입니다.
 
-//    /**
-//     * 주소정보 전송
-//     */
-//    public PostAddressInfoRes sendAddressInfoMessage(int uid, int roomId, PostAddressInfoReq pInfo) throws BaseException {
-//        try {
-//            // 보낼 수 있는 상품인지 확인 : 내 상품 혹은 상대방의 상품인지?
-//            if (!chatProvider.isYourProduct(uid, roomId, pInfo.getProductId()))
-//                throw new BaseException(SEND_NOT_PERMITTED); // 3401|이용자가 전송할 수 없는 상품입니다.
-//            // todo: 존재하는 상품인지 확인
-//            // todo: 입력값 리젝스
-//
-//
-//            // 상품 정보 가져오기
-//            PostAddressInfoRes result;
-//            try {
-//                result = chatDao.getAddressInfoMessage(pInfo.getProductId());
-//            } catch (Exception exception) {
-//                throw new BaseException(INVALID_PRODUCT_ID); // 3301|존재하지 않는 상품입니다.
-//            }
-//
-//            // 사용자 이름 가져오기
-//            result.setStoreName(chatDao.getStoreNameById(uid));
-//
-//            // 계좌 데이터 생성하기 -> id 반환
-//            int lastInsertId = chatDao.newAddressInfoMessage(uid, pInfo);
-//            result.setAddressInfoId(lastInsertId);
-//
-//            // 계좌 정보 json으로 바꿔서 DB에 저장하기
-//            ObjectMapper mapper = new ObjectMapper();
-//            String productInfoJson = mapper.writeValueAsString(result);
-//            chatDao.sendObjectMessage(uid, roomId, "Object_address", productInfoJson);
-//
-//            // 정보 반환하기 -> getProductInfoMessage(int productId);
-//            return result;
-//        } catch (BaseException exception) {
-//            throw exception;
-//        } catch (Exception e) {
-//            logger.error(e.getMessage());
-//            throw new BaseException(DATABASE_ERROR);
-//        }
-//    }
-//
-//    /**
-//     * 직거래정보 전송
-//     */
-//    public PostDealInfoRes sendDealInfoMessage(int uid, int roomId, PostDealInfoReq pInfo) throws BaseException {
-//        try {
-//            // 보낼 수 있는 상품인지 확인 : 내 상품 혹은 상대방의 상품인지?
-//            if (!chatProvider.isOurProduct(roomId, pInfo.getProductId()))
-//                throw new BaseException(SEND_NOT_PERMITTED); // 3401|이용자가 전송할 수 없는 상품입니다.
-//            // todo: 존재하는 상품인지 확인
-//            // todo: 입력값 리젝스
-//
-//
-//            // 상품 정보 가져오기
-//            PostDealInfoRes result;
-//            try {
-//                result = chatDao.getDealInfoMessage(pInfo.getProductId());
-//            } catch (Exception exception) {
-//                throw new BaseException(INVALID_PRODUCT_ID); // 3301|존재하지 않는 상품입니다.
-//            }
-//
-//            // 계좌 데이터 생성하기 -> id 반환
-//            int lastInsertId = chatDao.newDealInfoMessage(uid, pInfo);
-//            result.setDealInfoId(lastInsertId);
-//
-//            // 계좌 정보 json으로 바꿔서 DB에 저장하기
-//            ObjectMapper mapper = new ObjectMapper();
-//            String productInfoJson = mapper.writeValueAsString(result);
-//            chatDao.sendObjectMessage(uid, roomId, "Object_address", productInfoJson);
-//
-//            // 정보 반환하기 -> getProductInfoMessage(int productId);
-//            return result;
-//        } catch (BaseException exception) {
-//            throw exception;
-//        } catch (Exception e) {
-//            logger.error(e.getMessage());
-//            throw new BaseException(DATABASE_ERROR);
-//        }
-//    }
+            // todo: 입력값 리젝스
+
+            // 기존 계좌정보 불러오기
+            GetAccountInfoRes oldAccount;
+            try {
+                oldAccount = chatDao.getAccountDetail(messageId);
+            } catch (IncorrectResultSizeDataAccessException error) {
+                logger.error(error.getMessage());
+                throw new BaseException(INVALID_MESSAGE_ID); //3403|존재하지 않는 메시지 아이디입니다.
+            }
+            // 빈칸 채우기 if null ||  ""
+            if (pInfo.getOwner() == null || pInfo.getOwner().isEmpty())
+                pInfo.setOwner(oldAccount.getOwner());
+            if (pInfo.getBankName() == null || pInfo.getBankName().isEmpty())
+                pInfo.setBankName(oldAccount.getBankName());
+            if (pInfo.getAccountNum() == null || pInfo.getAccountNum().isEmpty())
+                pInfo.setAccountNum(oldAccount.getAccountNum());
+
+            // 수정하기
+            try {
+                chatDao.updateAccountInfo(messageId, pInfo);
+            } catch (Exception e) {
+                logger.error(e.getMessage());
+                throw new BaseException(DATABASE_ERROR);
+            }
+            return new PatchObjectRes("Object_account", messageId);
+
+        } catch (BaseException exception) {
+            throw exception;
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+    /**
+     * 배송정보 수정
+     */
+    @Transactional(rollbackFor = BaseException.class)
+    public PatchObjectRes patchAddressInfo(int uid, int messageId, PatchAddressInfoReq pInfo) throws BaseException {
+        try {
+            // (validation) 내가 수정 가능한 데이터인지 확인 - uid, mid 일치하는지 조회
+            int productId = chatDao.isModifiableAddressData(uid,messageId);
+            if (productId == 0 )
+                throw new BaseException(MODIFY_NOT_PERMITTED); // 3403|이용자가 수정할 수 없는 메시지입니다.
+
+            // todo: 입력값 리젝스
+
+            // 기존 계좌정보 불러오기
+            GetAddressInfoRes oldAddress;
+            try {
+                oldAddress = chatDao.getAddressDetail(messageId);
+            } catch (IncorrectResultSizeDataAccessException error) {
+                logger.error(error.getMessage());
+                throw new BaseException(INVALID_MESSAGE_ID); //3403|존재하지 않는 메시지 아이디입니다.
+            }
+            // 빈칸 채우기 if null ||  ""
+            if (pInfo.getName() == null || pInfo.getName().isEmpty())
+                pInfo.setName(oldAddress.getName());
+            if (pInfo.getPhoneNum() == null || pInfo.getPhoneNum().isEmpty())
+                pInfo.setPhoneNum(oldAddress.getPhoneNum());
+            if (pInfo.getAddress() == null || pInfo.getAddress().isEmpty())
+                pInfo.setAddress(oldAddress.getAddress());
+            if (pInfo.getAddressDetail() == null || pInfo.getAddressDetail().isEmpty())
+                pInfo.setAddressDetail(oldAddress.getAddressDetail());
+
+            // 수정하기
+            try {
+                chatDao.updateAddressInfo(messageId, pInfo);
+            } catch (Exception e) {
+                logger.error(e.getMessage());
+                throw new BaseException(DATABASE_ERROR);
+            }
+            return new PatchObjectRes("Object_address", messageId);
+
+        } catch (BaseException exception) {
+            throw exception;
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+    /**
+     * 계좌정보 수정
+     */
+    @Transactional(rollbackFor = BaseException.class)
+    public PatchObjectRes patchDealInfo(int uid, int messageId, PatchDealInfoReq pInfo) throws BaseException {
+        try {
+            // (validation) 내가 수정 가능한 데이터인지 확인 - uid, mid 일치하는지 조회
+            int productId = chatDao.isModifiableDealData(uid,messageId);
+            if (productId == 0 )
+                throw new BaseException(MODIFY_NOT_PERMITTED); // 3403|이용자가 수정할 수 없는 메시지입니다.
+
+            // todo: 입력값 리젝스
+
+            // 기존 계좌정보 불러오기
+            GetDealInfoRes oldDeal;
+            try {
+                oldDeal = chatDao.getDealDetail(messageId);
+            } catch (IncorrectResultSizeDataAccessException error) {
+                logger.error(error.getMessage());
+                throw new BaseException(INVALID_MESSAGE_ID); //3403|존재하지 않는 메시지 아이디입니다.
+            }
+            // 빈칸 채우기 if null ||  ""
+            if (pInfo.getDate() == null || pInfo.getDate().isEmpty())
+                pInfo.setDate(oldDeal.getDate());
+            if (pInfo.getLocation() == null || pInfo.getLocation().isEmpty())
+                pInfo.setLocation(oldDeal.getLocation());
+            if (pInfo.getPhoneNum() == null || pInfo.getPhoneNum().isEmpty())
+                pInfo.setPhoneNum(oldDeal.getPhoneNum());
+
+            // 수정하기
+            try {
+                chatDao.updateDealInfo(messageId, pInfo);
+            } catch (Exception e) {
+                logger.error(e.getMessage());
+                throw new BaseException(DATABASE_ERROR);
+            }
+            return new PatchObjectRes("Object_deal", messageId);
+
+        } catch (BaseException exception) {
+            throw exception;
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
 
 
     /**
      * 상품 판매자와 번개톡 시작하기
      */
+    @Transactional(rollbackFor = BaseException.class)
     public PostRoomRes openNewChatRoom (int uid, int productId) throws BaseException {
         // productId -> 상대방 storeId 가져오기
         int storeId;

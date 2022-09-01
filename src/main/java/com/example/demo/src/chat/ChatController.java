@@ -544,6 +544,89 @@ public class ChatController {
             return new BaseResponse<>((exception.getStatus()));
         }
     }
+
+    /**
+     * 계좌정보 수정
+     * [PATCH] /bungae/chat/:roomId/account ? id=
+     */
+    @ResponseBody
+    @PatchMapping("/{roomId}/account")
+    public BaseResponse<PatchObjectRes> updateAccountInfoMessage(
+            @PathVariable("roomId") Integer roomId,
+            @RequestParam Integer id,
+            @RequestBody PatchAccountInfoReq patchAccountInfoReq){
+        try {
+            // jwt 에서 uid 추출
+            int uid;
+            uid = jwtService.getUserIdx();
+            // 존재하는 상점 아이디인지 검증
+            if (!verifier.isPresentStoreId(uid))
+                throw new BaseException(INVALID_STORE_ID); // /3001/존재하지 않는 상점 id 입니다.
+            // 접속 가능한 채팅방인지 검증
+            if (!chatProvider.isAccessableRoom(uid, roomId))
+                throw new BaseException(INVALID_ROOM_ID);
+
+
+            return new BaseResponse<>(chatService.patchAccountInfo(uid, id, patchAccountInfoReq));
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+    /**
+     * 배송정보 수정
+     * [PATCH] /bungae/chat/:roomId/address ? id=
+     */
+    @ResponseBody
+    @PatchMapping("/{roomId}/address")
+    public BaseResponse<PatchObjectRes> updateAddressInfoMessage(
+            @PathVariable("roomId") Integer roomId,
+            @RequestParam Integer id,
+            @RequestBody PatchAddressInfoReq patchAddressInfoReq){
+        try {
+            // jwt 에서 uid 추출
+            int uid;
+            uid = jwtService.getUserIdx();
+            // 존재하는 상점 아이디인지 검증
+            if (!verifier.isPresentStoreId(uid))
+                throw new BaseException(INVALID_STORE_ID); // /3001/존재하지 않는 상점 id 입니다.
+            // 접속 가능한 채팅방인지 검증
+            if (!chatProvider.isAccessableRoom(uid, roomId))
+                throw new BaseException(INVALID_ROOM_ID);
+
+
+            return new BaseResponse<>(chatService.patchAddressInfo(uid, id, patchAddressInfoReq));
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+    /**
+     * 계좌정보 수정
+     * [PATCH] /bungae/chat/:roomId/deal ? id=
+     */
+    @ResponseBody
+    @PatchMapping("/{roomId}/deal")
+    public BaseResponse<PatchObjectRes> updateDealInfoMessage(
+            @PathVariable("roomId") Integer roomId,
+            @RequestParam Integer id,
+            @RequestBody PatchDealInfoReq patchDealInfoReq){
+        try {
+            // jwt 에서 uid 추출
+            int uid;
+            uid = jwtService.getUserIdx();
+            // 존재하는 상점 아이디인지 검증
+            if (!verifier.isPresentStoreId(uid))
+                throw new BaseException(INVALID_STORE_ID); // /3001/존재하지 않는 상점 id 입니다.
+            // 접속 가능한 채팅방인지 검증
+            if (!chatProvider.isAccessableRoom(uid, roomId))
+                throw new BaseException(INVALID_ROOM_ID);
+
+
+            return new BaseResponse<>(chatService.patchDealInfo(uid, id, patchDealInfoReq));
+        } catch (BaseException exception) {
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
 //    /**
 //     * 계좌 거래 취소
 //     * [PATCH] /bungae/chat/:roomId/account ? id=

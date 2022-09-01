@@ -42,6 +42,7 @@ import static com.example.demo.config.BaseResponseStatus.*;
     /**
      * 채팅방 목록 조회
      */
+    @Transactional(rollbackFor = BaseException.class)
     public List<GetChatRoomsRes> getChatRoomList(int uid) throws BaseException {
         try {
             // 채팅방 id 리스트 조회
@@ -86,6 +87,7 @@ import static com.example.demo.config.BaseResponseStatus.*;
     /**
      * 최근 채팅 메시지 조회
      */
+    @Transactional(rollbackFor = BaseException.class)
     public List<GetChatRes> getChatHistory(int roomId, int uid, int p) throws BaseException {
         try {
             List<MessageRawInfoModel> messageRawInfoModels = chatDao.getChatHistory(roomId, p);

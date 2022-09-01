@@ -18,17 +18,15 @@ public class OAuthController {
 
     /**
      * 카카오 callback
-     * [GET] /oauth/kakao/callback
+     * [GET] /oauth/kakao
      */
     @ResponseBody
     @GetMapping("/kakao")
     public void kakaoCallback(@RequestParam String code, HttpSession session) {
         System.out.println("code : " + code);
         String access_Token = oAuthService.getKakaoAccessToken(code);
-        System.out.println("access_Token = " + access_Token);
+//        System.out.println("access_Token = " + access_Token);
         oAuthService.getKakaoUserInfo(access_Token);
-
-
 
     }
 

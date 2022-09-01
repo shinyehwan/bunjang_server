@@ -221,11 +221,16 @@ public class StoreDao {
     }
     // 상점 상세 정보 조회
     public GetStoreDetailRes getStoreDetail (int storeId) {
-        String getUserQuery = "select Store.storeName, Store.profileImgUrl, round(avg(Review.star)) as star, Store.contactTime, Store.introduce, Store.policy, Store.precautions\n" +
-                "from Store, Review\n" +
-                "where Review.sellerStoreId = Store.id\n" +
-                "    and Store.id = ?";
+        String getUserQuery = "select Store.storeName, Store.profileImgUrl,\n" +
+                "       A.star\n" +
+                "       ,Store.contactTime, Store.introduce, Store.policy, Store.precautions\n" +
+                "                from Store, (select round(avg(Review.star)) as star\n" +
+                "                                from Store, Review\n" +
+                "                                   where Store.id = Review.sellerStoreId\n" +
+                "                                   and Store.id = ?) A\n" +
+                "                where Store.id = ?";
         int getUserParams = storeId;
+        int getUserParams2 = storeId;
         return this.jdbcTemplate.queryForObject(getUserQuery,
                 (rs, rowNum) -> new GetStoreDetailRes(
                         rs.getString("storeName"),
@@ -236,13 +241,13 @@ public class StoreDao {
                         rs.getString("policy"),
                         rs.getString("precautions")
                         ), // RowMapper(위의 링크 참조): 원하는 결과값 형태로 받기
-                getUserParams); // 한 개의 회원정보를 얻기 위한 jdbcTemplate 함수(Query, 객체 매핑 정보, Params)의 결과 반환
+                getUserParams, getUserParams2); // 한 개의 회원정보를 얻기 위한 jdbcTemplate 함수(Query, 객체 매핑 정보, Params)의 결과 반환
     }
 
     // 상점 정보 변경
     public int modifyStore(int storeId, PatchStoreDetailReq patchStoreDetailReq) {
         String modifyUserNameQuery = "update Store set storeName = ?, profileImgUrl = ?, contactTime = ?, introduce = ?, policy = ?, precautions = ?\n" +
-                "             where id = ?"; // 해당 userIdx를 만족하는 User를 해당 nickname으로 변경한다.
+                "             where id = ?";
         Object[] modifyUserNameParams = new Object[]{patchStoreDetailReq.getStoreName(), patchStoreDetailReq.getProfileImgUrl(), patchStoreDetailReq.getContactTime(), patchStoreDetailReq.getIntroduce(), patchStoreDetailReq.getPolicy(), patchStoreDetailReq.getPrecautions(), storeId};
         return this.jdbcTemplate.update(modifyUserNameQuery, modifyUserNameParams); // 대응시켜 매핑시켜 쿼리 요청(생성했으면 1, 실패했으면 0)
     }

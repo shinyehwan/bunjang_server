@@ -3,6 +3,8 @@ package com.example.demo.src.chat;
 
 import com.example.demo.src.chat.model.*;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -21,6 +23,7 @@ import java.util.List;
 public class ChatDao {
 
     // *********************** 동작에 있어 필요한 요소들을 불러옵니다. *************************
+    final Logger logger = LoggerFactory.getLogger(this.getClass()); // Log 처리부분: Log를 기록하기 위해 필요한 함수입니다.
 
     private JdbcTemplate jdbcTemplate;
 
@@ -343,6 +346,33 @@ public class ChatDao {
         String Query = "UPDATE DirectDeal SET status='deleted' WHERE  status='active' AND id=?";
         this.jdbcTemplate.update(Query, messageId);
     }
+    /**
+     * 계좌정보 수정
+     */
+    public void updateAccountInfo  (int messageId, PatchAccountInfoReq p) {
+        String Query = "UPDATE Account SET owner=?, bankName=?, accountNum=?\n" +
+                "WHERE status='active' AND\n" +
+                "      id =?";
+        this.jdbcTemplate.update(Query, p.getOwner(), p.getBankName(), p.getAccountNum(), messageId);
+    }
+    /**
+     * 배송정보 수정
+     */
+    public void updateAddressInfo  (int messageId, PatchAddressInfoReq p) {
+        String Query = "UPDATE Address SET name=?, phoneNum=?, address=?, addressDetail=?\n" +
+                "WHERE status='active' AND\n" +
+                "      id =?";
+        this.jdbcTemplate.update(Query, p.getName(), p.getPhoneNum(), p.getAddress(), p.getAddressDetail(), messageId);
+    }
+    /**
+     * 직거래정보 수정
+     */
+    public void updateDealInfo  (int messageId, PatchDealInfoReq p) {
+        String Query = "UPDATE DirectDeal SET date=?, location=?, phone=?\n" +
+                "WHERE status='active' AND\n" +
+                "      id =?";
+        this.jdbcTemplate.update(Query, p.getDate(), p.getLocation(), p.getPhoneNum(), messageId);
+    }
 
 
 
@@ -473,12 +503,12 @@ public class ChatDao {
         try {
             String Query = "SELECT productId FROM DirectDeal\n" +
                     "WHERE status='active' AND storeId=? AND id= ?";
-
             return this.jdbcTemplate.queryForObject(Query,
                     (rs,rn)-> rs.getInt("productId"),
                     uid, messageId
             );
         } catch (IncorrectResultSizeDataAccessException error) {
+            logger.error(error.getMessage());
             return 0;
         }
     }

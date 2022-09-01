@@ -25,5 +25,12 @@ public class ValidationRegex {
         Matcher matcher = pattern.matcher(target);
         return matcher.find();    }
 
+    public static boolean isRegexAccount(String target){
+        String regex = "[0-9-]";
+        Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(target);
+        return matcher.find();
+    }
+
 }
 

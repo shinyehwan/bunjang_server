@@ -88,6 +88,13 @@ public enum BaseResponseStatus {
     FOLLOW_DELETE(false,2340,"이미 언팔로우한 계정입니다."),
     STATUS_UNAVAILABE(false,2341,"sale, reserved, closed 형태로만 가능합니다."),
 
+
+
+    // 2400 : 번개톡 관련
+    ACCOUNT_REGEX_ERR(false,2401,"올바르지 않은 계좌번호입니다."),
+    PHONE_REGEX_ERR(false,2402,"올바르지 않은 전화번호입니다."),
+
+
     /**
      * 3000 : Response 오류
      */

@@ -44,6 +44,7 @@ public class ProductService {
     /**
      * 상품 등록
      */
+    @Transactional(rollbackFor = BaseException.class)
     public PostNewProductRes postNewProduct(int uid, PostNewProductReq newProduct) throws BaseException {
         NewProductModel newProductModel = new NewProductModel();
         List<String> checkExistOptions = new ArrayList<>();
@@ -243,6 +244,7 @@ public class ProductService {
     /**
      * 상품 정보 수정
      */
+    @Transactional(rollbackFor = BaseException.class)
     public PostNewProductRes patchNewProduct(int uid, int productId, PostNewProductReq newProduct) throws BaseException {
         String updateQuery = "";
 

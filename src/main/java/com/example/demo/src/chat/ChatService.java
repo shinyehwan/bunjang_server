@@ -115,6 +115,7 @@ public class ChatService {
     /**
      * 상품정보 전송
      */
+    @Transactional(rollbackFor = BaseException.class)
     public PostProductInfoRes sendProcutInfoMessage(int uid, int roomId, int productId) throws BaseException {
         try {
             // 보낼 수 있는 상품인지 확인 : 내 상품 혹은 상대방의 상품인지?
@@ -151,6 +152,7 @@ public class ChatService {
     /**
      * 계좌정보 전송
      */
+    @Transactional(rollbackFor = BaseException.class)
     public PostAccountInfoRes sendAccountInfoMessage(int uid, int roomId, PostAccountInfoReq pInfo) throws BaseException {
         try {
             // 보낼 수 있는 상품인지 확인 : 내 상품 혹은 상대방의 상품인지?
@@ -190,6 +192,7 @@ public class ChatService {
     /**
      * 주소정보 전송
      */
+    @Transactional(rollbackFor = BaseException.class)
     public PostAddressInfoRes sendAddressInfoMessage(int uid, int roomId, PostAddressInfoReq pInfo) throws BaseException {
         try {
             // 보낼 수 있는 상품인지 확인 : 내 상품 혹은 상대방의 상품인지?
@@ -232,6 +235,7 @@ public class ChatService {
     /**
      * 직거래정보 전송
      */
+    @Transactional(rollbackFor = BaseException.class)
     public PostDealInfoRes sendDealInfoMessage(int uid, int roomId, PostDealInfoReq pInfo) throws BaseException {
         try {
             // 보낼 수 있는 상품인지 확인 : 내 상품 혹은 상대방의 상품인지?
@@ -271,6 +275,7 @@ public class ChatService {
     /**
      * 계좌정보 조회하기
      */
+    @Transactional(rollbackFor = BaseException.class)
     public GetAccountInfoRes viewAccountInfoMessage(int uid, int roomId, int messageId) throws BaseException {
         try {
             // todo: validation 내가 조회할 수 있는 정보인지? -> (uid, storeId, roomId) -> 같은 방에 있는지 확인!
@@ -316,6 +321,7 @@ public class ChatService {
     /**
      * 주소정보 조회하기
      */
+    @Transactional(rollbackFor = BaseException.class)
     public GetAddressInfoRes viewAddressInfoMessage(int uid, int roomId, int messageId) throws BaseException {
         try {
             // todo: validation 내가 조회할 수 있는 정보인지? -> (uid, storeId, roomId) -> 같은 방에 있는지 확인!
@@ -362,6 +368,7 @@ public class ChatService {
     /**
      * 직거래정보 조회하기
      */
+    @Transactional(rollbackFor = BaseException.class)
     public GetDealInfoRes viewDealInfoMessage(int uid, int roomId, int messageId) throws BaseException {
         try {
             // todo: validation 내가 조회할 수 있는 정보인지? -> (uid, storeId, roomId) -> 같은 방에 있는지 확인!
@@ -408,6 +415,7 @@ public class ChatService {
     /**
      * 계좌정보 거래 취소하기
      */
+    @Transactional(rollbackFor = BaseException.class)
     public PatchCancelRes delAccountInfoMessage(int uid, int roomId, int messageId) throws BaseException {
         try {
             // (validation) 내가 취소 가능한 데이터인지 확인 - uid, mid 일치하는지 조회
@@ -445,6 +453,7 @@ public class ChatService {
     /**
      * 배송정보 거래 취소하기
      */
+    @Transactional(rollbackFor = BaseException.class)
     public PatchCancelRes delAddressInfoMessage(int uid, int roomId, int messageId) throws BaseException {
         try {
             // (validation) 내가 취소 가능한 데이터인지 확인 - uid, mid 일치하는지 조회
@@ -482,6 +491,7 @@ public class ChatService {
     /**
      * 계좌정보 거래 취소하기
      */
+    @Transactional(rollbackFor = BaseException.class)
     public PatchCancelRes delDealInfoMessage(int uid, int roomId, int messageId) throws BaseException {
         try {
             // (validation) 내가 취소 가능한 데이터인지 확인 - uid, mid 일치하는지 조회
@@ -658,6 +668,7 @@ public class ChatService {
     /**
      * 상품 판매자와 번개톡 시작하기
      */
+    @Transactional(rollbackFor = BaseException.class)
     public PostRoomRes openNewChatRoom (int uid, int productId) throws BaseException {
         // productId -> 상대방 storeId 가져오기
         int storeId;

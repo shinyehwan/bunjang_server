@@ -49,6 +49,7 @@ public class ProductProvider {
     /**
      * 상품 상세정보 조회 - 상품정보
      */
+    @Transactional(rollbackFor = BaseException.class)
     public GetProductRes getProductDetailInfo(int productId) throws BaseException {
         ProductDetailInfoModel productInfoModel;
         try {
@@ -194,7 +195,7 @@ public class ProductProvider {
      * 상품 세부정보 조회
      * [GET] /bungae/product/registration
      */
-
+    @Transactional(rollbackFor = BaseException.class)
      public GetProductRegistrationRes getProductRegiInfo (int uid,int productId) throws BaseException {
          ProductDetailInfoModel productInfoModel;
          try {
@@ -237,6 +238,7 @@ public class ProductProvider {
     /**
      * 카테고리 항목 조회
      */
+    @Transactional(rollbackFor = BaseException.class)
     public List<GetCategoryDepth01Res> getCategoryDepth01 () throws BaseException {
         try {
             // 카테고리 리스트 조회
@@ -257,6 +259,7 @@ public class ProductProvider {
     /**
      * 카테고리 항목 조회 - 세부 카테고리 1
      */
+    @Transactional(rollbackFor = BaseException.class)
     public List<GetCategoryDepth02Res> getCategoryDepth02 (int depth1Id) throws BaseException {
         try {
             List<GetCategoryDepth02Res> getCategoryDepth02ResList = productDao.getCategoryDepth02(depth1Id);
@@ -282,6 +285,7 @@ public class ProductProvider {
     /**
      * 카테고리 항목 조회 - 세부 카테고리 2
      */
+    @Transactional(rollbackFor = BaseException.class)
     public List<GetCategoryDepth03Res> getCategoryDepth03 (int depth1Id, int depth2Id) throws BaseException {
         try {
             // (Validation) 카테고리 아이디 d1 d2 가 일치하는지 확인

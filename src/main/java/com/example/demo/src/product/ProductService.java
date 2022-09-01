@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -482,6 +483,7 @@ public class ProductService {
     /**
      * 해당상품 판매자 팔로우 하기
      */
+    @Transactional(rollbackFor = BaseException.class)
 
     public PostProductFollowRes postProductFollow(int uid, int productId) throws BaseException {
         if (productProvider.checkFollow(uid, productId) == 1) {
@@ -499,7 +501,7 @@ public class ProductService {
     /**
      * 해당상품 판매자 팔로우 취소
      */
-
+    @Transactional(rollbackFor = BaseException.class)
     public PatchProductFollowRes patchProductFollow(int uid, int productId) throws BaseException {
         // 팔로우->언팔로우->팔로우 끝난후 다시 언팔로우 하는 과정에서 문제 발생.
         // 사실 언팔로우는 계속 하여도 상관이없다.
@@ -519,7 +521,7 @@ public class ProductService {
     /**
      * 해당상품 찜하기
      */
-
+    @Transactional(rollbackFor = BaseException.class)
     public PostProductBasketRes postProductBasket(int uid, int productId) throws BaseException {
         if (productProvider.checkBasket(uid, productId) == 1) {
             throw new BaseException(BASKET_EXIST);
@@ -536,7 +538,7 @@ public class ProductService {
     /**
      * 해당상품 찜하기 취소
      */
-
+    @Transactional(rollbackFor = BaseException.class)
     public PatchProductBasketRes patchProductBasket(int uid, int productId) throws BaseException {
         // 찜하기->취소->찜하기 끝난후 다시 찜하는 과정에서 문제 발생.
         // 사실 찜하기 취소는 계속 하여도 상관이없다.
@@ -554,7 +556,7 @@ public class ProductService {
     /**
      * 내 상품 상태변경
      */
-
+    @Transactional(rollbackFor = BaseException.class)
     public PostProductStatusRes postProductStatus(int uid, int productId, PostProductStatusReq postProductStatusReq) throws BaseException {
         try {
             productDao.postProductStatus(uid, productId, postProductStatusReq);

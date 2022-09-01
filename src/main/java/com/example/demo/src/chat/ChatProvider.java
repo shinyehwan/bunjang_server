@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -176,7 +177,7 @@ import static com.example.demo.config.BaseResponseStatus.*;
             return false;
         }
     }
-
+    @Transactional(rollbackFor = BaseException.class)
     public GetChatRoomInfoRes getChatRoomInfo(int uid, int roomId) throws BaseException {
         try {
             GetChatRoomInfoRes getChatRoomInfoRes = chatDao.getChatRoomInfo(uid, roomId);
@@ -185,6 +186,7 @@ import static com.example.demo.config.BaseResponseStatus.*;
             throw new BaseException(DATABASE_ERROR);
         }
     }
+    @Transactional(rollbackFor = BaseException.class)
     public List<GetChatRoomMessageRes> getChatRoomMessage(int roomId) throws BaseException {
         try {
             List<GetChatRoomMessageRes> getChatRoomMessageRes = chatDao.getChatRoomMessage(roomId);
@@ -195,6 +197,7 @@ import static com.example.demo.config.BaseResponseStatus.*;
     }
 
     // 이모티콘 리스트 조회
+    @Transactional(rollbackFor = BaseException.class)
     public List<GetEmoticonListRes> getEmoticonList(int roomId) throws BaseException {
         try {
             List<GetEmoticonListRes> getEmoticonListRes = chatDao.getEmoticonList(roomId);

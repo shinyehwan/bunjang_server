@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -123,6 +124,7 @@ public class ProductProvider {
     /**
      * 상품 상세정보 조회 - 판매자 정보(프로필 정보)
      */
+    @Transactional(rollbackFor = BaseException.class)
     public List<GetProductStoreRes> getProductStore(int productId) throws BaseException {
         try {
             List<GetProductStoreRes> getProductStoreRes = productDao.getProductStore(productId);
@@ -135,6 +137,7 @@ public class ProductProvider {
     /**
      * 상품 상세정보 조회 - 판매자 정보(상품, 후기, 팔로잉, 팔로워 갯수 정보)
      */
+    @Transactional(rollbackFor = BaseException.class)
     public GetProductStoreCountRes getProductStoreCount(int productId) throws BaseException {
         try {
             int productCount = utils.getProductCount(productId);
@@ -151,6 +154,7 @@ public class ProductProvider {
     /**
      * 상품 상세정보 조회 - 판매자 정보(상품 정보)
      */
+    @Transactional(rollbackFor = BaseException.class)
     public List<GetProductStoreProductRes> getProductStoreProduct(int productId) throws BaseException {
         try {
             List<GetProductStoreProductRes> getProductStoreProductRes = productDao.getProductStoreProduct(productId);
@@ -162,6 +166,7 @@ public class ProductProvider {
     /**
      * 상품 상세정보 조회 - 판매자 정보(최근 리뷰 정보)
      */
+    @Transactional(rollbackFor = BaseException.class)
     public List<GetProductStoreReviewRes> getProductStoreReview(int productId) throws BaseException {
         try {
             List<GetProductStoreReviewRes> getProductStoreReviewRes = productDao.getProductStoreReview(productId);
@@ -174,7 +179,7 @@ public class ProductProvider {
     /**
      * 해당 상품 - 관련상품 정보 조회
      */
-
+    @Transactional(rollbackFor = BaseException.class)
     public List<GetProductRelatedRes> getProductRelated(int productId) throws BaseException {
         try {
             List<GetProductRelatedRes> getProductRelatedRes = productDao.getProductRelated(productId);
@@ -189,6 +194,7 @@ public class ProductProvider {
      * 상품 세부정보 조회
      * [GET] /bungae/product/registration
      */
+
      public GetProductRegistrationRes getProductRegiInfo (int uid,int productId) throws BaseException {
          ProductDetailInfoModel productInfoModel;
          try {
@@ -347,6 +353,7 @@ public class ProductProvider {
      * 해당 상품 팔로우 여부 확인
      *
      */
+    @Transactional(rollbackFor = BaseException.class)
     public int checkFollow(int uid, int productId) throws BaseException {
         try {
             return productDao.checkFollow(uid, productId);
@@ -358,6 +365,7 @@ public class ProductProvider {
     /**
      * 해당 상품 팔로우 취소 여부 확인
      */
+    @Transactional(rollbackFor = BaseException.class)
     public int checkFollowFalse(int uid, int productId) throws BaseException {
         try {
             return productDao.checkFollowFalse(uid, productId);
@@ -371,6 +379,7 @@ public class ProductProvider {
      * 해당 상품이 찜하기 등록 여부 확인
      *
      */
+    @Transactional(rollbackFor = BaseException.class)
     public int checkBasket(int uid, int productId) throws BaseException {
         try {
             return productDao.checkBasket(uid, productId);
@@ -382,6 +391,7 @@ public class ProductProvider {
     /**
      * 해당 상품이 찜하기 취소 여부 확인
      */
+    @Transactional(rollbackFor = BaseException.class)
     public int checkBasketFalse(int uid, int productId) throws BaseException {
         try {
             return productDao.checkBasketFalse(uid, productId);

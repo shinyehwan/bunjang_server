@@ -204,7 +204,7 @@ gradle-app.setting
 .classpath
 
 # 로그 파일
-logs
+**/logs/
 
 # 시크릿 파일
 src/main/java/com/example/demo/config/secret

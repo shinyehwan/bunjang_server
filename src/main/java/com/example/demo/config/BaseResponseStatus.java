@@ -88,6 +88,13 @@ public enum BaseResponseStatus {
     FOLLOW_DELETE(false,2340,"이미 언팔로우한 계정입니다."),
     STATUS_UNAVAILABE(false,2341,"sale, reserved, closed 형태로만 가능합니다."),
 
+
+
+    // 2400 : 번개톡 관련
+    ACCOUNT_REGEX_ERR(false,2401,"올바르지 않은 계좌번호입니다."),
+    PHONE_REGEX_ERR(false,2402,"올바르지 않은 전화번호입니다."),
+
+
     /**
      * 3000 : Response 오류
      */
@@ -118,8 +125,8 @@ public enum BaseResponseStatus {
     SEND_NOT_PERMITTED(false, 3401, "이용자가 전송할 수 없는 상품입니다."),
     VIEW_NOT_PERMITTED(false, 3402, "이용자가 조회할 수 없는 상품입니다."),
     MODIFY_NOT_PERMITTED(false, 3403, "이용자가 수정할 수 없는 메시지입니다."),
-    INVALID_MESSAGE_ID(false, 3403, "존재하지 않는 메시지 아이디입니다."),
-    ITS_MY_PRODUCT(false, 3404, "내 상품과는 채팅이 불가능합니다."),
+    INVALID_MESSAGE_ID(false, 3404, "존재하지 않는 메시지 아이디입니다."),
+    ITS_MY_PRODUCT(false, 3405, "내 상품과는 채팅이 불가능합니다."),
 
 
     /**

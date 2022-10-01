@@ -24,6 +24,8 @@ import java.util.Map;
 import static com.example.demo.config.BaseResponseStatus.*;
 
 import static com.example.demo.config.BaseResponseStatus.DATABASE_ERROR;
+import static com.example.demo.utils.ValidationRegex.isRegexAccount;
+import static com.example.demo.utils.ValidationRegex.isRegexPhone;
 
 /**
  * Service란?
@@ -118,11 +120,13 @@ public class ChatService {
     @Transactional(rollbackFor = BaseException.class)
     public PostProductInfoRes sendProcutInfoMessage(int uid, int roomId, int productId) throws BaseException {
         try {
+            // (validation) 존재하는 상품인지 확인
+            if (!verifier.isPresentProductId(productId))
+                throw new BaseException(INVALID_PRODUCT_ID); // 3301|존재하지 않는 상품입니다.
+
             // 보낼 수 있는 상품인지 확인 : 내 상품 혹은 상대방의 상품인지?
             if (!chatProvider.isOurProduct(roomId, productId))
                 throw new BaseException(SEND_NOT_PERMITTED); // 3401|이용자가 전송할 수 없는 상품입니다.
-            // todo: 대표상품 바꾸기!!
-            // todo: 존재하는 상품인지 확인
 
             // 상품 정보 가져오기
             PostProductInfoRes result;
@@ -155,12 +159,13 @@ public class ChatService {
     @Transactional(rollbackFor = BaseException.class)
     public PostAccountInfoRes sendAccountInfoMessage(int uid, int roomId, PostAccountInfoReq pInfo) throws BaseException {
         try {
+            if (!isRegexAccount(pInfo.getAccountNum()))
+                throw new BaseException(ACCOUNT_REGEX_ERR);
+
+
             // 보낼 수 있는 상품인지 확인 : 내 상품 혹은 상대방의 상품인지?
             if (!chatProvider.isMyProduct(uid, pInfo.getProductId()))
                 throw new BaseException(SEND_NOT_PERMITTED); // 3401|이용자가 전송할 수 없는 상품입니다.
-            // todo: 존재하는 상품인지 확인
-            // todo: 입력값 리젝스
-
 
             // 상품 정보 가져오기
             PostAccountInfoRes result;
@@ -195,11 +200,17 @@ public class ChatService {
     @Transactional(rollbackFor = BaseException.class)
     public PostAddressInfoRes sendAddressInfoMessage(int uid, int roomId, PostAddressInfoReq pInfo) throws BaseException {
         try {
+            // 입력값 리젝스
+            if (!isRegexPhone(pInfo.getPhoneNum()))
+                throw new BaseException(PHONE_REGEX_ERR);
+
+            // (validation) 존재하는 상품인지 확인
+            if (!verifier.isPresentProductId(pInfo.getProductId()))
+                throw new BaseException(INVALID_PRODUCT_ID); // 3301|존재하지 않는 상품입니다.
+
             // 보낼 수 있는 상품인지 확인 : 내 상품 혹은 상대방의 상품인지?
             if (!chatProvider.isYourProduct(uid, roomId, pInfo.getProductId()))
                 throw new BaseException(SEND_NOT_PERMITTED); // 3401|이용자가 전송할 수 없는 상품입니다.
-            // todo: 존재하는 상품인지 확인
-            // todo: 입력값 리젝스
 
 
             // 상품 정보 가져오기
@@ -238,11 +249,17 @@ public class ChatService {
     @Transactional(rollbackFor = BaseException.class)
     public PostDealInfoRes sendDealInfoMessage(int uid, int roomId, PostDealInfoReq pInfo) throws BaseException {
         try {
+            // 입력값 리젝스
+            if (!isRegexPhone(pInfo.getPhoneNum()))
+                throw new BaseException(PHONE_REGEX_ERR);
+
+            // (validation) 존재하는 상품인지 확인
+            if (!verifier.isPresentProductId(pInfo.getProductId()))
+                throw new BaseException(INVALID_PRODUCT_ID); // 3301|존재하지 않는 상품입니다.
+
             // 보낼 수 있는 상품인지 확인 : 내 상품 혹은 상대방의 상품인지?
             if (!chatProvider.isOurProduct(roomId, pInfo.getProductId()))
                 throw new BaseException(SEND_NOT_PERMITTED); // 3401|이용자가 전송할 수 없는 상품입니다.
-            // todo: 존재하는 상품인지 확인
-            // todo: 입력값 리젝스
 
 
             // 상품 정보 가져오기
@@ -278,7 +295,6 @@ public class ChatService {
     @Transactional(rollbackFor = BaseException.class)
     public GetAccountInfoRes viewAccountInfoMessage(int uid, int roomId, int messageId) throws BaseException {
         try {
-            // todo: validation 내가 조회할 수 있는 정보인지? -> (uid, storeId, roomId) -> 같은 방에 있는지 확인!
 
             // 계좌정보 불러오기
             GetAccountInfoRes result;
@@ -324,7 +340,6 @@ public class ChatService {
     @Transactional(rollbackFor = BaseException.class)
     public GetAddressInfoRes viewAddressInfoMessage(int uid, int roomId, int messageId) throws BaseException {
         try {
-            // todo: validation 내가 조회할 수 있는 정보인지? -> (uid, storeId, roomId) -> 같은 방에 있는지 확인!
 
             // 주소정보 불러오기
             GetAddressInfoRes result;
@@ -371,7 +386,6 @@ public class ChatService {
     @Transactional(rollbackFor = BaseException.class)
     public GetDealInfoRes viewDealInfoMessage(int uid, int roomId, int messageId) throws BaseException {
         try {
-            // todo: validation 내가 조회할 수 있는 정보인지? -> (uid, storeId, roomId) -> 같은 방에 있는지 확인!
 
             // 계좌정보 불러오기
             GetDealInfoRes result;
@@ -537,8 +551,6 @@ public class ChatService {
             if (productId == 0 )
                 throw new BaseException(MODIFY_NOT_PERMITTED); // 3403|이용자가 수정할 수 없는 메시지입니다.
 
-            // todo: 입력값 리젝스
-
             // 기존 계좌정보 불러오기
             GetAccountInfoRes oldAccount;
             try {
@@ -554,6 +566,10 @@ public class ChatService {
                 pInfo.setBankName(oldAccount.getBankName());
             if (pInfo.getAccountNum() == null || pInfo.getAccountNum().isEmpty())
                 pInfo.setAccountNum(oldAccount.getAccountNum());
+
+            // (validation) 입력값 리젝스
+            if (!isRegexAccount(pInfo.getAccountNum()))
+                throw new BaseException(ACCOUNT_REGEX_ERR);
 
             // 수정하기
             try {
@@ -582,8 +598,6 @@ public class ChatService {
             if (productId == 0 )
                 throw new BaseException(MODIFY_NOT_PERMITTED); // 3403|이용자가 수정할 수 없는 메시지입니다.
 
-            // todo: 입력값 리젝스
-
             // 기존 계좌정보 불러오기
             GetAddressInfoRes oldAddress;
             try {
@@ -601,6 +615,10 @@ public class ChatService {
                 pInfo.setAddress(oldAddress.getAddress());
             if (pInfo.getAddressDetail() == null || pInfo.getAddressDetail().isEmpty())
                 pInfo.setAddressDetail(oldAddress.getAddressDetail());
+
+            // 입력값 리젝스
+            if (!isRegexPhone(pInfo.getPhoneNum()))
+                throw new BaseException(PHONE_REGEX_ERR);
 
             // 수정하기
             try {
@@ -629,8 +647,6 @@ public class ChatService {
             if (productId == 0 )
                 throw new BaseException(MODIFY_NOT_PERMITTED); // 3403|이용자가 수정할 수 없는 메시지입니다.
 
-            // todo: 입력값 리젝스
-
             // 기존 계좌정보 불러오기
             GetDealInfoRes oldDeal;
             try {
@@ -646,6 +662,10 @@ public class ChatService {
                 pInfo.setLocation(oldDeal.getLocation());
             if (pInfo.getPhoneNum() == null || pInfo.getPhoneNum().isEmpty())
                 pInfo.setPhoneNum(oldDeal.getPhoneNum());
+
+            // 입력값 리젝스
+            if (!isRegexPhone(pInfo.getPhoneNum()))
+                throw new BaseException(PHONE_REGEX_ERR);
 
             // 수정하기
             try {
@@ -681,7 +701,7 @@ public class ChatService {
 
         // (validation) 내 상품
         if (storeId == uid)
-            throw new BaseException(ITS_MY_PRODUCT); // 3404|내 상품과는 채팅이 불가능합니다.
+            throw new BaseException(ITS_MY_PRODUCT); // 3405|내 상품과는 채팅이 불가능합니다.
 
         // 이미 생성된 채팅방인지 확인
         int roomId = chatDao.checkExistRoom(uid, storeId);

@@ -238,7 +238,7 @@ public class ProductService {
         }
 
         // 결과 반환
-        return new PostNewProductRes(productId, newProduct.getName()); // TODO: getName db조회후 반환하기
+        return new PostNewProductRes(productId, newProduct.getName());
     }
 
     /**

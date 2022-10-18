@@ -3,9 +3,13 @@
 # Structure
 
 
-# API 명세서 접속링크
+# API Specification
 - [Bunjang - API specification](https://docs.google.com/spreadsheets/d/1xFWkTea2nxwVpAfKPkQA3OhuB2xRzCOQD3YocloCrgI/edit?usp=sharing)
-- [기획서 보드 접속링크](https://www.notion.so/softsquared/B-f746c78fa5c44506bb4144550e51d3ba)
+- [Board](https://www.notion.so/softsquared/B-f746c78fa5c44506bb4144550e51d3ba)
+
+# ERD(AqueryTool)
+- [Bunjang - ERD](URL : https://aquerytool.com/aquerymain/index/?rurl=1788d167-85ad-44bf-b0e5-8869208ff1dd)
+> Password : eylmq0
 
 # 번개장터 개발일지
 템플릿의 저작권은 (주)소프트스퀘어드에 있습니다. 상업적 용도의 사용을 금합니다.

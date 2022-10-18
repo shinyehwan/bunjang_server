@@ -1,7 +1,89 @@
-# 번개장터 B 개발일지
-템플릿의 저작권은 (주)소프트스퀘어드에 있습니다. 상업적 용도의 사용을 금합니다.
-- [API 명세서 접속링크](https://docs.google.com/spreadsheets/d/1xFWkTea2nxwVpAfKPkQA3OhuB2xRzCOQD3YocloCrgI/edit?usp=sharing)
+# Architecture
+![KakaoTalk_Photo_2022-10-17-18-04-52](https://user-images.githubusercontent.com/77479647/196305286-c607bba2-3503-474e-91d3-fbfe2e61879e.png)
+# Structure
+```
+├── 📂 config
+│   ├── 📄 baseResponseStatus.js
+│   ├── 📄 database.js
+│   ├── 📄 express.js
+│   ├── 📄 jwtMiddleware.js
+│   ├── 📄 kakao_config.js
+│   ├── 📄 mail_config.js
+│   ├── 📄 response.js
+│   ├── 📄 secret.js
+│   ├── 📄 sens_config.js
+│   └── 📄 winston.js
+├── 📂 controllers
+│   ├── 📄 kakao_ctrl.js
+│   ├── 📄 mail_ctrl.js
+│   ├── 📄 sens_ctrl.js
+│   └── 📄 user_ctrl.js
+├── 📂 log
+├── 📂 node_modules
+├── 📂 src
+│   └── 📂 app
+│      ├── 📂 Address
+│      │    ├── 📄 addressDao.js
+│      │    ├── 📄 addressController.js
+│      │    ├── 📄 addressProvider.js
+│      │    └── 📄 addressService.js
+│      ├── 📂 admin
+│      │    ├── 📄 adminDao.js
+│      │    ├── 📄 adminController.js
+│      │    ├── 📄 adminProvider.js
+│      │    └── 📄 adminService.js
+│      ├── 📂 Cart
+│      │    ├── 📄 cartDao.js
+│      │    ├── 📄 cartController.js
+│      │    ├── 📄 cartProvider.js
+│      │    └── 📄 cartService.js
+│      ├── 📂 Coupon
+│      │    ├── 📄 couponDao.js
+│      │    ├── 📄 couponController.js
+│      │    ├── 📄 couponProvider.js
+│      │    └── 📄 couponService.js
+│      ├── 📂 Order
+│      │    ├── 📄 orderDao.js
+│      │    ├── 📄 orderController.js
+│      │    ├── 📄 orderProvider.js
+│      │    └── 📄 orderService.js
+│      ├── 📂 Payment
+│      │    ├── 📄 paymentDao.js
+│      │    ├── 📄 paymentController.js
+│      │    ├── 📄 paymentProvider.js
+│      │    └── 📄 paymentService.js
+│      ├── 📂 Review
+│      │    ├── 📄 reviewDao.js
+│      │    ├── 📄 reviewController.js
+│      │    ├── 📄 reviewProvider.js
+│      │    └── 📄 reviewService.js
+│      ├── 📂 Store
+│      │    ├── 📄 storeDao.js
+│      │    ├── 📄 storeController.js
+│      │    ├── 📄 storeProvider.js
+│      │    └── 📄 storeService.js
+│      └── 📂 User
+│           ├── 📄 userDao.js
+│           ├── 📄 userController.js
+│           ├── 📄 userProvider.js
+│           └── 📄 userService.js
+│
+├── 📄 .gitattributes
+├── 📄 .gitignore
+├── 📄 index.js
+├── 📄 package-lock.json
+├── 📄 package.json
+└── 📄 README.md
+```
+
+API 명세서 접속링크
+
+(https://docs.google.com/spreadsheets/d/1xFWkTea2nxwVpAfKPkQA3OhuB2xRzCOQD3YocloCrgI/edit?usp=sharing)
 - [기획서 보드 접속링크](https://www.notion.so/softsquared/B-f746c78fa5c44506bb4144550e51d3ba)
+
+# 번개장터 개발일지
+템플릿의 저작권은 (주)소프트스퀘어드에 있습니다. 상업적 용도의 사용을 금합니다.
+
 
 ## 2022-08-20
 

@@ -3,7 +3,7 @@
 
 # Structure
 <p align="center">
-<img width="70%" alt="스크린샷 2022-10-18 오후 6 36 49" src="https://user-images.githubusercontent.com/77479647/196396977-ad0e7d93-54d4-4bc9-9c78-357c778d9408.png">
+<img width="65%" alt="스크린샷 2022-10-18 오후 6 36 49" src="https://user-images.githubusercontent.com/77479647/196396977-ad0e7d93-54d4-4bc9-9c78-357c778d9408.png">
 </p>
 
 

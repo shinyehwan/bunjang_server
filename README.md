@@ -2,9 +2,9 @@
 ![KakaoTalk_Photo_2022-10-17-18-04-52](https://user-images.githubusercontent.com/77479647/196305286-c607bba2-3503-474e-91d3-fbfe2e61879e.png)
 
 # Structure
-```
-<img width="282" alt="스크린샷 2022-10-18 오후 6 36 49" src="https://user-images.githubusercontent.com/77479647/196394850-ed7a29d9-5474-4726-adc1-496f5f8af0fa.png">
-```
+<img width="282" alt="스크린샷 2022-10-18 오후 6 36 49" src="https://user-images.githubusercontent.com/77479647/196395191-4a3b7d00-ff29-406d-8575-fe945bc86887.png">
+
+
 
 # API Specification
 - [Bunjang - API specification](https://docs.google.com/spreadsheets/d/1xFWkTea2nxwVpAfKPkQA3OhuB2xRzCOQD3YocloCrgI/edit?usp=sharing)

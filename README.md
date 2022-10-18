@@ -8,7 +8,7 @@
 - [Board](https://www.notion.so/softsquared/B-f746c78fa5c44506bb4144550e51d3ba)
 
 # ERD(AqueryTool)
-- [Bunjang - ERD](URL : https://aquerytool.com/aquerymain/index/?rurl=1788d167-85ad-44bf-b0e5-8869208ff1dd)
+- [Bunjang - ERD](https://aquerytool.com/aquerymain/index/?rurl=1788d167-85ad-44bf-b0e5-8869208ff1dd)
 > Password : eylmq0
 
 # 번개장터 개발일지

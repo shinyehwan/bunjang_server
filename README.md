@@ -2,7 +2,9 @@
 ![KakaoTalk_Photo_2022-10-17-18-04-52](https://user-images.githubusercontent.com/77479647/196305286-c607bba2-3503-474e-91d3-fbfe2e61879e.png)
 
 # Structure
-![스크린샷 2022-10-18 오후 6 36 49](https://user-images.githubusercontent.com/77479647/196396451-c63f2487-0454-4b78-a544-c8079629854a.png)
+<p align="center">
+<img width="300" alt="스크린샷 2022-10-18 오후 6 36 49" src="https://user-images.githubusercontent.com/77479647/196396977-ad0e7d93-54d4-4bc9-9c78-357c778d9408.png">
+</p>
 
 
 # API Specification

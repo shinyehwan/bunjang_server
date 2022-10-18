@@ -21,48 +21,47 @@
 ├── 📂 log
 ├── 📂 node_modules
 ├── 📂 src
-│   └── 📂 app
-│      ├── 📂 Address
-│      │    ├── 📄 addressDao.js
-│      │    ├── 📄 addressController.js
-│      │    ├── 📄 addressProvider.js
-│      │    └── 📄 addressService.js
-│      ├── 📂 admin
-│      │    ├── 📄 adminDao.js
-│      │    ├── 📄 adminController.js
-│      │    ├── 📄 adminProvider.js
-│      │    └── 📄 adminService.js
-│      ├── 📂 Cart
-│      │    ├── 📄 cartDao.js
-│      │    ├── 📄 cartController.js
-│      │    ├── 📄 cartProvider.js
-│      │    └── 📄 cartService.js
-│      ├── 📂 Coupon
-│      │    ├── 📄 couponDao.js
-│      │    ├── 📄 couponController.js
-│      │    ├── 📄 couponProvider.js
-│      │    └── 📄 couponService.js
-│      ├── 📂 Order
-│      │    ├── 📄 orderDao.js
-│      │    ├── 📄 orderController.js
-│      │    ├── 📄 orderProvider.js
-│      │    └── 📄 orderService.js
-│      ├── 📂 Payment
-│      │    ├── 📄 paymentDao.js
-│      │    ├── 📄 paymentController.js
-│      │    ├── 📄 paymentProvider.js
-│      │    └── 📄 paymentService.js
-│      ├── 📂 Review
-│      │    ├── 📄 reviewDao.js
-│      │    ├── 📄 reviewController.js
-│      │    ├── 📄 reviewProvider.js
-│      │    └── 📄 reviewService.js
-│      ├── 📂 Store
-│      │    ├── 📄 storeDao.js
-│      │    ├── 📄 storeController.js
-│      │    ├── 📄 storeProvider.js
-│      │    └── 📄 storeService.js
-│      └── 📂 User
+│   ├── 📂 chat
+│   │    ├── 📄 addressDao.js
+│   │    ├── 📄 addressController.js
+│   │    ├── 📄 addressProvider.js
+│   │    └── 📄 addressService.js
+│   ├── 📂 feed
+│   │    ├── 📄 adminDao.js
+│   │    ├── 📄 adminController.js
+│   │    ├── 📄 adminProvider.js
+│   │    └── 📄 adminService.js
+│   ├── 📂 product
+│   │    ├── 📄 cartDao.js
+│   │    ├── 📄 cartController.js
+│   │    ├── 📄 cartProvider.js
+│   │    └── 📄 cartService.js
+│   ├── 📂 social
+│   │    ├── 📄 couponDao.js
+│   │    ├── 📄 couponController.js
+│   │    ├── 📄 couponProvider.js
+│   │    └── 📄 couponService.js
+│   ├── 📂 store
+│   │    ├── 📄 orderDao.js
+│   │    ├── 📄 orderController.js
+│   │    ├── 📄 orderProvider.js
+│   │    └── 📄 orderService.js
+│   ├── 📂 Payment
+│   │    ├── 📄 paymentDao.js
+│   │    ├── 📄 paymentController.js
+│   │    ├── 📄 paymentProvider.js
+│   │    └── 📄 paymentService.js
+│   ├── 📂 Review
+│   │    ├── 📄 reviewDao.js
+│   │    ├── 📄 reviewController.js
+│   │    ├── 📄 reviewProvider.js
+│   │    └── 📄 reviewService.js
+│   ├── 📂 Store
+│   │    ├── 📄 storeDao.js
+│   │    ├── 📄 storeController.js
+│   │    ├── 📄 storeProvider.js
+│   │    └── 📄 storeService.js
+│   └── 📂 User
 │           ├── 📄 userDao.js
 │           ├── 📄 userController.js
 │           ├── 📄 userProvider.js
@@ -76,7 +75,8 @@
 └── 📄 README.md
 ```
 
-- [API 명세서 접속링크](https://docs.google.com/spreadsheets/d/1xFWkTea2nxwVpAfKPkQA3OhuB2xRzCOQD3YocloCrgI/edit?usp=sharing)
+# API 명세서 접속링크
+- [Bunjang - API specification](https://docs.google.com/spreadsheets/d/1xFWkTea2nxwVpAfKPkQA3OhuB2xRzCOQD3YocloCrgI/edit?usp=sharing)
 - [기획서 보드 접속링크](https://www.notion.so/softsquared/B-f746c78fa5c44506bb4144550e51d3ba)
 
 # 번개장터 개발일지

@@ -76,9 +76,7 @@
 └── 📄 README.md
 ```
 
-API 명세서 접속링크
-
-(https://docs.google.com/spreadsheets/d/1xFWkTea2nxwVpAfKPkQA3OhuB2xRzCOQD3YocloCrgI/edit?usp=sharing)
+- [API 명세서 접속링크](https://docs.google.com/spreadsheets/d/1xFWkTea2nxwVpAfKPkQA3OhuB2xRzCOQD3YocloCrgI/edit?usp=sharing)
 - [기획서 보드 접속링크](https://www.notion.so/softsquared/B-f746c78fa5c44506bb4144550e51d3ba)
 
 # 번개장터 개발일지
